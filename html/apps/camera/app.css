@@ -1,0 +1,643 @@
+/* Camera App CSS - Phone Optimized */
+
+/* App Container */
+.camera-app {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+}
+
+/* Camera Viewfinder */
+.camera-viewfinder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Game Canvas */
+.camera-game-canvas {
+    /* Stretch the game render 50% to the left and right (total width 200%) */
+    width: 390%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+
+
+/* Header */
+.camera-header {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    right: 0;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    z-index: 100;
+}
+
+/* Camera Controls Info - Smaller for Phone */
+.camera-controls-info {
+    position: absolute;
+    top: 20px;
+    left: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 10px 12px;
+    z-index: 150;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 10px;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.controls-text {
+    margin-bottom: 5px;
+    opacity: 0.9;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+.controls-key {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-weight: 700;
+    font-size: 9px;
+    color: #007aff;
+    text-shadow: none;
+}
+
+.movement-status {
+    font-size: 10px;
+    font-weight: 600;
+    opacity: 0.8;
+    text-align: center;
+}
+
+.movement-status.enabled {
+    color: #34C759;
+}
+
+.movement-status.disabled {
+    color: #FF6B6B;
+}
+
+
+
+
+/* Grid Lines */
+.camera-grid {
+    position: absolute;
+    top: 104px;
+    left: 0;
+    right: 0;
+    bottom: 180px;
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+.grid-line {
+    position: absolute;
+    background: white;
+    opacity: 0.6;
+}
+
+.grid-line-v1 {
+    left: 33.333%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+}
+
+.grid-line-v2 {
+    left: 66.666%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+}
+
+.grid-line-h1 {
+    top: 33.333%;
+    left: 0;
+    right: 0;
+    height: 1px;
+}
+
+.grid-line-h2 {
+    top: 66.666%;
+    left: 0;
+    right: 0;
+    height: 1px;
+}
+
+/* Focus Ring - Smaller for Phone */
+.focus-ring {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 2px solid #007aff;
+    border-radius: 50%;
+    opacity: 0;
+    transform: scale(1.5);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+.focus-ring.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Camera Instructions - Optimized for Phone */
+.camera-instructions {
+    position: absolute;
+    bottom: 160px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(20px);
+    padding: 10px 20px;
+    border-radius: 16px;
+    opacity: 0.8;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Camera Controls - Phone Optimized */
+.camera-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    gap: 15px;
+    z-index: 100;
+}
+
+/* Shutter Button */
+.camera-shutter-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    position: relative;
+}
+
+.camera-flip-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.camera-flip-button:hover {
+    background: rgba(0, 122, 255, 0.2);
+    border-color: #007aff;
+    transform: scale(1.05);
+    box-shadow: 
+        0 0 15px rgba(0, 122, 255, 0.3),
+        0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+.camera-flip-button:active {
+    transform: scale(0.95);
+}
+
+.camera-flip-icon {
+    width: 20px;
+    height: 20px;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.camera-flip-button:hover .camera-flip-icon {
+    color: #007aff;
+    transform: rotateY(180deg);
+}
+
+.camera-flip-button.selfie-mode {
+    background: rgba(0, 122, 255, 0.3);
+    border-color: #007aff;
+}
+
+.camera-flip-button.selfie-mode .camera-flip-icon {
+    color: #007aff;
+    transform: rotateY(180deg);
+}
+
+.camera-shutter-button {
+    width: 60px;
+    height: 60px;
+    border: 5px solid white;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.camera-flip-button:hover {
+    background: rgba(0, 122, 255, 0.2);
+    border-color: #007aff;
+    transform: scale(1.05);
+    box-shadow: 
+        0 0 15px rgba(0, 122, 255, 0.3),
+        0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+.camera-flip-button:active {
+    transform: scale(0.95);
+}
+
+.camera-flip-icon {
+    width: 24px;
+    height: 24px;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.camera-flip-button:hover .camera-flip-icon {
+    color: #007aff;
+    transform: rotateY(180deg);
+}
+
+.camera-flip-button.selfie-mode {
+    background: rgba(0, 122, 255, 0.3);
+    border-color: #007aff;
+}
+
+.camera-flip-button.selfie-mode .camera-flip-icon {
+    color: #007aff;
+    transform: rotateY(180deg);
+}
+
+.camera-shutter-button {
+    width: 60px;
+    height: 60px;
+    border: 5px solid white;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 
+        0 0 0 2px rgba(0, 0, 0, 0.2),
+        0 4px 12px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.shutter-inner {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.camera-shutter-button:hover {
+    border-color: #007aff;
+    box-shadow: 
+        0 0 0 2px rgba(255, 214, 10, 0.3),
+        0 4px 16px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(255, 214, 10, 0.2);
+}
+
+.camera-shutter-button:active {
+    transform: scale(0.95);
+    border-width: 8px;
+}
+
+.camera-shutter-button:active .shutter-inner {
+    transform: scale(0.85);
+}
+
+.camera-shutter-button.capturing {
+    animation: shutterCapture 0.3s ease;
+}
+
+@keyframes shutterCapture {
+    0% {
+        transform: scale(1);
+        border-color: white;
+    }
+    50% {
+        transform: scale(0.9);
+        border-color: #007aff;
+    }
+    100% {
+        transform: scale(1);
+        border-color: white;
+    }
+}
+
+/* Flashlight Button */
+.camera-flashlight-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0;
+}
+
+.camera-flashlight-button .camera-flashlight-container {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.camera-flashlight-button .camera-flashlight-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.camera-flashlight-button .camera-icon-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.camera-flashlight-button .camera-flashlight-img {
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) invert(1);
+    transition: all 0.2s ease;
+    opacity: 0.8;
+}
+
+/* Hover State */
+.camera-flashlight-button:hover .camera-icon-circle {
+    background: rgba(255, 214, 10, 0);
+    border-color: #007aff;
+    box-shadow: 
+        0 0 15px rgba(255, 214, 10, 0),
+        0 2px 12px rgba(0, 0, 0, 0.4);
+    transform: scale(1.05);
+}
+
+.camera-flashlight-button:hover .camera-flashlight-img {
+    filter: brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(45deg);
+    opacity: 1;
+}
+
+/* Active/Pressed State */
+.camera-flashlight-button:active {
+    transform: scale(0.95);
+}
+
+.camera-flashlight-button:active .camera-icon-circle {
+    transform: scale(0.95);
+}
+
+/* Flashlight ON State */
+.camera-flashlight-button.active .camera-icon-circle {
+    background: rgba(255, 214, 10, 0);
+    border-color: #007aff;
+}
+
+.camera-flashlight-button.active .camera-flashlight-img {
+    filter: brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(45deg);
+    opacity: 1;
+    animation: flashlightGlow 2s ease-in-out infinite alternate;
+}
+
+/* Flashlight Glow Animation */
+@keyframes flashlightGlow {
+    0% {
+        filter: brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(45deg);
+        transform: scale(1);
+    }
+    100% {
+        filter: brightness(0) invert(1) sepia(1) saturate(8) hue-rotate(45deg);
+        transform: scale(1.1);
+    }
+}
+
+
+
+/* Loading Overlay */
+.camera-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    gap: 20px;
+}
+
+.camera-loading.active {
+    display: flex;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Flash Effect */
+.camera-flash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
+    opacity: 0;
+    z-index: 300;
+    pointer-events: none;
+}
+
+.camera-flash.active {
+    animation: flashEffect 0.3s ease;
+}
+
+@keyframes flashEffect {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+    .camera-shutter-button {
+        width: 70px;
+        height: 70px;
+        border-width: 5px;
+    }
+    
+    .shutter-inner {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .camera-flashlight-button {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .camera-flashlight-button .camera-icon-circle {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .camera-flashlight-button .camera-flashlight-img {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .camera-flip-button {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .camera-flip-icon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .camera-shutter-container {
+        gap: 25px;
+    }
+    
+    .camera-instructions {
+        font-size: 14px;
+        padding: 10px 20px;
+        bottom: 200px;
+    }
+    
+    .focus-ring {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .camera-controls-info {
+        top: 15px;
+        right: 15px;
+        padding: 10px 12px;
+        font-size: 11px;
+    }
+    
+    .controls-key {
+        font-size: 9px;
+        padding: 2px 4px;
+    }
+    
+    .movement-status {
+        font-size: 10px;
+    }
+}
+
+
+
+/* Animation for instruction text */
+.camera-instructions {
+    animation: instructionPulse 3s ease-in-out infinite;
+}
+
+@keyframes instructionPulse {
+    0%, 100% {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* Hide instruction after first interaction */
+.camera-app.interacted .camera-instructions {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+    transition: all 0.5s ease;
+}

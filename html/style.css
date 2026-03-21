@@ -1,0 +1,1365 @@
+@font-face {
+    font-family: 'Nunito-Black';
+    src: url('assets/fonts/Nunito-Black.ttf') format('truetype');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+    background: transparent;
+}
+
+/* Prevent text selection and element dragging inside the phone */
+#phone, #phone * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none; /* disable iOS-like callout (safety) */
+}
+
+/* Keep text selection and caret usable inside inputs/textareas/contenteditable */
+#phone input,
+#phone textarea,
+#phone [contenteditable="true"] {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+/* Prevent image/link dragging ghost preview inside phone */
+#phone img,
+#phone a,
+#phone [draggable="true"] {
+    -webkit-user-drag: none;
+}
+
+/* Hide any selection highlight color if a browser still allows selection */
+#phone ::selection { background: transparent; color: inherit; }
+#phone ::-moz-selection { background: transparent; color: inherit; }
+
+#phone-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding: 0 20px 20px 0;
+    pointer-events: none;
+    z-index: 9999;
+    
+    /* Optimierung für scharfe Text-Darstellung bei Skalierung */
+    image-rendering: crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: -moz-crisp-edges;
+    text-rendering: optimizeSpeed;
+    font-smooth: never;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: unset;
+    backface-visibility: hidden;
+    perspective: 1000px;
+    will-change: transform;
+}
+
+
+
+
+
+
+.phone {
+    position: relative;
+    width: 300px;
+    height: 650px;
+    border-radius: 40px;
+    padding: 4px;
+    pointer-events: all;
+    transition: all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    outline: 2px solid #3b354c;      /* äußere Outline */
+    box-shadow: inset 0 0 0 4px #010101,
+                0 0 0 4px #c5bcca;     
+    background: transparent;       
+}
+
+/* Peek Mode: Phone fast unsichtbar lassen, aber leicht erkennbar */
+.phone.peek-transparent {
+    opacity: 0.1 !important; /* ~90% unsichtbar, überschreibt Sichtbarkeitsregeln */
+}
+
+
+
+
+
+/* Kamera-Modus: Nur Phone-Frame wird transparent, Phone-Rahmen bleibt schwarz */
+
+
+.phone-hidden .phone {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.phone-visible .phone {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.phone-frame {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 35px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Power Button - Phone-Style (länglicher Button an der linken Seite) */
+.phone-power-btn {
+    position: absolute;
+    top: 60px;
+    left: -7px;
+    width: 5px;
+    height: 50px;
+    background: linear-gradient(135deg, #000000, #000000);
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    z-index: 10000;
+    transition: all 0.2s ease;
+    border: 1px solid #2a2536;
+    border-left: none;
+    transform: rotate(180deg);
+}
+
+/* Volume Buttons (unter dem Power Button) */
+.phone-volume-btn {
+    position: absolute;
+    left: -7px;
+    width: 5px;
+    height: 40px;
+    background: linear-gradient(135deg, #000000, #000000);
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    z-index: 9999;
+    transition: all 0.2s ease;
+    border: 1px solid #2a2536;
+    border-left: none;
+    transform: rotate(180deg);
+}
+
+.phone-volume-btn:hover {
+    background: linear-gradient(135deg, #5a5468, #4b4558);
+    transform: translateX(1px) rotate(180deg);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2),
+                0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.phone-volume-btn:active {
+    background: linear-gradient(135deg, #3a3448, #2b2538);
+    transform: translateX(-1px) rotate(180deg);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.volume-up-btn { top: 130px; }
+.volume-down-btn { top: 185px; }
+
+/* Volume Indicator Overlay (ähnlich Brightness Bar) */
+.volume-indicator {
+    position: absolute;
+    top: 70px; /* unter der Statusbar */
+    left: 6px; /* leicht näher an den Rahmen */
+    width: 30px; /* genug Platz für 28px Icon + Schatten */
+    height: 150px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s ease;
+    z-index: 2200;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.volume-indicator.show { opacity: 1; }
+
+.volume-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: .9;
+}
+
+.volume-icon-svg { filter: drop-shadow(0 1px 2px rgba(0,0,0,.4)); }
+
+.volume-bar {
+    position: relative;
+    flex: 1;
+    width: 12px;
+    background: #5e5e5ebd; /* wie dunkler Teil der Brightnessbar */
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+.volume-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0%;
+    background: #ececec; /* gleiche helle Farbe wie Brightnessbar */
+    transition: height .18s ease;
+}
+
+.phone-power-btn:hover {
+    background: linear-gradient(135deg, #5a5468, #4b4558);
+    transform: translateX(1px);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2),
+                0 3px 6px rgba(0, 0, 0, 0.4);
+                transform: rotate(180deg);
+}
+
+.phone-power-btn:active {
+    background: linear-gradient(135deg, #3a3448, #2b2538);
+    transform: translateX(-1px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    transform: rotate(180deg);
+}
+
+/* Kamera-Modus: Phone-Frame transparent */
+.phone-frame.camera-mode {
+    background: transparent !important;
+}
+
+/* Kamera-Modus: Power Button anpassen */
+.phone.camera-mode .phone-power-btn {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Status Bar */
+.status-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 33px; /* 28 px */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    z-index: 2000; /* Über allen Apps */
+    pointer-events: none; 
+}
+
+.status-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(80px, 270%); /* 5px weiter nach links (82px - 5px = 77px) */
+    pointer-events: all; /* Brightness Button ist anklickbar */
+}
+
+/* Brightness Control Button */
+.brightness-control-btn {
+    width: 46px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.brightness-control-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+
+}
+
+
+
+
+.brightness-menu {
+    position: absolute;
+    top: -15px; /* 15px weiter nach oben verschoben */
+    left: 50%;
+    transform: translateX(-50%) scale(0.8);
+    width: 110px; /* Auf 150px begrenzt */
+    height: 64px;
+    background: transparent;
+    border-radius: 16px;
+    padding: 0;
+    z-index: 3100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: none;
+    border: none;
+}
+
+
+
+
+
+
+
+
+.brightness-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) scale(1);
+}
+
+.brightness-slider-container {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.brightness-icon {
+    display: none;
+}
+
+.brightness-slider {
+    flex: 1;
+    width: 10px;
+    height: 25px;
+    border-radius: 16px;
+    background: linear-gradient(to right, #ececec 0%, #ececec var(--brightness-percent, 100%), #5e5e5ebd var(--brightness-percent, 100%), #5e5e5ebd 100%);
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.brightness-slider::-webkit-slider-track {
+    background: transparent;
+    height: 50px;
+    border-radius: 16px;
+}
+
+.brightness-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 0px;
+    height: 0px;
+    background: transparent;
+    cursor: pointer;
+    border: none;
+    box-shadow: none;
+}
+
+.brightness-slider::-webkit-slider-thumb:hover {
+    background: transparent;
+    box-shadow: none;
+}
+
+.brightness-slider::-moz-range-thumb {
+    width: 0px;
+    height: 0px;
+    background: transparent;
+    cursor: pointer;
+    border: none;
+    box-shadow: none;
+}
+
+.brightness-slider::-moz-range-thumb:hover {
+    background: transparent;
+    box-shadow: none;
+}
+
+.brightness-slider::-moz-range-track {
+    background: transparent;
+    height: 50px;
+    border-radius: 16px;
+    border: none;
+}
+
+/* Brightness Overlay - für die Abdunkelung */
+.brightness-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0);
+    pointer-events: none;
+    z-index: 1900; /* Unter Status Bar aber über allem anderen */
+    transition: background-color 0.3s ease;
+    border-radius: 25px;
+}
+
+/* Kamera Modus Anpassungen */
+.statusbar-white .brightness-control-btn {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.statusbar-white .brightness-control-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.statusbar-black .brightness-control-btn {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.statusbar-black .brightness-control-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.status-bar.camera-mode .brightness-control-btn {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.status-bar.camera-mode .brightness-control-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+
+
+/* Kamera-Modus: Status Bar komplett transparent */
+.status-bar.camera-mode {
+    background: transparent !important;
+}
+
+.status-bar.camera-mode .status-left,
+.status-bar.camera-mode .status-right {
+    color: white !important;
+}
+
+.status-bar.camera-mode .bar {
+    background: white !important;
+}
+
+.status-bar.camera-mode .airplane-icon {
+    fill: white !important;
+}
+
+.status-bar.camera-mode .battery-background {
+    background: white !important;
+}
+
+.status-bar.camera-mode .battery-outline {
+    border-color: white !important;
+}
+
+.status-bar.camera-mode .battery-outline::after {
+    background: white !important;
+}
+
+.status-left {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.status-right {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: white;
+    font-size: 14px;
+}
+
+.signal-bars {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+}
+
+.bar {
+    width: 3px;
+    background: white;
+    border-radius: 1px;
+}
+
+.bar:nth-child(1) { height: 4px; }
+.bar:nth-child(2) { height: 6px; }
+.bar:nth-child(3) { height: 8px; }
+.bar:nth-child(4) { height: 10px; }
+
+.wifi-icon {
+    font-size: 12px;
+}
+
+/* Airplane Mode Icon */
+.airplane-icon {
+    margin-right: 3px;
+    flex-shrink: 0;
+}
+
+/* Airplane Mode aktiv: Signal-Bars ausblenden */
+.status-right.airplane-mode-active .signal-bars {
+    display: none;
+}
+
+/* Airplane Mode aktiv: Flugzeug anzeigen */
+.status-right.airplane-mode-active .airplane-icon {
+    display: block !important;
+}
+
+/* Statusbar Farb-Themes */
+/* Weiße Statusbar (Standard für Home Screen) */
+.statusbar-white .status-left,
+.statusbar-white .status-right {
+    color: white !important;
+}
+
+.statusbar-white .bar {
+    background: white !important;
+}
+
+.statusbar-white .airplane-icon {
+    fill: #FF8C00 !important;
+}
+
+.statusbar-white .battery-background {
+    background: white !important;
+}
+
+.statusbar-white .battery-outline {
+    border-color: white !important;
+}
+
+.statusbar-white .battery-outline::after {
+    background: white !important;
+}
+
+/* Schwarze Statusbar (für Apps mit hellem Hintergrund) */
+.statusbar-black .status-left,
+.statusbar-black .status-right {
+    color: black !important;
+}
+
+.statusbar-black .bar {
+    background: black !important;
+}
+
+.statusbar-black .airplane-icon {
+    fill: #FF8C00 !important;
+}
+
+.statusbar-black .battery-background {
+    background: black !important;
+}
+
+.statusbar-black .battery-outline {
+    border-color: black !important;
+}
+
+.statusbar-black .battery-outline::after {
+    background: black !important;
+}
+
+
+
+/* Setup Screen - Phone Optimized */
+.setup-screen {
+    position: absolute;
+    top: 0px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #ffffff;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1200;
+    padding: 20px;
+}
+
+.setup-screen.active {
+    display: flex;
+}
+
+.setup-content {
+    text-align: center;
+    color: #333;
+    width: 100%;
+    max-width: 260px;
+}
+
+.sbf-logo {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    margin-bottom: 16px;
+}
+
+.setup-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.setup-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 24px;
+}
+
+.language-options {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    width: 100%;
+}
+
+.language-btn {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    max-width: 120px;
+}
+
+.language-btn:hover {
+    border-color: #007bff;
+    background: #e7f3ff;
+    transform: translateY(-2px);
+}
+
+.language-btn .flag {
+    font-size: 28px;
+}
+
+.language-btn .lang-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.continue-section {
+    margin-top: 24px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.continue-btn {
+    background: #007AFF;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 28px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+    transform: translateY(0);
+}
+
+.continue-btn:hover {
+    background: #0056CC;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+}
+
+.continue-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0, 122, 255, 0.3);
+}
+
+/* .continue-btn.show {
+    animation: slideInFromBottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+} */
+
+@keyframes slideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.language-btn.selected {
+    border-color: #007AFF;
+    background: #E3F2FD;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+}
+
+/* Theme Selection Screen - Phone Optimized */
+.theme-screen {
+    position: absolute;
+    top: 0px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #ffffff;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1200;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    padding: 20px;
+}
+
+.theme-screen.active {
+    display: flex;
+}
+
+.theme-screen.slide-out {
+    animation: slideOutToLeft 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.theme-content {
+    text-align: center;
+    color: #333;
+    width: 100%;
+    max-width: 260px;
+}
+
+/* Player Limit Screen - Design wie SBF Info App */
+.player-limit-screen {
+    position: absolute;
+    top: 0px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #1c1c1e;
+    display: none;
+    flex-direction: column;
+    z-index: 1250;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    --background-primary: #1c1c1e;
+    --background-secondary: #2c2c2e;
+    --text-primary: #ffffff;
+    --text-secondary: #86868b;
+}
+
+.player-limit-screen.active {
+    display: flex;
+}
+
+.limit-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 16px;
+    padding-top: 60px;
+    padding-bottom: 8px;
+}
+
+.limit-logo-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 8px 0;
+}
+
+.limit-logo {
+    max-width: 200px;
+    width: 65%;
+    height: auto;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+    transition: transform 0.3s ease;
+}
+
+.limit-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: center;
+}
+
+.limit-text-block {
+    padding: 4px 0;
+    text-align: center;
+}
+
+.limit-text {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #ffffff;
+    font-weight: 400;
+    text-align: center;
+}
+
+.limit-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ff3b30;
+    margin-bottom: 8px;
+}
+
+.limit-discord-section {
+    padding: 4px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.limit-discord-link {
+    color: #007aff;
+    text-decoration: underline;
+    font-size: 12px;
+    font-weight: 500;
+    word-break: break-all;
+    padding: 4px 0;
+    transition: all 0.2s ease;
+    text-align: center;
+    cursor: pointer;
+}
+
+.limit-discord-link:hover {
+    color: #0051d5;
+}
+
+.theme-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.theme-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 24px;
+}
+
+.theme-options {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 24px;
+    width: 100%;
+}
+
+.theme-btn {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    max-width: 120px;
+    position: relative;
+}
+
+.theme-btn:hover {
+    border-color: #007bff;
+    background: #e7f3ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+}
+
+.theme-btn.selected {
+    border-color: #007AFF;
+    background: #E3F2FD;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 122, 255, 0.3);
+}
+
+.theme-preview {
+    width: 60px;
+    height: 90px;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.theme-btn:hover .theme-preview {
+    transform: scale(1.05);
+}
+
+.dark-preview {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.light-preview {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.preview-screen {
+    width: 100%;
+    height: 85%;
+    position: relative;
+}
+
+.dark-preview .preview-screen {
+    background: linear-gradient(135deg, #0f3460 0%, #0e6ba8 100%);
+}
+
+.light-preview .preview-screen {
+    background: linear-gradient(135deg, #ffffff 0%, #f1f3f4 100%);
+}
+
+.preview-dots {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 3px;
+}
+
+.preview-dots span {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    display: block;
+}
+
+.dark-preview .preview-dots span {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.light-preview .preview-dots span {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.theme-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.finish-section {
+    margin-top: 16px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.finish-btn {
+    background: #007AFF;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 28px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 160px;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+    transform: translateY(0);
+}
+
+.finish-btn:hover {
+    background: #0056CC;
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+.finish-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0, 122, 255, 0.3);
+}
+
+/* .finish-btn.show {
+    animation: slideInFromBottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+} */
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutToLeft {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+
+/* Lock Screen */
+.lock-screen {
+    position: absolute;
+    top: 24px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1100;
+    opacity: 1;
+    visibility: visible;
+}
+
+.lock-screen.swipe-up {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.lock-screen.hidden {
+    display: none !important;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.time-display {
+    margin-bottom: auto;
+    margin-top: 60px;
+}
+
+.main-time {
+    font-family: 'Nunito-Black', sans-serif;
+    font-size: 60px;
+    font-weight: 900;
+    line-height: 1;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.main-date {
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0.9;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Bottom Icons */
+.bottom-icons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 0px;
+    margin-bottom: 25px;
+}
+
+.bottom-icon {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.bottom-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Im Lockscreen kein Zoom-Effekt auf den Bottom-Icons */
+.lock-screen .bottom-icon:hover {
+    transform: none;
+}
+
+.icon-circle {
+    width: 45px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+/* Nudge left icon a bit inward */
+.bottom-icon.flashlight .icon-circle {
+    left: 20px;
+}
+
+/* Nudge right icon a bit inward */
+.bottom-icon.camera .icon-circle {
+    right: 20px;
+}
+
+.icon-circle:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.icon-circle.active {
+    background: rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+}
+
+.icon-circle.active:hover {
+    background: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Position: left = flashlight, right = camera */
+.bottom-icon.flashlight { align-self: flex-start; }
+.bottom-icon.camera { margin-left: auto; margin-right: 0px; }
+
+/* Hide lock screen UI when camera opened from lock */
+.lock-screen.camera-active .time-display,
+.lock-screen.camera-active .bottom-icons,
+.lock-screen.camera-active .home-indicator {
+    opacity: 0;
+    visibility: hidden;
+}
+
+
+
+/* Home Indicator - bleibt immer sichtbar */
+.home-indicator {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 1400; /* Über Home Screen aber unter Status Bar */
+}
+
+.home-indicator:hover {
+    background: rgb(255, 255, 255);
+}
+
+.home-indicator:active {
+    transform: translateX(-50%) scale(0.95);
+}
+
+/* Battery Indicator */
+.battery-container {
+    position: relative;
+    width: 20px;
+    height: 10px;
+}
+
+.battery-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 10px;
+    background: #ffffff;
+    border-radius: 3px;
+}
+    
+
+
+.battery-outline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 10px;
+    border: 1px solid white;
+    border-radius: 3px;
+}
+
+.battery-outline::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: -4px;
+    width: 2px;
+    height: 4px;
+    background: white;
+    border-radius: 0 2px 2px 0;
+}
+
+/* Animations */
+@keyframes slideInUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutDown {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+.phone.slide-in {
+    animation: slideInUp 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.phone.slide-out {
+    animation: slideOutDown 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* App Notifications */
+.app-notifications-container {
+    position: absolute; /* inside phone */
+    top: 20px;
+    right: 20px;
+    z-index: 1600; /* above content, below status bar (2000) */
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 350px;
+}
+
+.app-notification {
+    background: rgba(28, 28, 30, 0.92); /* dark default */
+    border-radius: 12px;
+    padding: 16px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    pointer-events: auto;
+    /* no backdrop blur */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.app-notification-show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.app-notification-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.app-notification-icon {
+    font-size: 16px;
+    font-weight: bold;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.app-notification-message {
+    flex: 1;
+    line-height: 1.4;
+}
+
+/* Notification types */
+/* Tone down colors; keep subtle badges */
+.app-notification-success { border-color: rgba(52, 199, 89, 0.25); }
+.app-notification-error { border-color: rgba(255, 59, 48, 0.25); }
+.app-notification-warning { border-color: rgba(255, 149, 0, 0.25); }
+.app-notification-info { border-color: rgba(0, 122, 255, 0.25); }
+
+.theme-light .app-notification {
+    background: rgba(255, 255, 255, 0.92);
+    color: #111;
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.theme-dark .app-notification {
+    background: rgba(28, 28, 30, 0.92);
+    color: #fff;
+}
+
+/* Phone Size Scaling - Scharfe Text-Darstellung */
+#phone-container.scaled {
+    /* Verbesserte Rendering-Performance für skalierte Inhalte */
+    transform-style: preserve-3d;
+    
+    /* Schärfere Texte bei verschiedenen Skalierungen */
+    filter: contrast(1.01);
+}
+
+/* Zoom-basierte Skalierung (schärfer als transform) */
+#phone-container[style*="zoom"] {
+    /* Reset transform properties when using zoom */
+    transform: none !important;
+    transform-origin: initial !important;
+}
+
+#phone-container.scaled * {
+    /* Verhindere Unschärfe bei transformierten Elementen */
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+    
+    /* Verbesserte Klarheit für alle Elemente */
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+
+/* Spezielle Optimierungen für Text-Elemente */
+#phone-container.scaled .home-time,
+#phone-container.scaled .app-name,
+#phone-container.scaled .status-text,
+#phone-container.scaled h1, #phone-container.scaled h2, #phone-container.scaled h3,
+#phone-container.scaled p, #phone-container.scaled span, #phone-container.scaled div {
+    /* Scharfe Textdarstellung forcieren */
+    font-kerning: auto;
+    text-rendering: optimizeLegibility;
+    -webkit-font-feature-settings: "kern" 1;
+    font-feature-settings: "kern" 1;
+}
+
+
+

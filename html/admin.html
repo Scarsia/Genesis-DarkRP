@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Genesis Phone Admin</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0d0d0f;color:#e5e5ea;overflow:hidden}
+.admin{display:flex;height:100vh}.sidebar{width:210px;background:#1c1c1e;border-right:1px solid rgba(255,255,255,0.06);padding:16px 0;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-logo{padding:12px 16px 20px;font-size:16px;font-weight:800;color:#FF3B30}.sidebar-logo span{color:#8e8e93;font-weight:400;font-size:11px;display:block;margin-top:2px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;color:#8e8e93;font-size:13px;font-weight:500;transition:all 0.15s;border-left:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:#fff}.nav-item.active{color:#fff;background:rgba(255,59,48,0.08);border-left-color:#FF3B30}
+.nav-item svg{width:18px;height:18px;flex-shrink:0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.header{padding:16px 24px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.header h1{font-size:20px;font-weight:700}.close-btn{background:none;border:none;color:#8e8e93;cursor:pointer;font-size:20px;padding:4px 8px}
+.content{flex:1;overflow-y:auto;padding:20px 24px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:linear-gradient(145deg,rgba(28,28,30,0.9),rgba(20,20,22,0.95));border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px}
+.stat-card .sv{font-size:26px;font-weight:700;color:#fff}.stat-card .sl{font-size:10px;color:#8e8e93;margin-top:3px;text-transform:uppercase;letter-spacing:0.5px}
+.tw{background:rgba(28,28,30,0.5);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;padding:8px 12px;background:rgba(255,255,255,0.03);color:#8e8e93;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.03);vertical-align:middle}tr:hover td{background:rgba(255,255,255,0.02)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}.dot-on{background:#34C759}.dot-off{background:#636366}
+.btn{padding:5px 10px;border:none;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.btn-red{background:rgba(255,59,48,0.15);color:#FF3B30}.btn-blue{background:rgba(0,122,255,0.15);color:#007AFF}
+.btn-green{background:rgba(52,199,89,0.15);color:#34C759}.btn-purple{background:rgba(175,82,222,0.15);color:#AF52DE}
+.btn-orange{background:rgba(255,149,0,0.15);color:#FF9500}.btn-cyan{background:rgba(0,199,190,0.15);color:#00C7BE}
+.sb{padding:8px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#fff;font-size:12px;outline:none;width:220px;margin-bottom:12px}
+.st{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.feed{max-height:250px;overflow-y:auto}.feed-item{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.03);font-size:11px;display:flex;gap:6px;align-items:center}
+.tag{padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;flex-shrink:0}
+.tag-sms{background:rgba(0,122,255,0.15);color:#007AFF}.tag-call{background:rgba(52,199,89,0.15);color:#34C759}.tag-spy{background:rgba(255,149,0,0.15);color:#FF9500}
+.tab-content{display:none}.tab-content.active{display:block}
+.modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:100;display:flex;align-items:center;justify-content:center}
+.modal{background:#1c1c1e;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:20px;width:360px;max-height:80vh;overflow-y:auto}
+.modal h3{font-size:15px;margin-bottom:14px}.modal input,.modal textarea{width:100%;padding:9px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:13px;outline:none;margin-bottom:10px;font-family:inherit}
+.modal textarea{resize:none;min-height:60px}.modal .mb{display:flex;gap:8px;justify-content:flex-end}
+.copyright{padding:12px;text-align:center;color:#636366;font-size:9px;margin-top:auto}
+/* Toast notifications */
+.toast-container{position:fixed;top:16px;right:16px;z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:rgba(30,30,30,0.95);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:10px;opacity:0;transform:translateX(30px);transition:all 0.3s;pointer-events:all;min-width:250px}
+.toast.show{opacity:1;transform:translateX(0)}.toast-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.toast-success .toast-icon{background:rgba(52,199,89,0.2)}.toast-error .toast-icon{background:rgba(255,59,48,0.2)}.toast-info .toast-icon{background:rgba(0,122,255,0.2)}
+.toast-body{flex:1}.toast-title{font-size:12px;font-weight:600;color:#fff}.toast-msg{font-size:11px;color:#8e8e93;margin-top:1px}
+/* Spy mode indicator */
+.spy-indicator{position:fixed;bottom:16px;right:16px;background:rgba(255,149,0,0.15);border:1px solid rgba(255,149,0,0.3);border-radius:20px;padding:6px 14px;font-size:11px;color:#FF9500;font-weight:600;display:none;z-index:50;animation:spyPulse 2s infinite}
+@keyframes spyPulse{0%,100%{opacity:1}50%{opacity:0.5}}
+</style>
+</head>
+<body>
+<div class="toast-container" id="toasts"></div>
+<div class="spy-indicator" id="spy-indicator">🔍 MODE ESPION ACTIF</div>
+<div class="admin">
+<div class="sidebar">
+<div class="sidebar-logo">Genesis Phone <span>Panneau d'administration</span></div>
+<div class="nav-item active" data-tab="dashboard" onclick="go('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Tableau de bord</div>
+<div class="nav-item" data-tab="players" onclick="go('players')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Joueurs</div>
+<div class="nav-item" data-tab="tools" onclick="go('tools')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Outils</div>
+<div class="nav-item" data-tab="ads" onclick="go('ads')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1"/></svg>Annonces</div>
+<div class="nav-item" data-tab="wiretaps" onclick="go('wiretaps')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22"/><circle cx="12" cy="20" r="1"/><path d="M8.53 16.11a6 6 0 016.95 0"/></svg>Écoutes</div>
+<div class="copyright">© Walter — Genesis Network</div>
+</div>
+<div class="main">
+<div class="header"><h1 id="pt">Tableau de bord</h1><button class="close-btn" onclick="WLCAdmin.callback('close','{}')">✕</button></div>
+<div class="content">
+<!-- DASHBOARD -->
+<div id="tab-dashboard" class="tab-content active">
+<div class="stats-grid">
+<div class="stat-card"><div class="sv" id="s-users">-</div><div class="sl">Utilisateurs</div></div>
+<div class="stat-card"><div class="sv" id="s-online">-</div><div class="sl">En ligne</div></div>
+<div class="stat-card"><div class="sv" id="s-sms">-</div><div class="sl">SMS</div></div>
+<div class="stat-card"><div class="sv" id="s-calls">-</div><div class="sl">Appels</div></div>
+<div class="stat-card"><div class="sv" id="s-ads">-</div><div class="sl">Annonces</div></div>
+<div class="stat-card"><div class="sv" id="s-wiretaps">-</div><div class="sl">Écoutes</div></div>
+<div class="stat-card"><div class="sv" id="s-dc">-</div><div class="sl">DarkChat</div></div>
+<div class="stat-card"><div class="sv" id="s-services">-</div><div class="sl">Services</div></div>
+</div>
+<div class="st">📡 Flux en direct <button class="btn btn-orange" id="spy-btn" onclick="send('spyToggle',{})">Activer l'espion</button></div>
+<div class="tw"><div class="feed" id="live-feed"><div style="padding:16px;text-align:center;color:#636366;font-size:11px;">Aucune activité interceptée</div></div></div>
+</div>
+
+<!-- PLAYERS -->
+<div id="tab-players" class="tab-content">
+<input type="text" class="sb" id="ps" placeholder="Rechercher un joueur...">
+<div class="tw"><table><thead><tr><th></th><th>Nom</th><th>N°</th><th>SMS</th><th>PIN</th><th>Actions</th></tr></thead><tbody id="pb"></tbody></table></div>
+</div>
+
+<!-- TOOLS -->
+<div id="tab-tools" class="tab-content">
+<div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+<div class="stat-card" style="cursor:pointer" onclick="showBroadcast()">
+<div style="font-size:20px;margin-bottom:6px">📢</div>
+<div style="font-size:14px;font-weight:600;">Diffusion SMS</div>
+<div style="font-size:11px;color:#8e8e93;margin-top:4px">Envoyer un SMS système à tous les joueurs</div>
+</div>
+<div class="stat-card" style="cursor:pointer" onclick="showSendAs()">
+<div style="font-size:20px;margin-bottom:6px">🎭</div>
+<div style="font-size:14px;font-weight:600;">Usurper identité</div>
+<div style="font-size:11px;color:#8e8e93;margin-top:4px">Envoyer un SMS en tant qu'un autre joueur</div>
+</div>
+<div class="stat-card" style="cursor:pointer" onclick="send('spyToggle',{})">
+<div style="font-size:20px;margin-bottom:6px">🔍</div>
+<div style="font-size:14px;font-weight:600;">Mode espion</div>
+<div style="font-size:11px;color:#8e8e93;margin-top:4px">Voir tous les SMS en temps réel</div>
+</div>
+<div class="stat-card" style="cursor:pointer" onclick="showInspect()">
+<div style="font-size:20px;margin-bottom:6px">🔎</div>
+<div style="font-size:14px;font-weight:600;">Inspecter joueur</div>
+<div style="font-size:11px;color:#8e8e93;margin-top:4px">Voir les SMS, appels, notes d'un joueur</div>
+</div>
+</div>
+<div id="tool-result" style="margin-top:16px;"></div>
+</div>
+
+<!-- ADS -->
+<div id="tab-ads" class="tab-content">
+<div class="tw"><table><thead><tr><th>Titre</th><th>Auteur</th><th>Cat.</th><th>Vues</th><th>Date</th><th></th></tr></thead><tbody id="ab"></tbody></table></div>
+</div>
+
+<!-- WIRETAPS -->
+<div id="tab-wiretaps" class="tab-content">
+<div class="st">Nouvelle écoute
+<input type="text" id="wt-phone" placeholder="N° (6 chiffres)" maxlength="6" style="margin-left:auto;padding:5px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#fff;font-size:11px;outline:none;width:120px;">
+<button class="btn btn-green" id="wt-place-btn">Placer</button></div>
+<div class="tw"><table><thead><tr><th>Cible</th><th>N°</th><th>Par</th><th>Statut</th><th>Logs</th><th></th></tr></thead><tbody id="wb"></tbody></table></div>
+</div>
+
+</div></div></div>
+<div id="mc"></div>
+<script>
+var _ac=(window.WLCAdmin&&typeof window.WLCAdmin.callback==='function')?window.WLCAdmin.callback:null;
+function WLC_AdminReceive(j){try{var d=JSON.parse(j),h=_h[d.action];if(h)h.forEach(function(fn){try{fn(d)}catch(e){console.error(e)}});}catch(e){}}
+var _h={};function on(a,fn){if(!_h[a])_h[a]=[];_h[a].push(fn)}
+function send(n,d){if(_ac)_ac(n,JSON.stringify(d||{}))}
+function esc(s){if(!s)return'';var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+// ===== TOAST NOTIFICATIONS =====
+function toast(title,msg,type){
+    var c=document.getElementById('toasts'),el=document.createElement('div');
+    el.className='toast toast-'+(type||'info');
+    var icons={success:'✓',error:'✕',info:'ℹ'};
+    el.innerHTML='<div class="toast-icon"><span style="font-size:14px;">'+(icons[type]||'ℹ')+'</span></div><div class="toast-body"><div class="toast-title">'+esc(title)+'</div><div class="toast-msg">'+esc(msg)+'</div></div>';
+    c.appendChild(el);requestAnimationFrame(function(){el.classList.add('show')});
+    setTimeout(function(){el.classList.remove('show');setTimeout(function(){el.remove()},300)},4000);
+}
+
+// ===== NAVIGATION =====
+var titles={dashboard:'Tableau de bord',players:'Joueurs',tools:'Outils',ads:'Annonces',wiretaps:'Écoutes'};
+function go(t){document.querySelectorAll('.tab-content').forEach(function(e){e.classList.remove('active')});document.querySelectorAll('.nav-item').forEach(function(e){e.classList.remove('active')});document.getElementById('tab-'+t).classList.add('active');document.querySelector('[data-tab="'+t+'"]').classList.add('active');document.getElementById('pt').textContent=titles[t]||t;
+if(t==='dashboard')send('getStats',{});if(t==='players')send('getPlayers',{});if(t==='ads')send('getAllAds',{});if(t==='wiretaps')send('getAllWiretaps',{});}
+
+// ===== DASHBOARD =====
+on('stats',function(m){var d=m.data||{};var map={users:'totalUsers',online:'onlinePlayers',sms:'totalSMS',calls:'totalCalls',ads:'totalAds',wiretaps:'activeWiretaps',dc:'totalDCUsers',services:'totalServiceChats'};for(var k in map){var el=document.getElementById('s-'+k);if(el)el.textContent=d[map[k]]||0;}});
+
+// Live feed (wiretap + spy)
+function addFeedItem(type,text,time){
+    var f=document.getElementById('live-feed');
+    if(f.textContent.indexOf('Aucune')>=0)f.innerHTML='';
+    var el=document.createElement('div');el.className='feed-item';
+    var cls={sms:'tag-sms',call:'tag-call',spy:'tag-spy'}[type]||'tag-sms';
+    el.innerHTML='<span style="color:#636366;font-family:monospace;font-size:10px;">'+esc(time||'')+'</span><span class="tag '+cls+'">'+esc(type).toUpperCase()+'</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(text)+'</span>';
+    f.insertBefore(el,f.firstChild);
+}
+on('wtIntercepted',function(m){var d=m.data||{};addFeedItem(d.type,d.fromPhone+' → '+d.toPhone+(d.message?' : '+d.message:''),d.time);});
+on('spyFeed',function(m){var d=m.data||{};addFeedItem('spy',d.fromPhone+' → '+d.toPhone+' : '+d.message,d.time);});
+on('spyToggled',function(m){var d=m.data||{},el=document.getElementById('spy-indicator'),btn=document.getElementById('spy-btn');if(d.active){el.style.display='block';btn.textContent='Désactiver l\'espion';btn.className='btn btn-red';toast('Mode espion','Tous les SMS sont maintenant visibles','info');}else{el.style.display='none';btn.textContent='Activer l\'espion';btn.className='btn btn-orange';toast('Mode espion','Désactivé','info');}});
+
+// ===== PLAYERS =====
+var _players=[];
+on('players',function(m){_players=m.data||[];renderPlayers()});
+function renderPlayers(){
+    var b=document.getElementById('pb');
+    b.innerHTML=_players.map(function(p){var hp=p.has_pin==='1'||p.has_pin===1;
+    return '<tr><td><span class="dot '+(p.online?'dot-on':'dot-off')+'"></span></td><td>'+esc(p.name)+'</td><td style="font-family:monospace;font-size:11px;">'+esc(p.phone_number||'---')+'</td><td>'+p.smsCount+'</td><td>'+(hp?'<span style="color:#34C759">Oui</span>':'<span style="color:#636366">Non</span>')+'</td><td style="display:flex;gap:3px;flex-wrap:wrap;"><button class="btn btn-purple" onclick="send(\'possessPhone\',{identifier:\''+esc(p.identifier)+'\'})">👁 Posséder</button><button class="btn btn-blue" onclick="showAssign(\''+esc(p.identifier)+'\',\''+esc(p.phone_number||'')+'\')">📱 N°</button><button class="btn btn-cyan" onclick="showSetPIN(\''+esc(p.identifier)+'\',\''+esc(p.name)+'\')">🔒 PIN</button>'+(hp?'<button class="btn btn-blue" onclick="doResetPIN(\''+esc(p.identifier)+'\')">🔓 Reset PIN</button>':'')+'<button class="btn btn-orange" onclick="send(\'getPlayerFull\',{identifier:\''+esc(p.identifier)+'\'});go(\'tools\')">🔎 Inspecter</button><button class="btn btn-red" onclick="doDeletePhone(\''+esc(p.identifier)+'\',\''+esc(p.name)+'\')">🗑 Supprimer</button></td></tr>';}).join('');
+}
+on('playerReset',function(){toast('Joueur','Données réinitialisées','success');send('getPlayers',{})});
+on('pinReset',function(){toast('PIN','Code PIN supprimé','success');send('getPlayers',{})});
+on('pinSet',function(m){var d=m.data||{};if(d.success)toast('PIN','Nouveau PIN défini : '+d.pin,'success');else toast('Erreur','PIN invalide','error');send('getPlayers',{});closeModal()});
+on('phoneDeleted',function(m){var d=m.data||{};if(d.success)toast('Téléphone','Téléphone supprimé — le joueur devra reconfigurer','success');send('getPlayers',{})});
+on('numberAssigned',function(m){var d=m.data||{};if(d.success)toast('Numéro','Numéro attribué avec succès','success');else toast('Erreur',d.error==='number_taken'?'Numéro déjà pris':'Erreur','error');send('getPlayers',{});closeModal()});
+on('phonePossessed',function(m){var d=m.data||{};if(!d.success)toast('Erreur','Impossible de posséder: '+(d.error||'inconnu'),'error')});
+on('smsSentAs',function(m){var d=m.data||{};if(d.success)toast('SMS','SMS envoyé avec succès','success');else toast('Erreur','Cible invalide','error');closeModal()});
+on('broadcastSent',function(m){var d=m.data||{};if(d.success)toast('Diffusion','SMS envoyé à '+d.count+' joueurs','success');closeModal()});
+document.getElementById('ps').addEventListener('input',function(){var q=this.value.toLowerCase();document.querySelectorAll('#pb tr').forEach(function(r){r.style.display=r.textContent.toLowerCase().indexOf(q)>=0?'':'none'})});
+
+// Player inspection
+on('playerFull',function(m){var d=m.data||{},r=document.getElementById('tool-result');
+    var html='<div class="tw" style="margin-bottom:12px"><div style="padding:10px 12px;font-size:13px;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06)">📱 SMS ('+((d.sms||[]).length)+')</div><div style="max-height:200px;overflow-y:auto">';
+    (d.sms||[]).forEach(function(s){html+='<div style="padding:6px 12px;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.02);display:flex;gap:8px;"><span style="color:#636366;flex-shrink:0;font-family:monospace;">'+(s.from_phone||'?')+'→'+(s.to_phone||'?')+'</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(s.message)+'</span><span style="color:#636366;flex-shrink:0;font-size:10px;">'+esc(s.created_at||'')+'</span></div>'});
+    html+='</div></div>';
+    html+='<div class="tw" style="margin-bottom:12px"><div style="padding:10px 12px;font-size:13px;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06)">📞 Appels ('+((d.calls||[]).length)+')</div><div style="max-height:150px;overflow-y:auto">';
+    (d.calls||[]).forEach(function(c){html+='<div style="padding:6px 12px;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.02);">'+c.direction+' — '+esc(c.other_name||c.other_phone||'?')+' — '+c.status+(c.duration_seconds>0?' ('+c.duration_seconds+'s)':'')+'</div>'});
+    html+='</div></div>';
+    html+='<div class="tw"><div style="padding:10px 12px;font-size:13px;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06)">📝 Notes ('+((d.notes||[]).length)+')</div><div style="max-height:150px;overflow-y:auto">';
+    (d.notes||[]).forEach(function(n){html+='<div style="padding:6px 12px;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.02);"><b>'+esc(n.title||'Sans titre')+'</b> — '+esc((n.content||'').substring(0,80))+'</div>'});
+    html+='</div></div>';
+    r.innerHTML=html;
+});
+
+// ===== MODALS =====
+function showAssign(id,cur){document.getElementById('mc').innerHTML='<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><h3>📱 Attribuer un numéro</h3><input type="text" id="m-num" placeholder="6 chiffres" maxlength="6" value="'+esc(cur)+'"><div class="mb"><button class="btn btn-red" onclick="closeModal()">Annuler</button><button class="btn btn-green" onclick="doAssign(\''+esc(id)+'\')">Attribuer</button></div></div></div>';}
+function doAssign(id){var n=document.getElementById('m-num').value.trim();if(n.length===6)send('assignNumber',{identifier:id,number:n});else toast('Erreur','Le numéro doit faire 6 chiffres','error');}
+function showSetPIN(id,name){document.getElementById('mc').innerHTML='<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><h3>🔒 Définir un PIN pour '+esc(name)+'</h3><input type="text" id="m-pin" placeholder="4 chiffres" maxlength="4"><div class="mb"><button class="btn btn-red" onclick="closeModal()">Annuler</button><button class="btn btn-green" onclick="doSetPIN(\''+esc(id)+'\')">Définir</button></div></div></div>';}
+function doSetPIN(id){var p=document.getElementById('m-pin').value.trim();if(p.length===4&&/^\d{4}$/.test(p))send('setPIN',{identifier:id,pin:p});else toast('Erreur','Le PIN doit être 4 chiffres','error');}
+function doResetPIN(id){send('resetPIN',{identifier:id})}
+function doDeletePhone(id,name){if(confirm('⚠️ SUPPRIMER le téléphone de '+name+' ?\n\nToutes ses données seront effacées et il devra reconfigurer son téléphone.'))send('deletePhone',{identifier:id})}
+function showBroadcast(){document.getElementById('mc').innerHTML='<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><h3>📢 Diffusion SMS</h3><p style="font-size:11px;color:#8e8e93;margin-bottom:10px">Ce message sera envoyé à tous les joueurs connectés avec le préfixe [SYSTÈME]</p><textarea id="m-broadcast" placeholder="Votre message..."></textarea><div class="mb"><button class="btn btn-red" onclick="closeModal()">Annuler</button><button class="btn btn-green" onclick="doBroadcast()">Envoyer à tous</button></div></div></div>';}
+function doBroadcast(){var m=document.getElementById('m-broadcast').value.trim();if(m)send('broadcast',{message:m});else toast('Erreur','Message vide','error');}
+function showSendAs(){document.getElementById('mc').innerHTML='<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><h3>🎭 Envoyer un SMS en tant que...</h3><p style="font-size:11px;color:#8e8e93;margin-bottom:10px">Sélectionnez un joueur source et un destinataire</p><select id="m-from" style="width:100%;padding:8px;background:#2c2c2e;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:12px;margin-bottom:8px;outline:none;">'+_players.map(function(p){return '<option value="'+esc(p.identifier)+'">'+esc(p.name)+' ('+esc(p.phone_number||'?')+')</option>'}).join('')+'</select><input type="text" id="m-to-phone" placeholder="N° destinataire (6 chiffres)" maxlength="6"><textarea id="m-sms-body" placeholder="Message..."></textarea><div class="mb"><button class="btn btn-red" onclick="closeModal()">Annuler</button><button class="btn btn-green" onclick="doSendAs()">Envoyer</button></div></div></div>';}
+function doSendAs(){var f=document.getElementById('m-from').value,t=document.getElementById('m-to-phone').value.trim(),m=document.getElementById('m-sms-body').value.trim();if(f&&t.length===6&&m)send('sendSMSAs',{fromId:f,toPhone:t,message:m});else toast('Erreur','Remplissez tous les champs','error');}
+function showInspect(){document.getElementById('mc').innerHTML='<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><h3>🔎 Inspecter un joueur</h3><select id="m-inspect" style="width:100%;padding:8px;background:#2c2c2e;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:12px;margin-bottom:10px;outline:none;">'+_players.map(function(p){return '<option value="'+esc(p.identifier)+'">'+esc(p.name)+'</option>'}).join('')+'</select><div class="mb"><button class="btn btn-red" onclick="closeModal()">Annuler</button><button class="btn btn-green" onclick="doInspect()">Inspecter</button></div></div></div>';}
+function doInspect(){var id=document.getElementById('m-inspect').value;if(id){send('getPlayerFull',{identifier:id});closeModal();};}
+function closeModal(){document.getElementById('mc').innerHTML=''}
+
+// ===== ADS =====
+on('adsList',function(m){document.getElementById('ab').innerHTML=(m.data||[]).map(function(a){return '<tr><td>'+esc(a.title)+'</td><td>'+esc(a.author_name)+'</td><td>'+esc(a.category)+'</td><td>'+a.views+'</td><td style="font-size:10px;">'+esc(a.created_at)+'</td><td><button class="btn btn-red" onclick="send(\'deleteAd\',{adId:'+a.id+'})">Supprimer</button></td></tr>'}).join('')});
+on('adDeleted',function(){toast('Annonce','Annonce supprimée','success');send('getAllAds',{})});
+
+// ===== WIRETAPS =====
+on('wiretapsList',function(m){document.getElementById('wb').innerHTML=(m.data||[]).map(function(w){var a=w.active==='1'||w.active===1;return '<tr><td>'+esc(w.targetName)+'</td><td style="font-family:monospace;font-size:11px;">'+esc(w.target_phone)+'</td><td>'+esc(w.placed_by_name)+'</td><td>'+(a?'<span style="color:#34C759">Active</span>':'<span style="color:#636366">Inactive</span>')+'</td><td>'+w.logCount+'</td><td>'+(a?'<button class="btn btn-red" onclick="send(\'removeWiretap\',{wiretapId:'+w.id+'})">Retirer</button>':'')+'</td></tr>'}).join('')});
+on('wiretapRemoved',function(){toast('Écoute','Écoute retirée','success');send('getAllWiretaps',{})});
+document.getElementById('wt-place-btn').addEventListener('click',function(){var p=document.getElementById('wt-phone').value.trim();if(p.length===6){send('wtPlace',{phone:p});document.getElementById('wt-phone').value='';}});
+on('wtPlaced',function(m){var d=m.data||{};if(d.success){toast('Écoute','Écoute placée avec succès','success');send('getAllWiretaps',{});}else toast('Erreur',{number_not_found:'Numéro introuvable',already_tapping:'Déjà sur écoute'}[d.error]||'Erreur','error')});
+
+// ===== INIT =====
+window.addEventListener('load',function(){setTimeout(function(){send('ready',{});send('getStats',{})},100)});
+</script>
+</body>
+</html>

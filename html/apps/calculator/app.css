@@ -1,0 +1,142 @@
+/* Responsive Calculator for Phone UI */
+.calculator-app {
+    /* Fill the app viewport */
+    width: 100%;
+    height: 100%;
+    background: #1f1f1f;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0;
+    overflow: hidden;
+    /* Sit flush at the bottom as requested */
+    padding-bottom: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+    /* Sizing variables (overwritten via JS for perfect fit) */
+    --padding-x: 16px;
+    --gap: 10px;
+    --btn-size: 56px;
+    --display-font: 48px;
+}
+
+/* Header is not used on phone – hide to give more space */
+.calculator-header { display: none; }
+
+.calculator-body {
+    flex: 1;
+    padding: 8px var(--padding-x) 0 var(--padding-x);
+    display: flex;
+    flex-direction: column;
+    /* Place display+buttons at the bottom of the available space */
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.calculator-display {
+    background: transparent;
+    border-radius: 0;
+    padding: 8px 0;
+    border: none;
+    margin-bottom: 4px;
+    min-height: calc(var(--btn-size) * 1.2);
+    display: flex;
+    align-items: flex-end;
+}
+
+#calc-display {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: var(--display-font);
+    font-weight: 300;
+    text-align: right;
+    color: #ffffff;
+    outline: none;
+    line-height: 1;
+    letter-spacing: 0.5px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.calculator-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: var(--btn-size);
+    gap: var(--gap);
+    padding-bottom: 25px;
+}
+
+.calc-btn {
+    border: none;
+    border-radius: 50%;
+    font-size: calc(var(--btn-size) * 0.42);
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.08s ease, filter 0.08s ease, background 0.12s ease;
+    height: var(--btn-size);
+    width: var(--btn-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0 auto;
+    flex-shrink: 0;
+}
+
+.calc-btn:hover { transform: scale(1.03); }
+.calc-btn:active { transform: scale(0.97); filter: brightness(0.9); }
+
+.calc-btn-number {
+    background: #333333;
+    color: #ffffff;
+    border: none;
+}
+
+.calc-btn-number:hover { background: #3b3b3b; }
+
+.calc-btn-operator {
+    background: #ff9500;
+    color: #ffffff;
+}
+
+.calc-btn-operator:hover { background: #ffad33; }
+
+.calc-btn-equals {
+    background: #ff9500;
+    color: #ffffff;
+    border-radius: calc(var(--btn-size) / 2);
+    height: auto; /* determined by grid-row span */
+    width: var(--btn-size);
+}
+
+.calc-btn-equals:hover { background: #ffad33; }
+
+.calc-btn-clear {
+    background: #a6a6a6;
+    color: #000000;
+}
+
+.calc-btn-clear:hover { background: #bdbdbd; }
+
+.calc-btn-zero {
+    grid-column: span 2;
+    border-radius: calc(var(--btn-size) / 2);
+    width: calc(var(--btn-size) * 2 + var(--gap));
+    justify-content: flex-start;
+    padding-left: calc(var(--btn-size) * 0.38);
+}
+
+/* App Show Animation (used by phone app wrapper) */
+.app-wrapper { opacity: 0; transform: translateY(14px); transition: all 0.22s ease; }
+.app-wrapper.app-show { opacity: 1; transform: translateY(0); }
+
+/* Active operator highlighting */
+.calc-btn-operator.active { background: #ffffff !important; color: #ff9500 !important; }
+
+/* Ultra-small heights safety fallback */
+@media (max-height: 600px) {
+    .calculator-app { --btn-size: 52px; --display-font: 40px; --gap: 8px; --padding-x: 14px; }
+}
+@media (max-height: 520px) {
+    .calculator-app { --btn-size: 46px; --display-font: 34px; --gap: 6px; --padding-x: 12px; }
+}

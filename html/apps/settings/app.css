@@ -1,0 +1,870 @@
+/* Phone Settings Style Layout */
+.settings-app {
+    width: 100%;
+    height: 100%;
+    background: #f2f2f7;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Main Container - Single Column Layout for Phone */
+.settings-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Main Content Area - Full width for phone */
+.settings-content {
+    flex: 1;
+    background: #f2f2f7;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Content Sections */
+.content-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.content-header {
+    background: #f2f2f7;
+    padding: 25px 16px 5px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    border-bottom: 1px solid #c6c6c8;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.content-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #000000;
+    margin: 0;
+}
+
+.content-body {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+/* Profile Card in Content - Compact for phone */
+.profile-card {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e5e5e7;
+    margin-bottom: 16px;
+}
+
+.profile-avatar-large {
+    margin-right: 16px;
+}
+
+.profile-circle-large {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #007aff, #5ac8fa);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.profile-details {
+    flex: 1;
+}
+
+.profile-name-large {
+    font-size: 18px;
+    font-weight: 700;
+    color: #000000;
+    margin-bottom: 2px;
+}
+
+.profile-subtitle-large {
+    font-size: 14px;
+    color: #8e8e93;
+}
+
+/* SBF Info Button */
+.sbf-info-button {
+    width: 100%;
+    padding: 14px 1px;
+    background: linear-gradient(135deg, #007aff 0%, #5ac8fa 100%);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.sbf-info-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
+}
+
+.sbf-info-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+/* Setting Groups - Compact for phone */
+.setting-group {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e5e5e7;
+    margin-bottom: 16px;
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e5e7;
+    transition: background-color 0.2s ease;
+    min-height: 44px;
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+}
+
+.setting-item.clickable {
+    cursor: pointer;
+}
+
+.setting-item.clickable:hover {
+    background-color: rgba(0, 122, 255, 0.05);
+}
+
+.setting-item.clickable:active {
+    background-color: rgba(0, 122, 255, 0.1);
+}
+
+.setting-item.danger {
+    border-top: 1px solid #ff3b30;
+}
+
+.setting-item.danger:hover {
+    background-color: #ffebeb;
+}
+
+.setting-item.danger .setting-title {
+    color: #ff3b30;
+    font-weight: 500;
+}
+
+.setting-item.danger .setting-description {
+    color: #d70015;
+}
+
+.setting-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.setting-title {
+    font-size: 16px;
+    font-weight: 400;
+    color: #000000;
+    margin-bottom: 2px;
+}
+
+.setting-title-wallpaper {
+    font-size: 16px;
+    font-weight: 600;
+    color: #000000;
+    text-align: center;
+    margin: 8px 0;
+}
+
+.setting-description {
+    font-size: 12px;
+    color: #8e8e93;
+    line-height: 1.3;
+}
+
+.setting-control {
+    display: flex;
+    align-items: center;
+    margin-left: 12px;
+    flex-shrink: 0;
+}
+
+.setting-value {
+    font-size: 14px;
+    color: #8e8e93;
+    margin-right: 4px;
+}
+
+/* Toggle Switches - Slightly smaller for phone */
+.settings-toggle {
+    flex-shrink: 0;
+}
+
+.toggle-input {
+    display: none;
+}
+
+.toggle-slider {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 26px;
+    background-color: #e5e5ea;
+    border-radius: 13px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.toggle-slider:before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: white;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-input:checked + .toggle-slider {
+    background-color: #34c759;
+}
+
+.toggle-input:checked + .toggle-slider:before {
+    transform: translateX(18px);
+}
+
+/* Arrows - Smaller for phone */
+.settings-arrow {
+    color: #c6c6c8;
+    margin-left: 4px;
+    flex-shrink: 0;
+}
+
+.settings-arrow svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Back Button - Compact for phone */
+.back-button {
+    background: none;
+    border: none;
+    color: #007aff;
+    cursor: pointer;
+    padding: 4px;
+    margin-right: 12px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+    background-color: rgba(0, 122, 255, 0.1);
+}
+
+.back-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Language Options - Compact for phone */
+.language-option {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e5e7;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    min-height: 44px;
+}
+
+.language-option:last-child {
+    border-bottom: none;
+}
+
+.language-option:hover {
+    background-color: rgba(0, 122, 255, 0.05);
+}
+
+.language-option:active {
+    background-color: rgba(0, 122, 255, 0.1);
+}
+
+.language-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.language-name {
+    font-size: 16px;
+    font-weight: 400;
+    color: #000000;
+    margin-bottom: 2px;
+}
+
+.language-native {
+    font-size: 12px;
+    color: #8e8e93;
+}
+
+.language-check {
+    color: #007aff;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+.language-check svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Wallpaper Content - Optimized for phone */
+.current-wallpaper-section {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.current-wallpaper-preview {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 9/16;
+    border: 2px solid #007aff;
+    margin-top: 12px;
+    width: 100%;
+    max-width: 180px;
+}
+
+.current-wallpaper-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.current-wallpaper-name {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.wallpaper-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.wallpaper-option {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid #e5e5e7;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.wallpaper-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #007aff;
+}
+
+.wallpaper-option:active {
+    transform: translateY(0);
+}
+
+.wallpaper-option.selected {
+    border-color: #007aff;
+    border-width: 2px;
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+}
+
+.wallpaper-preview {
+    position: relative;
+    aspect-ratio: 9/16;
+    overflow: hidden;
+}
+
+.wallpaper-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.2s ease;
+}
+
+.wallpaper-option:hover .wallpaper-preview img {
+    transform: scale(1.05);
+}
+
+.wallpaper-check {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 122, 255, 0.9);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.4);
+}
+
+.wallpaper-check svg {
+    width: 16px;
+    height: 16px;
+}
+
+.wallpaper-name {
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #000000;
+    text-align: center;
+    background: #ffffff;
+}
+
+.wallpaper-option.selected .wallpaper-name {
+    color: #007aff;
+    font-weight: 600;
+}
+
+/* Smooth scrolling */
+.settings-content {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* iOS-style scrollbar */
+.settings-content::-webkit-scrollbar {
+    display: none;
+}
+
+.settings-content {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#wallpaper-content .content-body::-webkit-scrollbar {
+    display: block;
+    width: 2px;
+}
+
+#wallpaper-content .content-body::-webkit-scrollbar-track {
+    background: rgb(0, 0, 0);
+    border-radius: 4px;
+    margin: 4px;
+}
+
+#wallpaper-content .content-body::-webkit-scrollbar-thumb {
+    background: rgb(0, 0, 0);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Reset Confirmation Modal - Adjusted for phone */
+.reset-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.modal-content {
+    position: relative;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 20px;
+    margin: 16px;
+    max-width: 260px;
+    width: 100%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.modal-icon {
+    background: #ff3b30;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+}
+
+.modal-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #000000;
+}
+
+.modal-body {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.modal-body p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #8e8e93;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.modal-button {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.cancel-button {
+    background: #f2f2f7;
+    color: #007aff;
+}
+
+.cancel-button:hover {
+    background: #e5e5ea;
+}
+
+.cancel-button:active {
+    background: #d1d1d6;
+    transform: scale(0.98);
+}
+
+.confirm-button {
+    background: #ff3b30;
+    color: white;
+}
+
+.confirm-button:hover {
+    background: #e60000;
+}
+
+.confirm-button:active {
+    background: #cc0000;
+    transform: scale(0.98);
+}
+.settings-app.dark-mode {
+    background: #1c1c1e;
+    color: #ffffff;
+}
+
+.settings-app.dark-mode .settings-sidebar {
+    background: #2c2c2e;
+    border-right: 1px solid #38383a;
+}
+
+.settings-app.dark-mode .settings-search {
+    background: #2c2c2e;
+    border-bottom: 1px solid #38383a;
+}
+
+.settings-app.dark-mode .search-container {
+    background: #1c1c1e;
+    border: 1px solid #38383a;
+}
+
+.settings-app.dark-mode #settings-search-input {
+    color: #ffffff;
+}
+
+.settings-app.dark-mode #settings-search-input::placeholder {
+    color: #8e8e93;
+}
+
+.settings-app.dark-mode .sidebar-nav {
+    background: #2c2c2e;
+}
+
+
+
+.settings-app.dark-mode .sidebar-item:hover {
+    background-color: #3a3a3c;
+}
+
+.settings-app.dark-mode .profile-name {
+    color: #ffffff;
+}
+
+.settings-app.dark-mode .category-item .settings-label {
+    color: #ffffff;
+}
+
+.settings-app.dark-mode .settings-content {
+    background: #1c1c1e;
+}
+
+.settings-app.dark-mode .content-header {
+    background: #1c1c1e;
+    border-bottom: 1px solid #38383a;
+}
+
+.settings-app.dark-mode .content-header h3 {
+    color: #ffffff;
+}
+
+.settings-app.dark-mode .profile-card {
+    background: #2c2c2e;
+    border: 1px solid #38383a;
+}
+
+.settings-app.dark-mode .profile-name-large {
+    color: #ffffff;
+}
+
+.settings-app.dark-mode .setting-group {
+    background: #2c2c2e;
+    border: 1px solid #38383a;
+}
+
+.settings-app.dark-mode .setting-item {
+    border-bottom: 1px solid #38383a;
+}
+
+.settings-app.dark-mode .setting-item.clickable:hover {
+    background-color: #3a3a3c;
+}
+
+.settings-app.dark-mode .setting-item.clickable:active {
+    background-color: #48484a;
+}
+
+.settings-app.dark-mode .setting-title {
+    color: #ffffff;
+}
+
+
+/* Dark Mode Styles */
+.settings-app.dark-mode {
+    background: #1c1c1e;
+    color: #ffffff;
+}
+
+.settings-app.dark-mode .settings-content {
+    background: #1c1c1e;
+}
+
+.settings-app.dark-mode .content-header {
+    background: #1c1c1e;
+    border-bottom: 1px solid #38383a;
+}
+
+.settings-app.dark-mode .content-header h3 {
+    color: #ffffff;
+}
+
+.settings-app.dark-mode .profile-card {
+    background: #1c1c1e;
+    border: 1px solid #38383a;
+}
+
+.settings-app.dark-mode .profile-name-large {
+    color: #ffffff;
+}
+
+.settings-app.dark-mode .setting-group {
+    background: #1c1c1e;
+    border: 1px solid #38383a;
+}
+
+.settings-app.dark-mode .setting-item {
+    border-bottom: 1px solid #38383a;
+}
+
+.settings-app.dark-mode .setting-item.clickable:hover {
+    background-color: #2c2c2e;
+}
+
+.settings-app.dark-mode .setting-item.clickable:active {
+    background-color: #3a3a3c;
+}
+
+.settings-app.dark-mode .setting-title {
+    color: #ffffff;
+}
+
+.settings-app.dark-mode .setting-title-wallpaper {
+    color: #ffffff;
+}
+
+.settings-app.dark-mode .setting-description {
+    color: #8e8e93;
+}
+
+.settings-app.dark-mode .setting-value {
+    color: #8e8e93;
+}
+
+.settings-app.dark-mode .language-option:hover {
+    background-color: #2c2c2e;
+}
+
+.settings-app.dark-mode .language-option:active {
+    background-color: #3a3a3c;
+}
+
+.settings-app.dark-mode .language-name {
+    color: #ffffff;
+}
+
+.settings-app.dark-mode .language-native {
+    color: #8e8e93;
+}
+
+.settings-app.dark-mode .wallpaper-option {
+    background: #1c1c1e;
+}
+
+.settings-app.dark-mode .wallpaper-name {
+    background: #1c1c1e;
+    color: #ffffff;
+}
+
+.settings-app.dark-mode .current-wallpaper-name {
+    color: #ffffff;
+}
+
+.settings-app.dark-mode .modal-content {
+    background: #1c1c1e;
+}
+
+.settings-app.dark-mode .modal-header h3 {
+    color: #ffffff;
+}
+
+.settings-app.dark-mode .modal-body p {
+    color: #8e8e93;
+}
+
+.settings-app.dark-mode .cancel-button {
+    background: #2c2c2e;
+    color: #007aff;
+}
+
+.settings-app.dark-mode .cancel-button:hover {
+    background: #3a3a3c;
+}
+
+.settings-app.dark-mode .cancel-button:active {
+    background: #48484a;
+}

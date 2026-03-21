@@ -1,0 +1,320 @@
+/* Call UI - Inside Phone Screen */
+.call-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    z-index: 1800; /* Unter Status Bar (2000) und Dynamic Island (2500) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+    border-radius: inherit;
+    overflow: hidden;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.call-overlay.minimized {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.95);
+}
+
+.call-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px 80px;
+}
+
+.call-incoming,
+.call-outgoing,
+.call-active {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Avatar */
+.call-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 60px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 24px;
+    animation: pulse 2s infinite;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.call-avatar.has-photo {
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+    }
+}
+
+/* Name & Status */
+.call-name {
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 8px 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+.call-status {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 0 60px 0;
+    font-weight: 400;
+}
+
+/* Call Actions (Accept/Decline/Cancel/End) */
+.call-actions {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    margin-top: auto;
+}
+
+.call-button {
+    width: 70px;
+    height: 70px;
+    border-radius: 35px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.call-button span {
+    position: absolute;
+    bottom: -28px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    color: #ffffff;
+}
+
+.call-accept {
+    background: #34C759 !important;
+}
+
+.call-accept:hover {
+    background: #2fb350 !important;
+    transform: scale(1.05);
+}
+
+.call-accept:active {
+    transform: scale(0.95);
+}
+
+.call-decline,
+.call-end-button {
+    background: #FF3B30 !important;
+}
+
+.call-decline:hover,
+.call-end-button:hover {
+    background: #e6342a !important;
+    transform: scale(1.05);
+}
+
+.call-decline:active,
+.call-end-button:active {
+    transform: scale(0.95);
+}
+
+/* Call Controls (Mute/Speaker) */
+
+/* Light Mode Support */
+.phone-app.light-mode .call-overlay {
+    background: linear-gradient(135deg, #f0f0f5 0%, #e0e0eb 100%);
+}
+
+.phone-app.light-mode .call-name {
+    color: #1d1d1f;
+}
+
+.phone-app.light-mode .call-status {
+    color: rgba(29, 29, 31, 0.6);
+}
+
+.phone-app.light-mode .call-button span,
+
+.phone-app.light-mode .call-avatar {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+
+
+@keyframes ringing {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+    }
+    25% {
+        transform: scale(1.05) rotate(-5deg);
+    }
+    75% {
+        transform: scale(1.05) rotate(5deg);
+    }
+}
+
+/* Timer in Active Call */
+.call-active .call-status {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    margin-bottom: 80px;
+}
+
+/* Call Home Bar */
+.call-home-bar {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    z-index: 100;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.call-home-bar:hover {
+    background: rgba(255, 255, 255, 0.5);
+    height: 6px;
+}
+
+.call-home-bar:active {
+    transform: translateX(-50%) scale(0.95);
+}
+
+.phone-app.light-mode .call-home-bar {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.phone-app.light-mode .call-home-bar:hover {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Minimized Call in Dynamic Island */
+.call-minimized-island {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 25px;
+    background: rgba(0, 0, 0, 0.9); /* Grünes Telefon-Theme */
+    border-radius: 20px;
+    z-index: 3000; /* Deutlich über Dynamic Island (2500) */
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: islandAppear 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.call-minimized-island.active {
+    display: flex;
+}
+
+.call-minimized-island:hover {
+    background: rgba(27, 27, 27, 0.9);
+    width: 115px;
+}
+
+.call-minimized-island:active {
+    transform: translateX(-50%) scale(0.95);
+}
+
+.call-island-icon {
+    width: 14px;
+    height: 14px;
+    color: #16d33f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.call-island-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.call-island-timer {
+    font-size: 11px;
+    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: 0.3px;
+}
+
+/* Responsive for very small phones */
+@media (max-height: 600px) {
+    .call-avatar {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 16px;
+    }
+    
+    .call-name {
+        font-size: 26px;
+        margin-bottom: 6px;
+    }
+    
+    .call-status {
+        font-size: 16px;
+        margin-bottom: 40px;
+    }
+    
+    .call-button {
+        width: 60px;
+        height: 60px;
+    }
+    
+}

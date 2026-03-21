@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis Phone</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="notifications.css">
+    <link rel="stylesheet" href="dynamic-island.css">
+    <link rel="stylesheet" href="apps/phone/call.css">
+    <style>
+        /* CSS custom properties for theming */
+        :root {
+            --phone-bg: #000000;
+            --phone-text: #ffffff;
+            --phone-text-secondary: #8e8e93;
+            --phone-card: rgba(28,28,30,0.8);
+            --phone-accent: #007AFF;
+            --phone-red: #FF3B30;
+            --phone-green: #34C759;
+            --phone-orange: #FF9500;
+        }
+        .phone-frame.theme-dark {
+            background-color: #000;
+        }
+        .phone-frame.theme-light {
+            background-color: #f2f2f7;
+        }
+        .phone-frame.theme-light .status-bar { color: #000; }
+        .phone-frame.theme-light .app-icon-label { color: #000; }
+        .phone-frame.theme-light .home-screen-bar { background: rgba(0,0,0,0.3); }
+        .phone-frame.theme-light .dock-area { background: rgba(255,255,255,0.4); }
+
+        /* Setup screen selected state */
+        .language-btn.selected, .theme-btn.selected {
+            border-color: var(--phone-accent) !important;
+            box-shadow: 0 0 0 2px var(--phone-accent);
+        }
+        .continue-btn, .finish-btn {
+            opacity: 0; transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        .continue-btn.show, .finish-btn.show {
+            opacity: 1; transform: translateY(0);
+        }
+        @keyframes pinShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-12px); }
+            40% { transform: translateX(12px); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(8px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="phone-container" class="phone-hidden">
+        <div id="phone" class="phone">
+            <!-- Power Button -->
+            <div id="phone-power-btn" class="phone-power-btn"></div>
+            <!-- Volume Buttons -->
+            <div id="phone-volume-up" class="phone-volume-btn volume-up-btn" title="Volume Up"></div>
+            <div id="phone-volume-down" class="phone-volume-btn volume-down-btn" title="Volume Down"></div>
+            
+            <!-- Phone Frame -->
+            <div class="phone-frame theme-dark">
+                
+                <!-- Dynamic Island -->
+                <div class="dynamic-island"></div>
+                
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <div class="status-left">
+                        <span id="current-time">00:00</span>
+                    </div>
+                    <div class="status-center">
+                        <div id="brightness-control-btn" class="brightness-control-btn"></div>
+                    </div>
+                    <div class="status-right">
+                        <div class="signal-bars">
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                        </div>
+                        <svg id="airplane-icon" class="airplane-icon" width="14" height="14" viewBox="0 0 24 24" fill="#FF8C00" style="display: none;">
+                            <path d="M21,16V14L13,9V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V9L2,14V16L10,13.5V19L8,20.5V22L11.5,21L15,22V20.5L13,19V13.5L21,16Z"/>
+                        </svg>
+                        <div class="battery-container">
+                            <div class="battery-background"></div>
+                            <div class="battery-outline"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Brightness Control Menu -->
+                <div id="brightness-menu" class="brightness-menu">
+                    <div class="brightness-slider-container">
+                        <input type="range" id="brightness-slider" class="brightness-slider" min="0" max="100" value="100" step="5">
+                    </div>
+                </div>
+                
+                <!-- Brightness Overlay -->
+                <div id="brightness-overlay" class="brightness-overlay"></div>
+
+                <!-- Volume Indicator -->
+                <div id="volume-indicator" class="volume-indicator" aria-hidden="true">
+                    <div class="volume-icon" aria-hidden="true">
+                        <svg class="volume-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="3 9 9 9 13 5 13 19 9 15 3 15"></polygon>
+                            <path d="M17 8a4 4 0 0 1 0 8"></path>
+                            <path d="M21 5a8 8 0 0 1 0 14"></path>
+                        </svg>
+                    </div>
+                    <div class="volume-bar">
+                        <div class="volume-fill" style="height: 50%"></div>
+                    </div>
+                </div>
+                
+                <!-- Setup Screen -->
+                <div id="setup-screen" class="setup-screen">
+                    <div class="setup-content">
+                        <div class="setup-logo">
+                            <img src="assets/img/sbf.png" alt="Logo" class="sbf-logo" />
+                        </div>
+                        <h1 class="setup-title" data-locale="setup.welcome">Bienvenue</h1>
+                        <p class="setup-subtitle" data-locale="setup.chooseLanguage">Choisissez votre langue</p>
+                        
+                        <div class="language-options">
+                            <button class="language-btn" data-lang="en">
+                                <span class="flag">🇺🇸</span>
+                                <span class="lang-text">English</span>
+                            </button>
+                            <button class="language-btn" data-lang="fr">
+                                <span class="flag">🇫🇷</span>
+                                <span class="lang-text">Français</span>
+                            </button>
+                        </div>
+                        
+                        <div class="continue-section">
+                            <button id="continue-btn" class="continue-btn" style="display: none;">
+                                <span class="continue-text" data-locale="setup.continue">Continuer</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Theme Selection Screen -->
+                <div id="theme-screen" class="theme-screen">
+                    <div class="theme-content">
+                        <div class="theme-logo">
+                            <img src="assets/img/sbf.png" alt="Logo" class="sbf-logo" />
+                        </div>
+                        <h1 class="theme-title" data-locale="setup.chooseTheme">Choisir le thème</h1>
+                        <p class="theme-subtitle" data-locale="setup.selectMode">Sélectionnez votre mode</p>
+                        
+                        <div class="theme-options">
+                            <button class="theme-btn" data-theme="dark">
+                                <div class="theme-preview dark-preview">
+                                    <div class="preview-screen"></div>
+                                    <div class="preview-dots"><span></span><span></span><span></span></div>
+                                </div>
+                                <span class="theme-text" data-locale="setup.darkMode">Mode sombre</span>
+                            </button>
+                            <button class="theme-btn" data-theme="light">
+                                <div class="theme-preview light-preview">
+                                    <div class="preview-screen"></div>
+                                    <div class="preview-dots"><span></span><span></span><span></span></div>
+                                </div>
+                                <span class="theme-text" data-locale="setup.lightMode">Mode clair</span>
+                            </button>
+                        </div>
+                        
+                        <div class="finish-section">
+                            <button id="finish-setup-btn" class="finish-btn" style="display: none;">
+                                <span class="finish-text" data-locale="setup.finishSetup">Terminer</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PIN Setup Screen (after first setup) -->
+                <div id="pin-setup-screen" class="setup-screen" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:2500;color:#fff;"></div>
+
+                <!-- PIN Lock Screen (every open if PIN set) -->
+                <div id="pin-lock-screen" class="setup-screen" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:2500;color:#fff;"></div>
+
+                <!-- Home Screen -->
+                <div class="home-screen">
+                    <div class="home-content">
+                        <div class="app-grid">
+                            <!-- Apps rendered by home.js -->
+                        </div>
+                    </div>
+                    
+                    <!-- Dock -->
+                    <div class="dock-area">
+                        <!-- Dock apps rendered by home.js -->
+                    </div>
+                    
+                    <!-- Home Bar -->
+                    <div id="home-screen-bar" class="home-screen-bar"></div>
+                </div>
+
+                <!-- App Container (overlay for open apps) -->
+                <div class="app-container" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sound System -->
+    <div id="soundContainer" class="sound-container" style="position:absolute;top:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none;z-index:-1;"></div>
+    
+    <!-- Error suppression (from original) -->
+    <script>
+        window.addEventListener('error', function(e) {
+            if (e.error && e.error.message && 
+                (e.error.message.includes("Cannot read properties of null") ||
+                 e.error.message.includes("Cannot read properties of undefined"))) {
+                e.preventDefault();
+                return false;
+            }
+        }, true);
+    </script>
+    
+    <!-- Core Scripts (order matters) -->
+    <script src="bridge.js"></script>
+    <script src="locale-loader.js"></script>
+    <script src="script.js"></script>
+    <script src="home.js"></script>
+    <script src="app-manager.js"></script>
+    <script src="notifications.js"></script>
+    
+    <!-- App Modules -->
+    <script src="apps/calculator/app.js"></script>
+    <script src="apps/phone/app.js"></script>
+    <script src="apps/notes/app.js"></script>
+    <script src="apps/settings/app.js"></script>
+    <script src="apps/darkchat/app.js"></script>
+    <script src="apps/services/app.js"></script>
+    <script src="apps/camera/app.js"></script>
+    <script src="apps/photos/app.js"></script>
+    <script src="apps/lifeinvader/app.js"></script>
+    <script src="apps/appstore/app.js"></script>
+    <script src="call-ui.js"></script>
+    
+    <!-- Sound System -->
+    <script>
+        class SBFSoundSystem {
+            constructor() {
+                this.audioElements = new Map();
+                this.soundsPath = 'assets/sounds/';
+            }
+            playSound(name, loop = false) {
+                try {
+                    this.stopSound();
+                    let audio = this.audioElements.get(name);
+                    if (!audio) {
+                        audio = document.createElement('audio');
+                        audio.preload = 'auto';
+                        audio.src = this.soundsPath + name;
+                        document.getElementById('soundContainer').appendChild(audio);
+                        this.audioElements.set(name, audio);
+                    }
+                    audio.loop = loop;
+                    audio.volume = (window.currentVolume !== undefined ? window.currentVolume / 100 : 1.0);
+                    audio.currentTime = 0;
+                    audio.play().catch(() => {});
+                } catch(e) {}
+            }
+            stopSound() {
+                this.audioElements.forEach(a => { if (!a.paused) { a.pause(); a.currentTime = 0; } });
+            }
+        }
+        window.sbfSoundSystem = new SBFSoundSystem();
+        
+        // Bridge sound handlers
+        WLCBridge.on('playSound', d => window.sbfSoundSystem.playSound(d.soundName, d.loop));
+        WLCBridge.on('stopSound', () => window.sbfSoundSystem.stopSound());
+    </script>
+</body>
+</html>

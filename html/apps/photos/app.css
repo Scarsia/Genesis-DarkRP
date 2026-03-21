@@ -1,0 +1,1407 @@
+.photos-app {
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Header */
+.photos-header {
+    background: rgba(248, 248, 248, 0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 12px;
+    height: 36px;
+    position: relative;
+    z-index: 100;
+    flex-shrink: 0;
+}
+
+.header-left,
+.header-right {
+    min-width: 60px;
+    display: flex;
+}
+
+.header-right {
+    justify-content: flex-end;
+}
+
+.header-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.header-button {
+    background: none;
+    border: none;
+    color: #007aff;
+    font-size: 11px;
+    font-weight: 400;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+    transition: opacity 0.2s ease;
+    padding-left: 3px;
+}
+
+.header-button:hover {
+    opacity: 0.6;
+}
+
+.header-button:active {
+    opacity: 0.3;
+}
+
+/* Selection Actions Bar */
+.selection-actions {
+    background: rgba(248, 248, 248, 0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    height: 36px;
+    position: relative;
+    z-index: 99;
+    flex-shrink: 0;
+}
+
+.selection-info {
+    font-size: 15px;
+    font-weight: 400;
+    color: #000000;
+}
+
+.selection-buttons {
+    display: flex;
+    gap: 16px;
+}
+
+.selection-action-btn {
+    background: none;
+    border: none;
+    color: #007aff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 15px;
+    font-weight: 400;
+    font-family: inherit;
+    transition: opacity 0.2s ease;
+}
+
+.selection-action-btn:hover {
+    opacity: 0.6;
+}
+
+.selection-action-btn:active {
+    opacity: 0.3;
+}
+
+.selection-action-btn.delete-btn {
+    color: #ff3b30;
+}
+
+.photos-body {
+    flex: 1;
+    overflow: hidden;
+    background: #ffffff;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Loading Screen */
+.loading-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    z-index: 10;
+}
+
+.loading-spinner {
+    margin-bottom: 20px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e5e5ea;
+    border-top: 4px solid #007aff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 16px;
+    color: #8e8e93;
+    font-weight: 400;
+}
+
+/* Empty State */
+.empty-state {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    padding: 24px 16px;
+    text-align: center;
+}
+
+.empty-icon {
+    color: #c6c6c8;
+    margin-bottom: 24px;
+    opacity: 0.6;
+}
+
+.empty-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #000000;
+    margin-bottom: 6px;
+}
+
+.empty-message {
+    font-size: 14px;
+    color: #8e8e93;
+    line-height: 1.4;
+    max-width: 250px;
+}
+
+/* Photos Content */
+.photos-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Verhindert dass Inhalt überläuft */
+}
+
+/* Filter Bar */
+.filter-bar {
+    background: #ffffff;
+    border-bottom: 0.5px solid rgba(60, 60, 67, 0.12);
+    padding: 6px 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.filter-tabs {
+    display: flex;
+    background: rgba(118, 118, 128, 0.12);
+    border-radius: 8px;
+    padding: 2px;
+}
+
+.filter-tab {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: rgba(60, 60, 67, 0.6);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 5px 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.filter-tab.active {
+    background: #ffffff;
+    color: #000000;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.photo-count {
+    background: rgba(60, 60, 67, 0.12);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    min-width: 16px;
+    text-align: center;
+}
+
+.filter-tab.active .photo-count {
+    background: rgba(0, 122, 255, 0.12);
+    color: #007aff;
+}
+
+.view-options {
+    display: flex;
+}
+
+/* Photo Grid */
+.photos-grid {
+    flex: 1;
+    padding: 1px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 1px;
+    overflow-y: auto;
+    grid-auto-rows: min-content;
+    align-content: start;
+    contain: layout style;
+    will-change: scroll-position;
+    background: rgba(60, 60, 67, 0.12);
+}
+
+/* Photo Items */
+.photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #ffffff;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.photo-item:hover {
+    transform: scale(1.02);
+    z-index: 10;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.photo-item:active {
+    transform: scale(0.98);
+}
+
+.photo-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+    transition: transform 0.2s ease;
+    will-change: transform;
+    image-rendering: auto;
+}
+
+.photo-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    padding: 6px 8px 8px;
+    color: white;
+    font-size: 10px;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.photo-item:hover .photo-overlay {
+    opacity: 1;
+}
+
+.photo-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.photo-date {
+    font-size: 11px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 1px;
+}
+
+.photo-time {
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Photo Selection */
+.photo-item.selected {
+    border: 3px solid #007aff;
+    box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.3);
+}
+
+.photo-item.selected .photo-image {
+    opacity: 0.8;
+}
+
+.photo-select-indicator {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #007aff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    opacity: 0;
+    transition: all 0.2s ease;
+    border: 2px solid #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.photo-item.selected .photo-select-indicator {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.photo-item:not(.selected) .photo-select-indicator {
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid #ffffff;
+}
+
+/* Selection Mode */
+.photos-body.selection-mode .photo-select-indicator {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid #ffffff;
+}
+
+.photos-body.selection-mode .photo-item.selected .photo-select-indicator {
+    background: #007aff;
+}
+
+/* Photo Detail Modal */
+.photo-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.photos-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 1.0);
+    backdrop-filter: none;
+}
+
+.photos-modal-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    border-radius: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.photos-modal-header {
+
+    color: #000000;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    flex-shrink: 0;
+    min-height: 48px;
+    transform: translateY(16px);
+}
+
+.photos-modal-close {
+    background: rgba(0, 0, 0, 0.08);
+    border: none;
+    color: #007aff;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.photos-modal-close:hover {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.photos-modal-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.photos-modal-action-btn {
+    background: rgba(0, 0, 0, 0.08);
+    border: none;
+    color: #007aff;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.photos-modal-action-btn:hover {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.photos-modal-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background: #ffffff;
+    margin: 0;
+}
+
+/* Navigation Buttons */
+.photo-nav-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.212);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    z-index: 20;
+}
+
+.photo-nav-button:hover {
+    background: rgba(255, 255, 255, 0.548);
+
+}
+
+.photo-nav-button:active {
+    transform: translateY(-50%) scale(0.95);
+    background: rgba(255, 255, 255, 0.548);
+}
+
+.photo-nav-button.prev {
+    left: 12px;
+}
+
+.photo-nav-button.next {
+    right: 12px;
+}
+
+.photo-nav-button:before {
+    content: '';
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+.photo-nav-button.prev:before {
+    border-width: 6px 8px 6px 0;
+    border-color: transparent white transparent transparent;
+    margin-right: 1px;
+}
+
+.photo-nav-button.next:before {
+    border-width: 6px 0 6px 8px;
+    border-color: transparent transparent transparent white;
+    margin-left: 1px;
+}
+
+/* Hide nav buttons when there's only one photo */
+.photo-modal.single-photo .photo-nav-button {
+    display: none;
+}
+
+.photos-modal-image-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+#photos-modal-image {
+    max-width: none;
+    max-height: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    border-radius: 0;
+    display: block;
+    position: relative;
+    left: 0;
+    top: 0;
+}
+
+.photos-modal-info {
+    display: none;
+}
+
+.photos-modal-info .photo-date {
+    display: none;
+}
+
+.photos-modal-info .photo-time {
+    display: none;
+}
+
+/* Delete Modal */
+.delete-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-modal .photos-modal-overlay {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.delete-modal .photos-modal-content {
+    position: relative;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 16px;
+    max-width: 240px;
+    width: 100%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+    text-align: center;
+    max-height: 200px;
+}
+
+.delete-modal .photos-modal-body {
+    text-align: center;
+    margin-bottom: 16px;
+    position: static;
+    flex: none;
+}
+
+.delete-modal .photos-modal-body p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: rgba(60, 60, 67, 0.6);
+}
+
+.delete-modal .photos-modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.photos-modal-button {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.cancel-button {
+    background: rgba(142, 142, 147, 0.12);
+    color: #007aff;
+    order: 2;
+}
+
+.cancel-button:hover {
+    background: rgba(142, 142, 147, 0.2);
+}
+
+.cancel-button:active {
+    background: rgba(142, 142, 147, 0.3);
+    transform: scale(0.98);
+}
+
+.delete-button {
+    background: #ff3b30;
+    color: white;
+    font-weight: 600;
+    order: 1;
+}
+
+.delete-button:hover {
+    background: #e60000;
+}
+
+.delete-button:active {
+    background: #cc0000;
+    transform: scale(0.98);
+}
+
+/* Apple-style scrollbars für Photos Grid */
+.photos-grid::-webkit-scrollbar {
+    width: 3px;
+}
+
+.photos-grid::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.photos-grid::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+}
+
+.photos-grid::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* Firefox scrollbar */
+.photos-grid {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+/* Smooth scrolling */
+.photos-body {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+.photos-grid {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* iOS-style scrollbar für Body (versteckt) */
+.photos-body::-webkit-scrollbar {
+    display: none;
+}
+
+.photos-body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* AirDrop Modal */
+.airdrop-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.airdrop-modal.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.airdrop-content {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 320px;
+    width: 90%;
+    max-height: 420px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.airdrop-modal.visible .airdrop-content {
+    transform: scale(1) translateY(0);
+}
+
+.airdrop-header {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.airdrop-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #000000;
+    margin: 0 0 6px 0;
+}
+
+.airdrop-subtitle {
+    font-size: 13px;
+    color: #8e8e93;
+    margin: 0;
+}
+
+.airdrop-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.airdrop-loading .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e5e5ea;
+    border-top: 3px solid #007aff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+.airdrop-loading-text {
+    font-size: 16px;
+    color: #8e8e93;
+    font-weight: 400;
+}
+
+.airdrop-players {
+    max-height: 240px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.airdrop-player {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 6px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.airdrop-player:hover {
+    background: rgba(0, 122, 255, 0.1);
+    border-color: #007aff;
+}
+
+.airdrop-player:last-child {
+    margin-bottom: 0;
+}
+
+.airdrop-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #007aff, #5856d6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.airdrop-player-info {
+    flex: 1;
+}
+
+.airdrop-player-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #000000;
+    margin: 0;
+}
+
+.airdrop-player-distance {
+    font-size: 12px;
+    color: #8e8e93;
+    margin: 2px 0 0 0;
+}
+
+.airdrop-empty {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.airdrop-empty-icon {
+    color: #c6c6c8;
+    margin-bottom: 16px;
+    opacity: 0.6;
+}
+
+.airdrop-empty-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #000000;
+    margin: 0 0 8px 0;
+}
+
+.airdrop-empty-message {
+    font-size: 14px;
+    color: #8e8e93;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.airdrop-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.airdrop-cancel {
+    background: rgba(142, 142, 147, 0.12);
+    border: none;
+    color: #007aff;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 12px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.airdrop-cancel:hover {
+    background: rgba(142, 142, 147, 0.2);
+}
+
+.airdrop-cancel:active {
+    background: rgba(142, 142, 147, 0.3);
+    transform: scale(0.98);
+}
+
+/* AirDrop Success Animation */
+.airdrop-success {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.airdrop-success-icon {
+    color: #34c759;
+    margin-bottom: 16px;
+    animation: successPulse 0.6s ease;
+}
+
+@keyframes successPulse {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.airdrop-success-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #000000;
+    margin: 0 0 8px 0;
+}
+
+.airdrop-success-message {
+    font-size: 14px;
+    color: #8e8e93;
+    margin: 0;
+}
+
+/* Scrollbar für AirDrop Players Liste */
+.airdrop-players::-webkit-scrollbar {
+    width: 6px;
+}
+
+.airdrop-players::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.airdrop-players::-webkit-scrollbar-thumb {
+    background: rgba(142, 142, 147, 0.3);
+    border-radius: 3px;
+}
+
+.airdrop-players::-webkit-scrollbar-thumb:hover {
+    background: rgba(142, 142, 147, 0.5);
+}
+
+.airdrop-players {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(142, 142, 147, 0.3) transparent;
+}
+
+/* Dark Theme Styles */
+.photos-app.dark-theme {
+    background: #1c1c1e;
+    color: #ffffff;
+}
+
+/* Header Dark Theme */
+.photos-app.dark-theme .photos-header {
+    background: rgba(44, 44, 46, 0.94);
+    border-bottom: 0.5px solid #38383a;
+}
+
+.photos-app.dark-theme .header-button {
+    color: #007AFF;
+}
+
+.photos-app.dark-theme .header-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Selection Actions Dark Theme */
+.photos-app.dark-theme .selection-actions {
+    background: rgba(44, 44, 46, 0.94);
+    border-bottom: 0.5px solid #38383a;
+}
+
+.photos-app.dark-theme .selection-info {
+    color: #ffffff;
+}
+
+.photos-app.dark-theme .selection-action-btn {
+    background: rgba(44, 44, 46, 0.94);
+    color: #ffffff;
+
+}
+
+.photos-app.dark-theme .selection-action-btn:hover {
+    background: rgba(44, 44, 46, 0.94);
+}
+
+.photos-app.dark-theme .selection-action-btn.delete-btn {
+    background: rgba(44, 44, 46, 0.94);
+    color: #FF3B30;
+
+}
+
+/* Body Dark Theme */
+.photos-app.dark-theme .photos-body {
+    background: #1c1c1e;
+}
+
+/* Loading Screen Dark Theme */
+.photos-app.dark-theme .loading-screen {
+    background: #1c1c1e;
+}
+
+.photos-app.dark-theme .loading-text {
+    color: #ffffff;
+}
+
+.photos-app.dark-theme .spinner {
+    border-color: rgba(255, 255, 255, 0.3);
+    border-top-color: #007AFF;
+}
+
+/* Empty State Dark Theme */
+.photos-app.dark-theme .empty-state {
+    background: #1c1c1e;
+}
+
+.photos-app.dark-theme .empty-icon {
+    color: #8e8e93;
+}
+
+.photos-app.dark-theme .empty-title {
+    color: #ffffff;
+}
+
+.photos-app.dark-theme .empty-message {
+    color: #8e8e93;
+}
+
+/* Photos Content Dark Theme */
+.photos-app.dark-theme .photos-content {
+    background: #1c1c1e;
+}
+
+/* Filter Bar Dark Theme */
+.photos-app.dark-theme .filter-bar {
+    background: rgba(44, 44, 46, 0.94);
+    border-bottom: 0.5px solid #38383a;
+}
+
+.photos-app.dark-theme .filter-tab {
+    color: #8e8e93;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #38383a;
+}
+
+.photos-app.dark-theme .filter-tab.active {
+    color: #007AFF;
+    background: rgba(0, 122, 255, 0.15);
+    border-color: rgba(0, 122, 255, 0.3);
+}
+
+.photos-app.dark-theme .filter-tab:hover {
+    background: #3a3a3c;
+}
+
+.photos-app.dark-theme .photo-count {
+    background: #38383a;
+    color: #8e8e93;
+}
+
+.photos-app.dark-theme .filter-tab.active .photo-count {
+    background: #007AFF;
+    color: #ffffff;
+}
+
+/* Photos Grid Dark Theme */
+.photos-app.dark-theme .photos-grid {
+    background: #1c1c1e;
+}
+
+.photos-app.dark-theme .photos-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.photos-app.dark-theme .photos-grid::-webkit-scrollbar-thumb {
+    background: #38383a;
+}
+
+.photos-app.dark-theme .photos-grid::-webkit-scrollbar-thumb:hover {
+    background: #48484a;
+}
+
+/* Photo Items Dark Theme */
+.photos-app.dark-theme .photo-item {
+    background: #2c2c2e;
+    border: 1px solid #38383a;
+}
+
+.photos-app.dark-theme .photo-item:hover {
+    transform: scale(1.02);
+    border-color: #48484a;
+}
+
+.photos-app.dark-theme .photo-item.selected {
+    border-color: #007AFF;
+    background: rgba(0, 122, 255, 0.1);
+}
+
+.photos-app.dark-theme .photo-overlay {
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+}
+
+.photos-app.dark-theme .photo-date {
+    color: #ffffff;
+}
+
+.photos-app.dark-theme .photo-time {
+    color: #8e8e93;
+}
+
+.photos-app.dark-theme .photo-select-indicator {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #38383a;
+}
+
+.photos-app.dark-theme .photo-item.selected .photo-select-indicator {
+    background: #007AFF;
+    border-color: #007AFF;
+}
+
+/* Photo Modal Dark Theme */
+.photos-app.dark-theme .photo-modal .photos-modal-overlay {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.photos-app.dark-theme .photos-modal-content {
+    background: #2c2c2e;
+    border: 1px solid #38383a;
+}
+
+.photos-app.dark-theme .photos-modal-header {
+    background: rgba(44, 44, 46, 0.95);
+    border-bottom: 1px solid #38383a;
+}
+
+.photos-app.dark-theme .photos-modal-close {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.photos-app.dark-theme .photos-modal-close:hover {
+    background: #3a3a3c;
+}
+
+.photos-app.dark-theme .photos-modal-action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.photos-app.dark-theme .photos-modal-action-btn:hover {
+    background: #3a3a3c;
+}
+
+.photos-app.dark-theme .photos-modal-body {
+    background: #2c2c2e;
+}
+
+.photos-app.dark-theme .photo-nav-button {
+    background: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+}
+
+.photos-app.dark-theme .photo-nav-button:hover {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.photos-app.dark-theme .photos-modal-image-container {
+    background: #2c2c2e;
+}
+
+.photos-app.dark-theme .photos-modal-info {
+    background: rgba(44, 44, 46, 0.95);
+    border-top: 1px solid #38383a;
+}
+
+.photos-app.dark-theme .photos-modal-info .photo-date {
+    color: #ffffff;
+}
+
+.photos-app.dark-theme .photos-modal-info .photo-time {
+    color: #8e8e93;
+}
+
+/* Delete Modal Dark Theme */
+.photos-app.dark-theme .delete-modal .photos-modal-overlay {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.photos-app.dark-theme .delete-modal,
+.photos-app.dark-theme .photos-modal-content {
+    background: #2c2c2e;
+    border: 1px solid #38383a;
+}
+
+.photos-app.dark-theme .delete-modal .photos-modal-body p {
+    color: #ffffff;
+}
+
+.photos-app.dark-theme .delete-modal .photos-modal-actions {
+    background: rgba(44, 44, 46, 0.95);
+    border-top: 1px solid #38383a;
+}
+
+.photos-app.dark-theme .cancel-button {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 1px solid #38383a;
+}
+
+.photos-app.dark-theme .cancel-button:hover {
+    background: #3a3a3c;
+}
+
+.photos-app.dark-theme .delete-button {
+    background: #FF3B30;
+    color: #ffffff;
+}
+
+.photos-app.dark-theme .delete-button:hover {
+    background: #FF453A;
+}
+
+/* AirDrop Modal Dark Theme */
+.photos-app.dark-theme .airdrop-modal {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.photos-app.dark-theme .airdrop-content {
+    background: #2c2c2e;
+    border: 1px solid #38383a;
+}
+
+.photos-app.dark-theme .airdrop-header {
+    border-bottom: 1px solid #38383a;
+}
+
+.photos-app.dark-theme .airdrop-header h3 {
+    color: #ffffff;
+}
+
+.photos-app.dark-theme .airdrop-subtitle {
+    color: #8e8e93;
+}
+
+.photos-app.dark-theme .airdrop-loading {
+    background: #2c2c2e;
+}
+
+.photos-app.dark-theme .airdrop-loading .spinner {
+    border-color: rgba(255, 255, 255, 0.3);
+    border-top-color: #007AFF;
+}
+
+.photos-app.dark-theme .airdrop-loading-text {
+    color: #ffffff;
+}
+
+.photos-app.dark-theme .airdrop-players {
+    background: #2c2c2e;
+}
+
+.photos-app.dark-theme .airdrop-players::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.photos-app.dark-theme .airdrop-players::-webkit-scrollbar-thumb {
+    background: #38383a;
+}
+
+.photos-app.dark-theme .airdrop-players::-webkit-scrollbar-thumb:hover {
+    background: #48484a;
+}
+
+.photos-app.dark-theme .airdrop-player {
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid #38383a;
+}
+
+.photos-app.dark-theme .airdrop-player:hover {
+    background: #3a3a3c;
+}
+
+.photos-app.dark-theme .airdrop-player:last-child {
+    border-bottom: none;
+}
+
+.photos-app.dark-theme .airdrop-avatar {
+    border: 2px solid #38383a;
+}
+
+.photos-app.dark-theme .airdrop-player-name {
+    color: #ffffff;
+}
+
+.photos-app.dark-theme .airdrop-player-distance {
+    color: #8e8e93;
+}
+
+.photos-app.dark-theme .airdrop-empty {
+    background: #2c2c2e;
+}
+
+.photos-app.dark-theme .airdrop-empty-icon {
+    color: #8e8e93;
+}
+
+.photos-app.dark-theme .airdrop-empty-title {
+    color: #ffffff;
+}
+
+.photos-app.dark-theme .airdrop-empty-message {
+    color: #8e8e93;
+}
+
+.photos-app.dark-theme .airdrop-success {
+    background: #2c2c2e;
+}
+
+.photos-app.dark-theme .airdrop-success-icon {
+    color: #34C759;
+}
+
+.photos-app.dark-theme .airdrop-success-title {
+    color: #ffffff;
+}
+
+.photos-app.dark-theme .airdrop-success-message {
+    color: #8e8e93;
+}
+
+.photos-app.dark-theme .airdrop-actions {
+    background: rgba(44, 44, 46, 0.95);
+    border-top: 1px solid #38383a;
+}
+
+.photos-app.dark-theme .airdrop-cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 1px solid #38383a;
+}
+
+.photos-app.dark-theme .airdrop-cancel:hover {
+    background: #3a3a3c;
+}
+
+.photos-app.dark-theme .airdrop-cancel:active {
+    background: #48484a;
+}
