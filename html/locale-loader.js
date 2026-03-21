@@ -47,4 +47,3 @@ class LocaleLoader {
 }
 
 window.localeLoader = new LocaleLoader();
-console.log('[GP Locale] Loaded with', Object.keys(_LOCALE_DATA).length, 'languages');

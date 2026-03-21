@@ -14,7 +14,6 @@ function WLC_Receive(jsonString) {
         var action = data.action;
         if (!action) return;
         
-        console.log('[GP Bridge] action:', action);
         
         var list = _wlcHandlers[action];
         if (list) {
@@ -33,9 +32,8 @@ function WLC_Receive(jsonString) {
 var _nativeBridge = null;
 if (window.WLCBridge && typeof window.WLCBridge.callback === 'function') {
     _nativeBridge = window.WLCBridge.callback;
-    console.log('[GP Bridge] Found native callback from AddFunction');
 } else {
-    console.warn('[GP Bridge] No native callback found');
+    //console.warn('[GP Bridge] No native callback found');
 }
 
 // ---- Public API (used by all app JS) ----
@@ -46,7 +44,7 @@ var WLCBridge = {
             if (_nativeBridge) {
                 _nativeBridge(name, json);
             } else {
-                console.warn('[GP Bridge] No native bridge, dropping:', name);
+                //console.warn('[GP Bridge] No native bridge, dropping:', name);
             }
         } catch(e) {
             console.error('[GP Bridge] send error:', e);
@@ -104,8 +102,22 @@ window.fetch = function(url, options) {
 window.addEventListener('load', function() {
     setTimeout(function() {
         WLCBridge.send('jsReady', {});
-        console.log('[GP Bridge] Sent jsReady to Lua');
     }, 100);
 });
 
-console.log('[GP Bridge] Initialized (native callback:', !!_nativeBridge, ')');
+
+// Global: detect focus on any input/textarea and notify Lua
+document.addEventListener('focusin', function(e) {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+        if (typeof WLCBridge !== 'undefined' && WLCBridge.send) {
+            WLCBridge.send('inputFocus', { focused: true });
+        }
+    }
+});
+document.addEventListener('focusout', function(e) {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+        if (typeof WLCBridge !== 'undefined' && WLCBridge.send) {
+            WLCBridge.send('inputFocus', { focused: false });
+        }
+    }
+});

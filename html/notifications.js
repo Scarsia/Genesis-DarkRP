@@ -91,7 +91,6 @@ window.phoneNotifications = new PhoneNotifications();
 WLCBridge.on('smsReceived', function(data) {
     var sms = data && data.data;
     if (!sms) return;
-    console.log('[GP Notif] SMS received from:', sms.fromName || sms.from);
     window.phoneNotifications.show(
         sms.fromName || sms.from || 'SMS',
         sms.message || '',

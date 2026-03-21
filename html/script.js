@@ -69,7 +69,6 @@ function openPhone(data) {
         if (window.phoneHome) window.phoneHome.init(data);
     }
 
-    console.log('[Genesis Phone] Opened. Setup:', Phone.setupComplete, 'PIN:', Phone.hasPIN);
 }
 
 function closePhone() {
@@ -193,7 +192,6 @@ function showPINLock() {
     Phone.isLocked = true;
     var el = document.getElementById('pin-lock-screen');
     if (el) { el.style.display='flex'; el.classList.add('active'); }
-    console.log('[Genesis Phone] PIN lock shown');
 
     // Clean any existing handler first
     WLCBridge.off('pinVerified');
@@ -205,7 +203,6 @@ function showPINLock() {
         WLCBridge.off('pinVerified');
 
         var d = msg && msg.data;
-        console.log('[Genesis Phone] PIN verified result:', JSON.stringify(d));
 
         if (d && d.success) {
             Phone.isLocked = false;
@@ -218,19 +215,16 @@ function showPINLock() {
                 home.style.display = 'flex';
                 home.classList.add('active', 'show');
                 home.style.opacity = '1';
-                console.log('[Genesis Phone] Home screen shown');
             } else {
                 console.error('[Genesis Phone] .home-screen NOT FOUND');
             }
 
             if (window.phoneHome && Phone.data) {
                 window.phoneHome.init(Phone.data);
-                console.log('[Genesis Phone] phoneHome.init called with', (Phone.data.apps || []).length, 'apps');
             } else {
                 console.error('[Genesis Phone] phoneHome or Phone.data missing:', !!window.phoneHome, !!Phone.data);
             }
         } else {
-            console.log('[Genesis Phone] Wrong PIN');
             var display = el.querySelector('.pin-dots');
             if (display) {
                 display.style.animation = 'none';
@@ -246,7 +240,6 @@ function showPINLock() {
 
     _initPINPad('pin-lock-screen', function(pin) {
         if (pin.length === 4) {
-            console.log('[Genesis Phone] Sending PIN verify...');
             WLCBridge.send('verifyPIN', { pin: pin });
         }
     }, 'Entrez votre PIN', false);
@@ -436,4 +429,129 @@ document.addEventListener('DOMContentLoaded', function() {
 WLCBridge.on('open', function(data) { openPhone(data); });
 WLCBridge.on('close', function() { closePhone(); });
 
-console.log('[Genesis Phone] Core script loaded');
+
+
+// ============================================================
+// OVERLAY SCREENS (Blackout, Remote Lock, Prank persist)
+// ============================================================
+var _overlayEl = null;
+
+function showPhoneOverlay(type, data) {
+    removePhoneOverlay();
+    var frame = document.querySelector('.phone-frame');
+    if (!frame) return;
+
+    _overlayEl = document.createElement('div');
+    _overlayEl.id = 'phone-overlay';
+    _overlayEl.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:all;';
+
+    if (type === 'blackout') {
+        _overlayEl.style.background = '#000';
+        _overlayEl.innerHTML = '<div style="text-align:center;padding:30px;">' +
+            '<div style="font-size:48px;margin-bottom:16px;opacity:0.3;">📵</div>' +
+            '<div style="font-size:16px;font-weight:700;color:#636366;">HORS SERVICE</div>' +
+            '<div style="font-size:11px;color:#48484a;margin-top:8px;">Le r\u00e9seau est temporairement indisponible.</div>' +
+            '<div style="font-size:10px;color:#48484a;margin-top:4px;">Impossible d\u2019envoyer des SMS ou passer des appels.</div>' +
+            '<div style="margin-top:24px;width:40px;height:2px;background:#2c2c2e;border-radius:1px;"></div></div>';
+    }
+
+    if (type === 'locked') {
+        var msg = (data && data.message) || 'T\u00e9l\u00e9phone verrouill\u00e9 par l\u2019administration';
+        _overlayEl.style.background = 'rgba(0,0,0,0.97)';
+        _overlayEl.innerHTML = '<div style="text-align:center;padding:30px;">' +
+            '<div style="width:64px;height:64px;border-radius:50%;background:rgba(255,59,48,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><span style="font-size:28px;">🔒</span></div>' +
+            '<div style="font-size:16px;font-weight:700;color:#FF3B30;">VERROUILL\u00c9</div>' +
+            '<div style="font-size:11px;color:#8e8e93;margin-top:8px;max-width:200px;line-height:1.4;">' + (data && data.message ? data.message.replace(/</g,'&lt;') : 'T\u00e9l\u00e9phone verrouill\u00e9 par l\u2019administration') + '</div>' +
+            '<div style="margin-top:20px;font-size:9px;color:#48484a;">Contactez un administrateur</div></div>';
+    }
+
+    if (type === 'prank') {
+        var fx = (data && data.effect) || 'glitch';
+        _overlayEl.style.pointerEvents = 'none';
+
+        if (fx === 'glitch') {
+            _overlayEl.style.background = 'none';
+            _overlayEl.innerHTML = '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,255,0,0.03);animation:gf 0.1s infinite;"></div>' +
+                '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#0f0;font-family:monospace;font-size:14px;text-align:center;text-shadow:0 0 10px #0f0;">SYSTEM COMPROMISED<br>ACCESSING DATA...<br>\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591 78%</div>';
+            var s = document.createElement('style'); s.id='prank-style';
+            s.textContent = '@keyframes gf{0%{opacity:0.8;transform:translateX(-2px)}25%{opacity:1;transform:translateX(2px)}50%{opacity:0.6}75%{opacity:1;transform:translateX(-1px)}100%{opacity:0.9;transform:translateX(1px)}}';
+            frame.appendChild(s);
+        }
+        if (fx === 'virus') {
+            _overlayEl.style.background = 'rgba(255,0,0,0.9)';
+            _overlayEl.style.pointerEvents = 'all';
+            _overlayEl.innerHTML = '<div style="font-size:48px;margin-bottom:16px;">\u26a0\ufe0f</div>' +
+                '<div style="font-size:18px;font-weight:800;color:#fff;">VIRUS D\u00c9TECT\u00c9</div>' +
+                '<div style="font-size:12px;color:rgba(255,255,255,0.8);text-align:center;padding:0 30px;margin-top:8px;">Trojan.Genesis.X4 d\u00e9tect\u00e9.<br>Vos donn\u00e9es sont compromises.</div>';
+        }
+        if (fx === 'bluescreen') {
+            _overlayEl.style.background = '#0078D7';
+            _overlayEl.style.pointerEvents = 'all';
+            _overlayEl.innerHTML = '<div style="font-size:60px;color:#fff;">:(</div>' +
+                '<div style="font-size:14px;color:#fff;max-width:80%;text-align:center;margin-top:16px;">Votre t\u00e9l\u00e9phone a rencontr\u00e9 un probl\u00e8me et doit red\u00e9marrer.</div>' +
+                '<div style="margin-top:20px;font-size:11px;color:rgba(255,255,255,0.7);font-family:monospace;">Collecte d\u2019informations en cours...</div>';
+        }
+        if (fx === 'scramble') {
+            _overlayEl.style.background = 'rgba(0,0,0,0.95)';
+            _overlayEl.style.pointerEvents = 'all';
+            var el = document.createElement('div');
+            el.style.cssText = 'font-family:monospace;font-size:10px;color:#0f0;line-height:1.2;word-break:break-all;padding:10px;text-shadow:0 0 5px #0f0;';
+            _overlayEl.appendChild(el);
+            var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*!?<>';
+            window._scrambleIv = setInterval(function() {
+                var t='';for(var i=0;i<500;i++)t+=chars[Math.floor(Math.random()*chars.length)];
+                el.textContent=t;
+            }, 50);
+        }
+        if (fx === 'reboot') {
+            _overlayEl.style.background = '#000';
+            _overlayEl.style.pointerEvents = 'all';
+            _overlayEl.innerHTML = '<div style="width:30px;height:30px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:sp2 1s linear infinite;"></div>' +
+                '<div style="margin-top:16px;font-size:12px;color:rgba(255,255,255,0.6);">Red\u00e9marrage en cours...</div>';
+            var s = document.createElement('style'); s.id='prank-style';
+            s.textContent = '@keyframes sp2{to{transform:rotate(360deg)}}';
+            frame.appendChild(s);
+        }
+    }
+
+    frame.appendChild(_overlayEl);
+}
+
+function removePhoneOverlay() {
+    if (_overlayEl) { _overlayEl.remove(); _overlayEl = null; }
+    var ps = document.getElementById('prank-style');
+    if (ps) ps.remove();
+    if (window._scrambleIv) { clearInterval(window._scrambleIv); window._scrambleIv = null; }
+}
+
+// Listen for overlay events from Lua
+WLCBridge.on('blackoutStart', function() { showPhoneOverlay('blackout'); });
+WLCBridge.on('blackoutEnd', function() { removePhoneOverlay(); });
+WLCBridge.on('remoteLock', function(msg) { var d = msg && msg.data; showPhoneOverlay('locked', d); });
+WLCBridge.on('remoteUnlock', function() { removePhoneOverlay(); });
+WLCBridge.on('prankStart', function(msg) { var d = msg && msg.data; showPhoneOverlay('prank', d); });
+WLCBridge.on('prankStop', function() { removePhoneOverlay(); });
+
+// ============================================================
+// BROADCAST POPUP (system alert overlay)
+// ============================================================
+WLCBridge.on('broadcastAlert', function(msg) {
+    var d = msg && msg.data;
+    if (!d || !d.message) return;
+    var frame = document.querySelector('.phone-frame');
+    if (!frame) return;
+
+    var popup = document.createElement('div');
+    popup.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;z-index:9997;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;pointer-events:all;opacity:0;transition:opacity 0.3s;';
+    popup.innerHTML = '<div style="background:rgba(44,44,46,0.95);border-radius:16px;padding:20px;width:85%;max-width:260px;text-align:center;border:1px solid rgba(255,255,255,0.1);">' +
+        '<div style="font-size:28px;margin-bottom:10px;">\ud83d\udce2</div>' +
+        '<div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:6px;">Alerte syst\u00e8me</div>' +
+        '<div style="font-size:12px;color:#e5e5ea;line-height:1.4;margin-bottom:16px;">' + (d.message || '').replace(/</g,'&lt;') + '</div>' +
+        '<button id="broadcast-ok" style="background:#FF3B30;color:#fff;border:none;border-radius:10px;padding:10px 40px;font-size:13px;font-weight:600;cursor:pointer;">OK</button></div>';
+    frame.appendChild(popup);
+    requestAnimationFrame(function() { popup.style.opacity = '1'; });
+    popup.querySelector('#broadcast-ok').addEventListener('click', function() {
+        popup.style.opacity = '0';
+        setTimeout(function() { popup.remove(); }, 300);
+    });
+});

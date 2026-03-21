@@ -34,7 +34,6 @@ window.phoneAppManager && window.phoneAppManager.register('notes', {
     _onNotes(msg) {
         if (!this.wrapper) return;
         var d = msg && msg.data;
-        console.log('[Notes] Received notesList, type:', typeof d, 'isArray:', Array.isArray(d), 'length:', d && d.length);
         if (Array.isArray(d)) {
             this.notes = d;
         } else if (d && typeof d === 'object' && !Array.isArray(d)) {
@@ -112,7 +111,6 @@ window.phoneAppManager && window.phoneAppManager.register('notes', {
         el.querySelector('#note-save').addEventListener('click', function() {
             var title = el.querySelector('#note-title').value;
             var content = el.querySelector('#note-content').value;
-            console.log('[Notes] Saving:', editId, JSON.stringify(title).substring(0,30));
             WLCBridge.send('saveNote', { id: editId || 0, title: title, content: content });
             self.editing = null;
             window.phoneNotifications && window.phoneNotifications.show('Notes', 'Note sauvegard\u00e9e', 'apps/notes/icon.png');
