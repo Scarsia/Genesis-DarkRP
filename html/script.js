@@ -117,9 +117,9 @@ function applyBackground(bg) {
 }
 
 function applyBrightness(value) {
-    Phone.brightness = value;
+    Phone.brightness = 100; // Always full brightness
     var overlay = document.getElementById('brightness-overlay');
-    if (overlay) overlay.style.backgroundColor = 'rgba(0,0,0,' + (((100-value)/100)*0.8) + ')';
+    if (overlay) overlay.style.backgroundColor = 'transparent';
 }
 
 // ============================================================

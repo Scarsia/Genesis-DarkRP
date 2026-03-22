@@ -10,12 +10,12 @@
     <link rel="stylesheet" href="dynamic-island.css">
     <link rel="stylesheet" href="apps/phone/call.css">
     <style>
-        /* Push app content below status bar (33px) */
-        .app-wrapper {
-            padding-top: 34px !important;
+        /* App content starts below the status bar - app background extends to top */
+        .app-wrapper > div {
+            box-sizing: border-box;
         }
-        .app-wrapper.camera-mode {
-            padding-top: 0 !important;
+        .app-wrapper > div > *:first-child {
+            margin-top: 36px;
         }
 
         /* CSS custom properties for theming */
@@ -250,6 +250,7 @@
     <script src="apps/photos/app.js"></script>
     <script src="apps/lifeinvader/app.js"></script>
     <script src="apps/appstore/app.js"></script>
+    <script src="apps/bank/app.js"></script>
     <script src="call-ui.js"></script>
     
     <!-- Sound System -->
