@@ -1,2 +1,140 @@
+/* Genesis Phone - Realestate App */
+.realestate-app {
+    display: flex; flex-direction: column; height: 100%;
+    background: var(--phone-bg, #000); color: var(--phone-text, #fff);
+    font-family: -apple-system, 'SF Pro Display', 'Nunito', sans-serif;
+    overflow: hidden;
+}
+.re-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.re-scroll::-webkit-scrollbar { display: none; }
 
-.gh-app,.gh-shell{height:100%;background:radial-gradient(circle at top,#1f2230,#0a0c13 62%);color:#fff}.gh-shell{padding:16px;display:flex;flex-direction:column;gap:14px}.gh-top{display:flex;justify-content:space-between;align-items:flex-start}.gh-title{font-size:24px;font-weight:800;letter-spacing:-.03em}.gh-sub{font-size:11px;color:#9da4b8;margin-top:4px}.gh-badge{padding:8px 12px;border-radius:999px;background:rgba(90,131,255,.16);color:#8fb0ff;font-size:10px;font-weight:700;border:1px solid rgba(143,176,255,.18)}.gh-controls{display:flex;gap:8px}.gh-controls select{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:12px;color:#fff;padding:10px 12px;font-size:12px}.gh-list{flex:1;overflow:auto;display:flex;flex-direction:column;gap:10px;padding-right:3px}.gh-card{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.07);box-shadow:0 10px 40px rgba(0,0,0,.28);border-radius:20px;padding:14px;position:relative;overflow:hidden}.gh-card:before{content:'';position:absolute;inset:auto -20px -50px auto;width:120px;height:120px;border-radius:50%;background:rgba(120,160,255,.08);filter:blur(10px)}.gh-hero{display:flex;gap:12px;align-items:center}.gh-icon{width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,#68a5ff,#465bff);display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 8px 24px rgba(70,91,255,.35)}.gh-meta{flex:1;min-width:0}.gh-name{font-size:15px;font-weight:800}.gh-type,.gh-address,.gh-desc,.gh-footer{font-size:11px;color:#aab1c4}.gh-address{margin-top:4px}.gh-price{font-size:16px;font-weight:900;color:#fefefe}.gh-tags{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 8px}.gh-tags span{padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);font-size:10px;color:#d8def0}.gh-desc{line-height:1.45}.gh-footer{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;gap:10px}.gh-loading,.gh-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;font-size:12px;color:#98a0b6;text-align:center;padding:20px}.gh-spinner{width:28px;height:28px;border:3px solid rgba(255,255,255,.08);border-top-color:#7ba5ff;border-radius:50%;animation:ghspin .8s linear infinite;margin-bottom:12px}@keyframes ghspin{to{transform:rotate(360deg)}}
+/* Header */
+.re-header { padding: 8px 16px 6px; }
+.re-header h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.3px; }
+.re-header p { font-size: 11px; color: var(--phone-text-secondary, #8e8e93); margin: 2px 0 0; }
+
+/* Stats bar */
+.re-stats {
+    display: flex; gap: 8px; padding: 8px 16px 12px; overflow-x: auto;
+}
+.re-stats::-webkit-scrollbar { display: none; }
+.re-stat {
+    flex: 1; min-width: 0; padding: 12px; border-radius: 14px;
+    background: rgba(255,255,255,0.04); text-align: center;
+}
+.re-stat-value { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
+.re-stat-label { font-size: 9px; color: var(--phone-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+.re-stat.owned .re-stat-value { color: #34C759; }
+.re-stat.rented .re-stat-value { color: #007AFF; }
+.re-stat.total .re-stat-value { color: #FF9500; }
+
+/* Filter tabs */
+.re-tabs {
+    display: flex; gap: 6px; padding: 0 16px 12px; overflow-x: auto;
+}
+.re-tabs::-webkit-scrollbar { display: none; }
+.re-tab {
+    padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    white-space: nowrap; cursor: pointer; transition: all 0.2s ease;
+    background: rgba(255,255,255,0.05); color: var(--phone-text-secondary, #8e8e93);
+    border: 1px solid transparent;
+}
+.re-tab.active {
+    background: rgba(52,199,89,0.12); color: #34C759;
+    border-color: rgba(52,199,89,0.2);
+}
+
+/* Property cards */
+.re-list { padding: 0 16px; }
+.re-card {
+    border-radius: 16px; margin-bottom: 12px; overflow: hidden;
+    background: rgba(255,255,255,0.04); cursor: pointer;
+    transition: transform 0.15s ease;
+    border: 1px solid rgba(255,255,255,0.04);
+}
+.re-card:active { transform: scale(0.98); }
+.re-card-img {
+    height: 110px; background: linear-gradient(135deg, #1a1a2e, #16213e);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+}
+.re-card-img-icon { font-size: 36px; opacity: 0.3; }
+.re-card-badge {
+    position: absolute; top: 10px; right: 10px;
+    padding: 3px 10px; border-radius: 6px;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.re-card-badge.owned { background: rgba(52,199,89,0.25); color: #34C759; }
+.re-card-badge.rented { background: rgba(0,122,255,0.25); color: #007AFF; }
+.re-card-badge.available { background: rgba(255,149,0,0.25); color: #FF9500; }
+.re-card-body { padding: 14px; }
+.re-card-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.re-card-addr { font-size: 11px; color: var(--phone-text-secondary); margin-bottom: 8px; }
+.re-card-meta {
+    display: flex; gap: 12px; font-size: 10px; color: var(--phone-text-secondary);
+}
+.re-card-meta span { display: flex; align-items: center; gap: 4px; }
+.re-card-price { font-size: 14px; font-weight: 700; color: #34C759; margin-top: 8px; }
+
+/* Detail view */
+.re-back {
+    display: flex; align-items: center; gap: 4px; cursor: pointer;
+    color: #007AFF; font-size: 14px; font-weight: 500; padding: 8px 16px 6px;
+}
+.re-back:active { opacity: 0.6; }
+.re-detail { padding: 0 16px 24px; }
+.re-detail-hero {
+    height: 150px; border-radius: 18px; margin-bottom: 16px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+}
+.re-detail-hero-icon { font-size: 48px; opacity: 0.2; }
+.re-detail-badge-top {
+    position: absolute; top: 12px; left: 12px;
+    padding: 4px 12px; border-radius: 8px; font-size: 10px; font-weight: 700;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.re-detail-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.3px; }
+.re-detail-addr { font-size: 12px; color: var(--phone-text-secondary); margin-bottom: 16px; }
+
+/* Info grid */
+.re-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.re-info-item {
+    padding: 14px; border-radius: 14px;
+    background: rgba(255,255,255,0.04);
+}
+.re-info-label { font-size: 9px; color: var(--phone-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 4px; }
+.re-info-value { font-size: 14px; font-weight: 700; }
+.re-info-value.green { color: #34C759; }
+.re-info-value.blue { color: #007AFF; }
+.re-info-value.orange { color: #FF9500; }
+
+/* Action buttons */
+.re-detail-actions { display: flex; gap: 10px; margin-top: 16px; }
+.re-btn {
+    flex: 1; padding: 14px; border: none; border-radius: 14px;
+    font-size: 13px; font-weight: 700; cursor: pointer; text-align: center;
+    font-family: inherit; transition: transform 0.15s ease;
+}
+.re-btn:active { transform: scale(0.97); }
+.re-btn.gps { background: rgba(0,122,255,0.15); color: #007AFF; }
+.re-btn.lock { background: rgba(255,149,0,0.15); color: #FF9500; }
+.re-btn.enter { background: rgba(52,199,89,0.15); color: #34C759; }
+
+/* Empty */
+.re-empty { text-align: center; padding: 60px 20px; }
+.re-empty-icon { font-size: 42px; margin-bottom: 12px; }
+.re-empty-text { font-size: 13px; color: var(--phone-text-secondary); }
+.re-empty-sub { font-size: 11px; color: var(--phone-text-secondary); margin-top: 4px; opacity: 0.6; }
+
+/* Loading */
+.re-loading { text-align: center; padding: 80px 0; }
+.re-spinner {
+    width: 28px; height: 28px; margin: 0 auto 12px;
+    border: 3px solid rgba(255,255,255,0.08);
+    border-top-color: #34C759; border-radius: 50%;
+    animation: reSpin 0.7s linear infinite;
+}
+@keyframes reSpin { to { transform: rotate(360deg); } }
