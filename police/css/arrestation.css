@@ -1,0 +1,307 @@
+/* ═══════════════════════════════════════════════════════════════
+   Arrestation split UI
+   - Rapport d'arrestation (police interne)
+   - Dossier d'arrestation (Justice)
+═══════════════════════════════════════════════════════════════ */
+
+#modal-rapport-arrestation.mdt-modal-wrapper,
+#modal-dossier-arrestation.mdt-modal-wrapper{
+  z-index:99999;
+  padding:20px!important;
+}
+#modal-rapport-arrestation.mdt-modal-wrapper[style*="display:flex"],
+#modal-dossier-arrestation.mdt-modal-wrapper[style*="display:flex"]{
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+}
+
+#modal-rapport-arrestation .mdt-modal-card,
+#modal-rapport-arrestation .mdt-modal-body,
+#modal-rapport-arrestation .mdt-field,
+#modal-rapport-arrestation .mdt-input,
+#modal-rapport-arrestation .mdt-select,
+#modal-rapport-arrestation .mdt-rich-editor,
+#modal-rapport-arrestation .ql-editor,
+#modal-rapport-arrestation .ql-toolbar,
+#modal-rapport-arrestation .arrest-ui-tagpicker,
+#modal-rapport-arrestation .arrest-ui-chipline,
+#modal-rapport-arrestation button{
+  position:relative;
+  pointer-events:auto;
+}
+#modal-rapport-arrestation .ql-editor{
+  user-select:text;
+  cursor:text;
+}
+
+.arrest-ui-card{width:min(1040px, calc(100vw - 24px));}
+.arrest-ui-card-report{max-width:980px;}
+.arrest-ui-card-dossier{max-width:1080px;}
+.arrest-ui-card-record{max-width:1120px;}
+.arrest-ui-body{display:flex;flex-direction:column;gap:14px;}
+.arrest-ui-body-long{max-height:calc(100vh - 140px);}
+
+.arrest-ui-linked-banner{
+  padding:10px 12px;
+  border:1px solid var(--border-light);
+  border-radius:var(--radius-md);
+  background:rgba(94, 150, 255, .08);
+  color:var(--text);
+  font-size:12px;
+  font-weight:700;
+}
+
+.arrest-ui-grid{grid-template-columns:repeat(2, minmax(0, 1fr));}
+.arrest-ui-grid-2{grid-template-columns:repeat(2, minmax(0, 1fr));}
+.arrest-ui-grid-vehicle{grid-template-columns:1fr 1fr auto;align-items:end;}
+.arrest-ui-grid-weapon{grid-template-columns:1fr 1fr 140px auto;align-items:end;}
+
+.arrest-ui-checkline{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:var(--text);
+  font-size:12px;
+  font-weight:700;
+}
+.arrest-ui-checkline input{accent-color:var(--accent-mid);}
+.arrest-ui-checkline-compact{align-self:flex-end;min-height:36px;padding-bottom:8px;}
+
+.arrest-ui-tagpicker{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.arrest-ui-tagpicker .mdt-input,
+.arrest-ui-tagpicker .arrest-ui-grow{flex:1;min-width:0;}
+
+.arrest-ui-chipline,
+.arrest-ui-simple-list,
+.arrest-ui-participant-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  min-height:28px;
+}
+.arrest-ui-simple-list,
+.arrest-ui-participant-list{flex-direction:column;}
+
+.arrest-ui-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-height:30px;
+  padding:5px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--bg-hover);
+  color:var(--text);
+  font-size:11px;
+  font-weight:700;
+}
+.arrest-ui-chip button,
+.arrest-ui-remove-btn{
+  width:20px;
+  height:20px;
+  border:none;
+  border-radius:999px;
+  background:transparent;
+  color:var(--text-muted);
+  cursor:pointer;
+  font-size:12px;
+  line-height:1;
+}
+.arrest-ui-chip button:hover,
+.arrest-ui-remove-btn:hover{background:var(--danger-bg);color:var(--danger);}
+
+.arrest-ui-participant-card,
+.arrest-ui-simple-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  padding:10px 12px;
+  border-radius:var(--radius-md);
+  border:1px solid var(--border);
+  background:var(--bg-hover);
+}
+.arrest-ui-participant-name{font-weight:800;color:var(--text);}
+.arrest-ui-participant-role,
+.arrest-ui-simple-meta{display:block;color:var(--text-muted);font-size:11px;margin-top:2px;}
+.arrest-ui-participant-meta{display:flex;flex-wrap:wrap;gap:12px;color:var(--text-secondary);font-size:11px;}
+.arrest-ui-participant-empty,
+.arrest-ui-empty{padding:10px 0;color:var(--text-muted);font-size:12px;}
+
+.arrest-ui-editor{min-height:250px;}
+.arrest-ui-editor .ql-toolbar.ql-snow{
+  border:none;
+  border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.02);
+}
+.arrest-ui-editor .ql-container.ql-snow{border:none;min-height:200px;}
+.arrest-ui-editor .ql-editor{min-height:200px;color:var(--text);font-size:12px;line-height:1.55;}
+.arrest-ui-editor .ql-toolbar .ql-stroke{stroke:var(--text-secondary);}
+.arrest-ui-editor .ql-toolbar .ql-fill{fill:var(--text-secondary);}
+.arrest-ui-editor .ql-toolbar button,
+.arrest-ui-editor .ql-toolbar .ql-picker{color:var(--text-secondary);}
+.arrest-ui-editor .ql-toolbar button:hover,
+.arrest-ui-editor .ql-toolbar button.ql-active{color:var(--accent-light);}
+.arrest-ui-editor.is-invalid{border-color:var(--danger)!important;box-shadow:0 0 0 3px rgba(239,68,68,.16)!important;}
+.arrest-ui-error{display:none;color:var(--danger);font-size:11px;}
+.arrest-ui-error.show{display:block;}
+
+.arrest-ui-proof-drop{
+  min-height:118px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:16px;
+  border:1px dashed var(--border-light);
+  border-radius:var(--radius-md);
+  background:rgba(255,255,255,.02);
+  color:var(--text-muted);
+  font-size:12px;
+  cursor:pointer;
+  transition:border-color .15s ease, background .15s ease, color .15s ease;
+}
+.arrest-ui-proof-drop:hover,
+.arrest-ui-proof-drop:focus{border-color:var(--accent-light);background:rgba(94,150,255,.06);color:var(--text);outline:none;}
+.arrest-ui-proof-drop.is-pasted{border-style:solid;color:var(--text);background:rgba(94,150,255,.08);}
+.arrest-ui-proof-preview{min-height:4px;}
+.arrest-ui-inline-remove{min-width:32px;width:32px;height:32px;padding:0!important;border:1px solid rgba(239,68,68,.28)!important;background:rgba(239,68,68,.12)!important;color:var(--danger)!important;font-size:15px;font-weight:900;}
+.arrest-ui-inline-remove:hover{background:rgba(239,68,68,.2)!important;color:var(--danger)!important;border-color:rgba(239,68,68,.4)!important;}
+.arrest-ui-proof-preview .report-photo-grid{margin-top:8px;}
+
+.arrest-ui-subsection{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding-top:6px;
+}
+.arrest-ui-subtitle{
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+
+.arrestdoc-page .opdoc-grid-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.arrestdoc-page .opdoc-list-tight{margin:0;padding-left:18px;}
+.arrestdoc-page .opdoc-muted{color:#64748b;font-size:11px;}
+.arrestdoc-page .opdoc-chipline{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.arrestdoc-page .opdoc-chip{
+  display:inline-flex;
+  padding:4px 9px;
+  border-radius:999px;
+  background:#e2e8f0;
+  color:#0f172a;
+  font-size:11px;
+  font-weight:700;
+}
+.arrestdoc-page .opdoc-person-card{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:9px 11px;
+  border:1px solid rgba(15,23,42,.12);
+  border-radius:10px;
+  background:#fff;
+}
+.arrestdoc-page .opdoc-person-card + .opdoc-person-card{margin-top:8px;}
+.arrestdoc-page .opdoc-person-name{font-weight:800;}
+.arrestdoc-page .opdoc-person-role{display:block;color:#64748b;font-size:11px;}
+.arrestdoc-page .opdoc-photo-note{font-size:11px;color:#64748b;margin-bottom:8px;}
+.arrest-report-viewer .opdoc-head-right,
+.arrest-report-viewer .opdoc-line,
+.arrest-report-viewer .opdoc-list li,
+.arrest-report-viewer .opdoc-report-box{color:#0f172a;}
+
+@media (max-width: 900px){
+  .arrest-ui-grid,
+  .arrest-ui-grid-2,
+  .arrest-ui-grid-vehicle,
+  .arrest-ui-grid-weapon,
+  .arrestdoc-page .opdoc-grid-two{grid-template-columns:1fr;}
+  .arrest-ui-checkline-compact{align-self:flex-start;padding-bottom:0;}
+}
+
+@media (max-width: 640px){
+  #modal-rapport-arrestation.mdt-modal-wrapper,
+  #modal-dossier-arrestation.mdt-modal-wrapper{padding:10px!important;}
+  .arrest-ui-tagpicker{flex-direction:column;align-items:stretch;}
+  .arrest-ui-participant-card{grid-template-columns:1fr;}
+  .arrest-ui-participant-meta{grid-column:1 / -1;}
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Justice dossier viewer — document officiel / copie justice
+═══════════════════════════════════════════════════════════════ */
+.justice-doc-page{
+  position:relative;
+  background:linear-gradient(180deg,#ffffff 0%,#f7f8fc 100%);
+  border:1px solid rgba(15,23,42,.10);
+  border-radius:22px;
+  padding:26px;
+  box-shadow:0 24px 60px rgba(15,23,42,.18);
+  color:#0f172a;
+  overflow:hidden;
+}
+.justice-doc-watermark{
+  position:absolute;
+  right:-42px;
+  top:52px;
+  transform:rotate(35deg);
+  font-size:44px;
+  font-weight:900;
+  letter-spacing:.2em;
+  color:rgba(15,23,42,.05);
+  pointer-events:none;
+}
+.justice-doc-header{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;padding-bottom:18px;border-bottom:1px solid rgba(15,23,42,.1);}
+.justice-doc-brand{display:flex;gap:16px;align-items:center;min-width:0;}
+.justice-doc-badge{width:76px;height:76px;object-fit:contain;filter:drop-shadow(0 8px 18px rgba(15,23,42,.16));}
+.justice-doc-kicker{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#475569;}
+.justice-doc-title{margin:4px 0 6px;font-size:28px;line-height:1.12;font-weight:900;color:#0f172a;}
+.justice-doc-ref{font-size:13px;font-weight:700;color:#334155;}
+.justice-doc-stamp{min-width:250px;padding:14px 16px;border:1px solid rgba(37,99,235,.18);border-radius:16px;background:linear-gradient(180deg,#eff6ff 0%,#f8fbff 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.8);}
+.justice-doc-stamp-label{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#2563eb;}
+.justice-doc-stamp-value{margin-top:6px;font-size:15px;font-weight:800;color:#0f172a;}
+.justice-doc-stamp-small{margin-top:6px;font-size:12px;color:#475569;}
+.justice-doc-summary-grid,.justice-doc-catalog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:18px;}
+.justice-doc-panel{margin-top:18px;padding:16px 18px;border:1px solid rgba(15,23,42,.10);border-radius:16px;background:rgba(255,255,255,.9);box-shadow:0 6px 18px rgba(15,23,42,.05);}
+.justice-doc-panel-title{margin-bottom:12px;font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#475569;}
+.justice-doc-kv{display:grid;grid-template-columns:180px minmax(0,1fr);gap:12px;padding:8px 0;border-top:1px dashed rgba(15,23,42,.08);}
+.justice-doc-kv:first-of-type{border-top:none;padding-top:0;}
+.justice-doc-kv span{font-size:12px;color:#64748b;font-weight:700;}
+.justice-doc-kv strong{font-size:13px;color:#0f172a;font-weight:800;}
+.justice-doc-participant{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,auto);gap:12px;align-items:center;padding:12px 14px;border:1px solid rgba(15,23,42,.09);border-radius:14px;background:#fff;}
+.justice-doc-participant + .justice-doc-participant{margin-top:10px;}
+.justice-doc-participant-name{font-size:15px;font-weight:900;color:#0f172a;}
+.justice-doc-participant-role{font-size:12px;color:#64748b;font-weight:700;}
+.justice-doc-participant-meta{font-size:12px;color:#334155;text-align:right;}
+.justice-doc-chipline{display:flex;flex-wrap:wrap;gap:8px;}
+.justice-doc-chip{display:inline-flex;align-items:center;padding:7px 12px;border-radius:999px;background:#e8eefc;color:#1e3a8a;font-size:12px;font-weight:800;border:1px solid rgba(37,99,235,.12);}
+.justice-doc-catalog{display:grid;gap:10px;}
+.justice-doc-catalog-card{padding:14px;border-radius:14px;border:1px solid rgba(15,23,42,.08);background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);}
+.justice-doc-catalog-index{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#64748b;}
+.justice-doc-catalog-title{margin-top:6px;font-size:15px;font-weight:900;color:#0f172a;}
+.justice-doc-catalog-meta{margin-top:5px;font-size:12px;color:#475569;}
+.justice-doc-report-box{padding:18px;border-radius:16px;border:1px solid rgba(15,23,42,.10);background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%);font-size:13px;line-height:1.7;color:#0f172a;}
+.justice-doc-report-box p:first-child{margin-top:0;}
+.justice-doc-report-box p:last-child{margin-bottom:0;}
+.justice-doc-proof-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px;font-size:12px;font-weight:800;color:#475569;}
+.justice-doc-proof-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+.justice-doc-photo-card{aspect-ratio:1.1/1;border-radius:16px;overflow:hidden;border:1px solid rgba(15,23,42,.08);background:#f8fafc;box-shadow:0 8px 20px rgba(15,23,42,.07);}
+.justice-doc-photo-card img,.justice-doc-proof-grid img{width:100%;height:100%;object-fit:cover;display:block;}
+.justice-doc-empty{padding:10px 0;color:#64748b;font-size:12px;font-weight:700;}
+@media (max-width: 920px){
+  .justice-doc-header,.justice-doc-summary-grid,.justice-doc-catalog-grid,.justice-doc-proof-grid{grid-template-columns:1fr;display:grid;}
+  .justice-doc-header{display:flex;flex-direction:column;}
+  .justice-doc-stamp{min-width:0;width:100%;}
+  .justice-doc-kv,.justice-doc-participant{grid-template-columns:1fr;}
+  .justice-doc-participant-meta{text-align:left;}
+}

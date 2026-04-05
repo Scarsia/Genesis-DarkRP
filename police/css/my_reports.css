@@ -1,0 +1,51 @@
+#page-mes-rapports{
+  padding:22px 26px;
+}
+
+.my-reports-shell{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  min-height:100%;
+}
+
+.my-reports-table-wrap{
+  min-height:420px;
+}
+
+.my-reports-table thead th:nth-child(1){width:180px;}
+.my-reports-table thead th:nth-child(2){width:230px;}
+.my-reports-table thead th:nth-child(4),
+.my-reports-col-actions{width:132px;}
+
+.my-reports-cell-type,
+.my-reports-cell-location{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.my-reports-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.my-reports-open-btn{
+  height:28px;
+  padding:0 10px;
+  border-radius:5px;
+  border:1px solid rgba(120,156,214,.22);
+  background:rgba(85,116,173,.16);
+  color:#dde7f8;
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+  transition:background .14s ease, border-color .14s ease, color .14s ease;
+}
+
+.my-reports-open-btn:hover{
+  background:rgba(120,156,214,.18);
+  border-color:rgba(120,156,214,.42);
+  color:var(--text);
+}

@@ -1,0 +1,74 @@
+#mdt-debug-toggle{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:999998;
+  border:1px solid #3a4a68;
+  background:#0f1726;
+  color:#e6eefc;
+  border-radius:10px;
+  padding:10px 14px;
+  font:700 12px/1 'Segoe UI',system-ui,sans-serif;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+  cursor:pointer;
+}
+#mdt-debug-panel{
+  position:fixed;
+  right:18px;
+  bottom:68px;
+  width:min(560px, calc(100vw - 36px));
+  max-height:min(78vh, 820px);
+  z-index:999998;
+  display:none;
+  flex-direction:column;
+  border:1px solid #334155;
+  border-radius:14px;
+  overflow:hidden;
+  background:#0b1220;
+  color:#e5eefb;
+  box-shadow:0 24px 70px rgba(0,0,0,.45);
+  font-family:'Segoe UI',system-ui,sans-serif;
+}
+#mdt-debug-panel.open{ display:flex; }
+.mdt-debug-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px 14px;
+  border-bottom:1px solid #23304a;
+  background:#111a2c;
+}
+.mdt-debug-title{ font-size:13px; font-weight:800; }
+.mdt-debug-head button,
+.mdt-debug-actions button{
+  border:1px solid #334155;
+  background:#162135;
+  color:#e6eefc;
+  border-radius:8px;
+  padding:8px 10px;
+  font:600 11px/1 'Segoe UI',system-ui,sans-serif;
+  cursor:pointer;
+}
+.mdt-debug-head button:hover,
+.mdt-debug-actions button:hover{ background:#1b2942; }
+.mdt-debug-body{ padding:12px; display:flex; flex-direction:column; gap:10px; overflow:auto; }
+.mdt-debug-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.mdt-debug-card{ border:1px solid #23304a; border-radius:10px; background:#0f1726; padding:10px; }
+.mdt-debug-k{ font-size:10px; color:#9fb0cf; text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; }
+.mdt-debug-v{ font-size:12px; font-weight:700; word-break:break-word; }
+.mdt-debug-actions{ display:flex; flex-wrap:wrap; gap:8px; }
+#mdt-debug-log{
+  border:1px solid #23304a;
+  border-radius:10px;
+  background:#08101c;
+  min-height:220px;
+  white-space:pre-wrap;
+  word-break:break-word;
+  overflow:auto;
+  padding:10px;
+  font:12px/1.45 Consolas, Monaco, monospace;
+}
+.mdt-debug-good{ color:#8ef0b1; }
+.mdt-debug-bad{ color:#ff9f9f; }
+.mdt-debug-warn{ color:#ffd17a; }

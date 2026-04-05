@@ -1,0 +1,289 @@
+/* ═══════════════════════════════════════════════════════════════
+   RAPPORT D'ARRESTATION — REDESIGN v5.0
+   by Teddy
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Suspect Banner ── */
+.suspect-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  transition: all 0.2s ease;
+}
+
+.suspect-banner.has-citizen {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.sb-ava {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  letter-spacing: 0;
+}
+
+.sb-ava.set {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+  color: var(--accent-bright);
+}
+
+.sb-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sb-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.sb-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+.sb-none-msg {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.sb-wanted-pill {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 12px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* ── Arrest Success Screen ── */
+.arrest-success {
+  display: none;
+  text-align: center;
+  padding: 40px 32px;
+  animation: fadeIn 0.32s ease;
+}
+
+.as-check {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--success-bg);
+  border: 2px solid rgba(34, 197, 94, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 18px;
+}
+
+.as-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--success);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+
+.as-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.as-rnum {
+  display: inline-block;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent-bright);
+  letter-spacing: 0.1em;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 24px;
+  margin-bottom: 24px;
+}
+
+.as-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+  max-width: 380px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.as-stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+
+.as-stat-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.as-stat-val {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.as-stat-val.danger {
+  color: var(--danger);
+}
+
+.as-stat-val.warning {
+  color: var(--warning);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   REGISTRE DES RAPPORTS D'ARRESTATION
+═══════════════════════════════════════════════════════════════ */
+
+.arrest-hdr-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.arrest-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--accent-subtle);
+  border: 1px solid var(--accent);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.arrest-filter-pill strong {
+  color: var(--accent-bright);
+  font-weight: 700;
+}
+
+.arrest-filter-pill button {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0 0 0 4px;
+  transition: color 0.15s ease;
+}
+
+.arrest-filter-pill button:hover {
+  color: var(--text);
+}
+
+.arrest-list-search {
+  margin: 0 0 12px 0;
+}
+
+.arrest-list-body {
+  min-height: 520px;
+}
+
+.arrest-row .ops-row-title {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.04em;
+}
+
+.arrest-report-viewer {
+  background: #e8ecf2 !important;
+  padding: 0;
+}
+
+/* ── Document Style ── */
+.arrestdoc-page {
+  max-width: 100%;
+}
+
+.arrestdoc-charges {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.arrestdoc-charge {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  background: var(--bg-card);
+  transition: border-color 0.15s ease;
+}
+
+.arrestdoc-charge:hover {
+  border-color: var(--border-light);
+}
+
+.arrestdoc-charge-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.arrestdoc-charge-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.arrestdoc-charge-inst {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+.arrestdoc-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.arrestdoc-split-col {
+  min-width: 0;
+}
+
+@media (max-width: 1100px) {
+  .arrestdoc-split {
+    grid-template-columns: 1fr;
+  }
+}

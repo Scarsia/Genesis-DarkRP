@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NYPD MDT</title>
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet"/>
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<link rel="stylesheet" href="css/base.css"/>
+<link rel="stylesheet" href="css/citizens.css"/>
+<link rel="stylesheet" href="css/auth.css"/>
+<link rel="stylesheet" href="css/officers.css"/>
+<link rel="stylesheet" href="css/promotions.css"/>
+<link rel="stylesheet" href="css/highgrade_permissions.css"/>
+<link rel="stylesheet" href="css/poles.css"/>
+<link rel="stylesheet" href="css/arrest.css"/>
+<link rel="stylesheet" href="css/arrestation.css"/>
+<link rel="stylesheet" href="css/dashboard.css"/>
+<link rel="stylesheet" href="css/operations.css"/>
+<link rel="stylesheet" href="css/complaints.css"/>
+<link rel="stylesheet" href="css/weapons.css"/>
+<link rel="stylesheet" href="css/warrants.css"/>
+<link rel="stylesheet" href="css/bracelets.css"/>
+<link rel="stylesheet" href="css/alerts.css"/>
+<link rel="stylesheet" href="css/debug.css"/>
+<link rel="stylesheet" href="css/photos.css"/>
+<link rel="stylesheet" href="css/my_reports.css"/>
+<link rel="stylesheet" href="css/road_tickets.css"/>
+<script>
+(function(){
+  if(window.__mdt_bootstrap_queue_ready) return;
+  window.__mdt_bootstrap_queue_ready = true;
+  window.__mdtPendingInitCalls = window.__mdtPendingInitCalls || [];
+  window.__mdtPendingResponseCalls = window.__mdtPendingResponseCalls || [];
+  window.__mdtPendingNotifyCalls = window.__mdtPendingNotifyCalls || [];
+
+  window.__mdt_init = window.__mdt_init || function(){
+    window.__mdtPendingInitCalls.push([].slice.call(arguments));
+  };
+
+  window.__mdt_response = window.__mdt_response || function(){
+    window.__mdtPendingResponseCalls.push([].slice.call(arguments));
+  };
+
+  window.__mdt_notify = window.__mdt_notify || function(){
+    window.__mdtPendingNotifyCalls.push([].slice.call(arguments));
+  };
+
+  window.__mdt_flushBootstrapQueue = window.__mdt_flushBootstrapQueue || function(){
+    var i, args;
+    if(typeof window.__mdt_real_init === 'function'){
+      while(window.__mdtPendingInitCalls.length){
+        args = window.__mdtPendingInitCalls.shift();
+        try{ window.__mdt_real_init.apply(window, args); }catch(e){ console.error('[MDT] queued init failed', e); }
+      }
+      window.__mdt_init = window.__mdt_real_init;
+    }
+    if(typeof window.__mdt_real_response === 'function'){
+      while(window.__mdtPendingResponseCalls.length){
+        args = window.__mdtPendingResponseCalls.shift();
+        try{ window.__mdt_real_response.apply(window, args); }catch(e){ console.error('[MDT] queued response failed', e); }
+      }
+      window.__mdt_response = window.__mdt_real_response;
+    }
+    if(typeof window.__mdt_real_notify === 'function'){
+      while(window.__mdtPendingNotifyCalls.length){
+        args = window.__mdtPendingNotifyCalls.shift();
+        try{ window.__mdt_real_notify.apply(window, args); }catch(e){ console.error('[MDT] queued notify failed', e); }
+      }
+      window.__mdt_notify = window.__mdt_real_notify;
+    }
+  };
+})();
+</script>
+
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     NYPD MDT — LOGIN OVERLAY v4 — HTML VANILLA ROBUSTE
+═══════════════════════════════════════════════════════════════ -->
+<div id="login-overlay">
+
+  <div id="lo-card">
+
+    <!-- Logo NYPD -->
+    <img src="assets/nypd_logo.png"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"
+         class="lo-logo-img" alt="NYPD Badge"
+         onerror="this.style.display='none'"/>
+
+    <div class="lo-h1">MOBILE DATA TERMINAL</div>
+    <div class="lo-h2">NEW YORK CITY POLICE DEPARTMENT</div>
+    <div class="lo-hr"></div>
+
+    <!-- ══════════════ FORMULAIRE CONNEXION ══════════════ -->
+    <div id="lo-form-login">
+
+      <div class="lo-msg" id="lo-login-msg"></div>
+
+      <!-- MATRICULE -->
+      <div class="lo-field">
+        <svg class="lo-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+        <input type="text" id="lo-mat"
+               placeholder="M A T R I C U L E"
+               maxlength="2" inputmode="numeric" autocomplete="off"
+               onkeypress="return event.charCode>=48&&event.charCode<=57"
+               oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+               onkeydown="if(event.key==='Enter')loSubmitLogin()"/>
+      </div>
+      <div class="lo-hint">2&nbsp;chiffres &nbsp;&middot;&nbsp; ex&nbsp;: 07, 42</div>
+
+      <!-- MOT DE PASSE -->
+      <div class="lo-field">
+        <svg class="lo-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <input type="password" id="lo-pw"
+               placeholder="M O T  D E  P A S S E"
+               autocomplete="current-password"
+               onkeydown="if(event.key==='Enter')loSubmitLogin()"/>
+      </div>
+
+      <!-- RESTER CONNECTÉ -->
+      <label class="lo-check-row">
+        <input type="checkbox" id="lo-rem"/>
+        <span>RESTER CONNECTÉ SUR CET APPAREIL</span>
+      </label>
+
+      <!-- SE CONNECTER -->
+      <button class="lo-btn-p" id="lo-btn-login" onclick="loSubmitLogin()">
+        SE CONNECTER
+      </button>
+
+      <!-- SÉPARATEUR OU -->
+      <div class="lo-or-sep" id="lo-or-sep"><span>OU</span></div>
+
+      <!-- CRÉER UN COMPTE -->
+      <button class="lo-btn-g" id="lo-create-btn" onclick="loShowRegister()">
+        CRÉER UN COMPTE
+      </button>
+
+    </div><!-- /lo-form-login -->
+
+    <!-- ═══════════════ FORMULAIRE INSCRIPTION ════════════ -->
+    <div id="lo-form-register" style="display:none">
+
+      <div class="lo-msg" id="lo-reg-msg"></div>
+
+      <div class="lo-mat-box" id="lo-mat-box">
+        <div class="lo-mat-box-lbl">Matricule attribué</div>
+        <div class="lo-mat-box-val" id="lo-mat-box-val">—</div>
+      </div>
+
+      <div id="lo-reg-fields">
+
+        <div class="lo-field">
+          <svg class="lo-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <rect x="2" y="7" width="20" height="14" rx="2"/>
+            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+          </svg>
+          <input type="text" id="lo-reg-mat"
+                 placeholder="M A T R I C U L E"
+                 maxlength="2" inputmode="numeric" autocomplete="off"
+                 onkeypress="return event.charCode>=48&&event.charCode<=57"
+                 oninput="this.value=this.value.replace(/[^0-9]/g,'')"/>
+        </div>
+        <div class="lo-hint">Exactement 2 chiffres &nbsp;&middot;&nbsp; ex : 07, 42, 99</div>
+
+        <div class="lo-field">
+          <svg class="lo-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+          <input type="text" id="lo-reg-nom"
+                 placeholder="N O M  D E  F A M I L L E"
+                 autocomplete="family-name"
+                 oninput="loGenEmail()"/>
+        </div>
+
+        <div class="lo-field">
+          <svg class="lo-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          <input type="text" id="lo-reg-email"
+                 placeholder="nom@genesis.com"
+                 readonly autocomplete="off"/>
+        </div>
+        <div class="lo-hint">Généré automatiquement &nbsp;&middot;&nbsp; format : <em>nom@genesis.com</em></div>
+
+        <div class="lo-field">
+          <svg class="lo-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <input type="password" id="lo-reg-pw"
+                 placeholder="M O T  D E  P A S S E"
+                 autocomplete="new-password"/>
+        </div>
+
+        <button class="lo-btn-p" id="lo-btn-register"
+                onclick="loSubmitRegister()" style="margin-top:18px">
+          VALIDER L'INSCRIPTION
+        </button>
+
+      </div><!-- /lo-reg-fields -->
+
+      <button class="lo-btn-back" onclick="loShowLogin()">&#8592; Retour</button>
+
+    </div><!-- /lo-form-register -->
+
+    <!-- Signature -->
+    <div class="lo-card-footer">
+      <div class="lo-signature">Developed <span>by Teddy</span></div>
+    </div>
+
+  </div><!-- /lo-card -->
+
+  <div id="lo-statusbar">
+    <div class="lo-sb-dot"></div>
+    <span>Système en ligne</span>
+    <span class="lo-sb-r">NYPD MDT v5.0 &nbsp;&middot;&nbsp; ACCÈS RESTREINT — PERSONNEL AUTORISÉ</span>
+  </div>
+
+</div><!-- /login-overlay -->
+
+<div id="app">
+
+  <header>
+    <div class="hbadge">NYPD</div>
+    <div class="htitle">Mobile Data Terminal</div>
+    <div class="hsub" id="hdr-agent-info">Système de gestion policière</div>
+    <div class="hdot"></div>
+  </header>
+
+  <div class="body">
+    <!-- ══ SIDEBAR — Redesign v5.0 ══ -->
+    <aside>
+      <!-- Sidebar Header avec Logo -->
+      <div class="sidebar-header">
+        <img src="assets/nypd_logo.png" alt="NYPD" class="sidebar-logo"/>
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-title">NYPD MDT</div>
+          <div class="sidebar-brand-sub">Mobile Data Terminal</div>
+        </div>
+      </div>
+
+      <!-- Sidebar Scroll Area -->
+      <div class="sidebar-scroll">
+        <div class="s-sec">Navigation</div>
+        <div class="nav-item" id="nav-dashboard" onclick="setPage('dashboard')"><span class="nav-ic">🏠</span> Tableau de bord</div>
+        <div class="nav-item active" id="nav-citizens" onclick="setPage('citizens')"><span class="nav-ic">👤</span> Citoyens</div>
+        <div class="nav-item" id="nav-officers" onclick="setPage('officers')"><span class="nav-ic">👮</span> Effectifs</div>
+        <div class="nav-item" id="nav-poles" onclick="setPage('poles')"><span class="nav-ic">🧩</span> Pôles / Spécialités</div>
+        <div class="sdiv"></div>
+
+        <div class="s-sec">Dossiers</div>
+        <div class="acc-hdr open" id="sidebar-menu-registres-header" onclick="toggleSidebarMenu('registres', event)">
+          <div class="acc-ico">📁</div>
+          <span class="acc-lbl">Registres</span>
+          <span class="acc-arr">&#9662;</span>
+        </div>
+        <div class="acc-body open" id="sidebar-menu-registres-body">
+          <div class="acc-item" data-page="arrest" onclick="setAccItem(this);setPage('arrest')">Dossiers d'arrestation</div>
+          <div class="acc-item" data-page="operations" onclick="setAccItem(this);setPage('operations')">Rapports d'opération</div>
+          <div class="acc-item" data-page="complaints" onclick="setAccItem(this);setPage('complaints')">Registre des plaintes</div>
+          <div class="acc-item" data-page="weapons" onclick="setAccItem(this);setPage('weapons')">Registre des armes</div>
+          <div class="acc-item" data-page="bracelets" onclick="setAccItem(this);setPage('bracelets')">Registre des bracelets</div>
+          <div class="acc-item" data-page="delits" onclick="setAccItem(this);setPage('delits')">Registre des délits</div>
+          <div class="acc-item" data-page="vehicle-tickets" onclick="setAccItem(this);setPage('vehicle-tickets')">Véhicules en infraction</div>
+        </div>
+
+        <div class="acc-hdr" id="sidebar-menu-preuves-header" onclick="toggleSidebarMenu('preuves', event)">
+          <div class="acc-ico">📸</div>
+          <span class="acc-lbl">Preuves</span>
+          <span class="acc-arr">&#9662;</span>
+        </div>
+        <div class="acc-body" id="sidebar-menu-preuves-body">
+          <div class="acc-item" data-page="dossier-photos" onclick="setAccItem(this);ensureSidebarMenuOpen('preuves', true);setPage('dossier-photos')">Photos</div>
+        </div>
+
+        <div class="acc-hdr" id="sidebar-menu-mes-dossiers-header" onclick="toggleSidebarMenu('mes-dossiers', event)">
+          <div class="acc-ico">🗂️</div>
+          <span class="acc-lbl">Mes dossiers</span>
+          <span class="acc-arr">&#9662;</span>
+        </div>
+        <div class="acc-body" id="sidebar-menu-mes-dossiers-body">
+          <div class="acc-item" data-page="interrogatoires" onclick="setAccItem(this);ensureSidebarMenuOpen('mes-dossiers', true);setPage('interrogatoires')">Mes interrogatoires</div>
+          <div class="acc-item" data-page="mes-rapports" onclick="setAccItem(this);ensureSidebarMenuOpen('mes-dossiers', true);setPage('mes-rapports')">Mes rapports d'incident</div>
+        </div>
+
+        <div id="sidebar-high-grade-slot" class="promo-sidebar-slot"></div>
+
+        <div class="sdiv"></div>
+        <div class="nav-item" id="nav-mandats" onclick="setPage('mandats')"><span class="nav-ic">⚖️</span> Mandats</div>
+        <div class="nav-item" id="nav-alerts" onclick="setPage('alerts')"><span class="nav-ic">🚨</span> Alertes actives</div>
+        <div class="sdiv"></div>
+        <div class="nav-item" onclick="closeMDT()"><span class="nav-ic">🚪</span> Fermer le MDT</div>
+      </div>
+
+      <!-- Sidebar Footer — Signature -->
+      <div class="sidebar-footer">
+        <div class="sidebar-signature">Developed <span>by Teddy</span></div>
+      </div>
+    </aside>
+
+    <main>
+
+      <!-- ══════════════════════════════════════════
+           PAGE : TABLEAU DE BORD (placeholder)
+      ══════════════════════════════════════════ -->
+      <!-- ══════════════════════════════════════════
+           PAGE : TABLEAU DE BORD
+      ══════════════════════════════════════════ -->
+      <div class="page" id="page-dashboard">
+
+        <!-- Ligne KPI -->
+        <div class="dash-grid" id="dash-kpi-grid">
+          <div class="kpi-card blue">
+            <div class="kpi-ico">📋</div>
+            <div class="kpi-val blue kpi-loading" id="kpi-arrests">—</div>
+            <div class="kpi-lbl">Arrestations aujourd'hui</div>
+            <div class="kpi-sub" id="kpi-arrests-sub">Chargement…</div>
+          </div>
+          <div class="kpi-card red">
+            <div class="kpi-ico">⚖️</div>
+            <div class="kpi-val red kpi-loading" id="kpi-warrants">—</div>
+            <div class="kpi-lbl">Mandats actifs</div>
+            <div class="kpi-sub" id="kpi-warrants-sub">Chargement…</div>
+          </div>
+          <div class="kpi-card green">
+            <div class="kpi-ico">👮</div>
+            <div class="kpi-val green kpi-loading" id="kpi-officers">—</div>
+            <div class="kpi-lbl">Agents en service</div>
+            <div class="kpi-sub" id="kpi-officers-sub">Chargement…</div>
+          </div>
+          <div class="kpi-card amber">
+            <div class="kpi-ico">⚑</div>
+            <div class="kpi-val amber kpi-loading" id="kpi-wanted">—</div>
+            <div class="kpi-lbl">Citoyens recherchés</div>
+            <div class="kpi-sub" id="kpi-wanted-sub">Chargement…</div>
+          </div>
+        </div>
+
+        <!-- Ligne principale -->
+        <div class="dash-row">
+
+          <!-- Activité récente -->
+          <div class="card" style="overflow:hidden">
+            <div class="dash-section-title">Activité récente</div>
+            <div class="activity-list" id="dash-activity">
+              <div style="color:var(--text-dim);font-size:12px;font-style:italic;padding:12px 0;text-align:center">⏳ Chargement…</div>
+            </div>
+          </div>
+
+          <!-- Roster agents connectés -->
+          <div class="card" style="overflow:hidden">
+            <div class="dash-section-title">Agents en service</div>
+            <div id="dash-roster">
+              <div style="color:var(--text-dim);font-size:12px;font-style:italic;padding:12px 0;text-align:center">⏳ Chargement…</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Ligne secondaire -->
+        <div class="dash-row">
+
+          <!-- Wanted mini-list -->
+          <div class="card" style="overflow:hidden">
+            <div class="dash-section-title">Personnes recherchées</div>
+            <div id="dash-wanted-list">
+              <div style="color:var(--text-dim);font-size:12px;font-style:italic;padding:12px 0;text-align:center">⏳ Chargement…</div>
+            </div>
+          </div>
+
+          <!-- Actions rapides -->
+          <div class="card" style="overflow:hidden">
+            <div class="dash-section-title">Actions rapides</div>
+            <div class="qa-grid">
+              <button class="qa-btn" onclick="setPage('arrest')">
+                <span class="qa-ico">📝</span>
+                <div class="qa-lbl">Rapport d'arrestation</div>
+                <div class="qa-sub">Nouveau dossier</div>
+              </button>
+              <button class="qa-btn" onclick="setPage('mandats')">
+                <span class="qa-ico">⚖️</span>
+                <div class="qa-lbl">Émettre un mandat</div>
+                <div class="qa-sub">Mandat d'arrêt / perquise</div>
+              </button>
+              <button class="qa-btn" onclick="setPage('citizens')">
+                <span class="qa-ico">👤</span>
+                <div class="qa-lbl">Rechercher un citoyen</div>
+                <div class="qa-sub">Base de données</div>
+              </button>
+              <button class="qa-btn" onclick="setPage('officers')">
+                <span class="qa-ico">👮</span>
+                <div class="qa-lbl">Consulter les effectifs</div>
+                <div class="qa-sub">Annuaire NYPD</div>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           PAGE : CITOYENS
+      ══════════════════════════════════════════ -->
+      <div class="page active" id="page-citizens" style="padding:0;overflow:hidden;height:100%">
+        <div class="citizens-layout" style="height:100%">
+
+          <!-- Liste citoyens -->
+          <div class="cit-list-col">
+            <div class="cit-list-header">
+              <h3>Citoyens enregistrés</h3>
+              <div class="cit-search">
+                <span class="cit-search-ico">🔍</span>
+                <input type="text" id="cit-search" placeholder="Rechercher…" oninput="filterCitizens()"/>
+              </div>
+            </div>
+            <div class="cit-list-body" id="cit-list"></div>
+          </div>
+
+          <!-- Profil (placeholder quand rien sélectionné) -->
+          <div class="cit-profile-col" id="cit-profile-col">
+            <div class="cit-placeholder" id="cit-placeholder">
+              <div class="ico">👤</div>
+              <p>Sélectionnez un citoyen</p>
+            </div>
+
+            <!-- Profil complet (caché par défaut) -->
+            <div id="cit-profile" style="display:none;flex:1;display:none;flex-direction:column;overflow:hidden">
+
+              <!-- En-tête -->
+              <div class="prof-header">
+                <div class="prof-avatar" id="prof-avatar">?</div>
+                <div class="prof-id">
+                  <div class="prof-name" id="prof-name">—</div>
+                  <div class="prof-meta">
+                    <span id="prof-dob">—</span>
+                    <span id="prof-phone">—</span>
+                    <span id="prof-sid">—</span>
+                  </div>
+                  <div class="prof-status-badges" id="prof-status-badges"></div>
+                </div>
+              </div>
+
+              <!-- Corps -->
+              <div class="prof-body">
+
+                <!-- Boutons actions -->
+                <div class="prof-actions">
+                  <div class="act-section">Dossiers</div>
+                  <button class="act-btn" onclick="actionBtn('casier')">
+                    <span class="act-ico">📋</span> Extrait de casier judiciaire
+                  </button>
+                  <button class="act-btn" onclick="actionBtn('mandat')">
+                    <span class="act-ico">⚖️</span> Demande de mandat d'arrêt
+                  </button>
+                  <div class="act-section">Rapports</div>
+                  <button class="act-btn" onclick="actionBtn('ticket')">
+                    <span class="act-ico">🎫</span> Écrire un ticket routier
+                  </button>
+                  <button class="act-btn" onclick="actionBtn('rapport_arrest')">
+                    <span class="act-ico">📝</span> Rapport d'arrestation
+                  </button>
+                  <button class="act-btn" onclick="actionBtn('dossier_arrest')">
+                    <span class="act-ico">🗂️</span> Dossier d'arrestation
+                  </button>
+                  <div class="act-section">Mesures</div>
+                  <button class="act-btn" onclick="actionBtn('plainte')">
+                    <span class="act-ico">📣</span> Encoder une plainte
+                  </button>
+                  <button class="act-btn" onclick="actionBtn('deposition')">
+                    <span class="act-ico">💬</span> Encoder une déposition
+                  </button>
+                  <button class="act-btn" onclick="actionBtn('bracelet')">
+                    <span class="act-ico">📡</span> Bracelet électronique
+                  </button>
+                </div>
+
+                <!-- Info + onglets -->
+                <div class="prof-content">
+                  <!-- Grille attributs -->
+                  <div class="info-grid">
+                    <div class="info-grid-inner">
+                      <div class="info-cell"><span class="info-lbl">Taille</span><span class="info-val" id="pi-taille">—</span></div>
+                      <div class="info-cell"><span class="info-lbl">Poids</span><span class="info-val" id="pi-poids">—</span></div>
+                      <div class="info-cell"><span class="info-lbl">Sexe</span><span class="info-val" id="pi-sexe">—</span></div>
+                      <div class="info-cell"><span class="info-lbl">Adresse</span><span class="info-val" id="pi-adresse">—</span></div>
+                      <div class="info-cell"><span class="info-lbl">Cheveux</span><span class="info-val" id="pi-cheveux">—</span></div>
+                      <div class="info-cell"><span class="info-lbl">Yeux</span><span class="info-val" id="pi-yeux">—</span></div>
+                      <div class="info-cell"><span class="info-lbl">Ethnie</span><span class="info-val" id="pi-ethnie">—</span></div>
+                      <div class="info-cell"><span class="info-lbl">Emploi</span><span class="info-val" id="pi-emploi">—</span></div>
+                    </div>
+                  </div>
+                  <!-- Licences -->
+                  <div class="licenses-row">
+                    <div class="lic-item">
+                      <div class="lic-dot" id="lic-permis"></div>
+                      <span class="lic-label">Permis de conduire</span>
+                    </div>
+                    <div class="lic-item">
+                      <div class="lic-dot" id="lic-ppa-civil"></div>
+                      <span class="lic-label">PPA civil</span>
+                    </div>
+                    <div class="lic-item">
+                      <div class="lic-dot" id="lic-ppa-chasse"></div>
+                      <span class="lic-label">PPA de chasse</span>
+                    </div>
+                    <div class="lic-item" style="margin-left:auto">
+                      <div class="lic-dot" id="lic-wanted"></div>
+                      <span class="lic-label">Wanted</span>
+                    </div>
+                    <div class="lic-item">
+                      <div class="lic-dot" id="lic-deceased"></div>
+                      <span class="lic-label">Décédé</span>
+                    </div>
+                  </div>
+                  <!-- Onglets -->
+                  <div class="tabs-bar">
+                    <div class="tab active" onclick="setTab(this,'tab-arrests')">Dossier d'Arrestation</div>
+                    <div class="tab" onclick="setTab(this,'tab-plaintes')">Plaintes</div>
+                    <div class="tab" onclick="setTab(this,'tab-depositions')">Dépositions</div>
+                    <div class="tab" onclick="setTab(this,'tab-bracelets')">Bracelets électroniques</div>
+                  </div>
+                  <div class="tab-content">
+                    <div class="tab-panel active" id="tab-arrests"></div>
+                    <div class="tab-panel" id="tab-plaintes"></div>
+                    <div class="tab-panel" id="tab-depositions"></div>
+                    <div class="tab-panel" id="tab-bracelets"></div>
+                  </div>
+                </div><!-- /prof-content -->
+
+              </div><!-- /prof-body -->
+            </div><!-- /cit-profile -->
+          </div><!-- /cit-profile-col -->
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           PAGE : RAPPORT D'ARRESTATION
+      ══════════════════════════════════════════ -->
+      <div class="page" id="page-arrest">
+        <div class="ops-page-shell arrest-registry-shell">
+          <div class="ops-page-hdr">
+            <div>
+              <div class="card-title">Dossiers d'arrestation</div>
+              <div class="card-sub">Registre central — aperçu PDF à droite, création dans une modale dédiée.</div>
+            </div>
+            <div class="mdt-hdr-right arrest-hdr-right">
+              <div class="arrest-filter-pill" id="arrest-citizen-filter-pill" style="display:none"></div>
+              <button class="btn btn-primary" id="arrest-open-create-btn" type="button" onclick="window.openModalArrestation();return false;">Créer un dossier d'arrestation</button>
+            </div>
+          </div>
+
+          <div class="ops-layout arrest-layout">
+            <div class="ops-list-col arrest-list-col">
+              <div class="ops-list-top">
+                <div class="ops-list-title">Liste des rapports</div>
+                <div class="ops-list-count" id="arrest-count">0 rapport</div>
+              </div>
+
+              <div class="plaints-search-box arrest-list-search">
+                <span class="plaints-search-ico">🔎</span>
+                <input type="text" id="arrest-search" placeholder="Rechercher un dossier d'arrestation..." oninput="window.filterArrestReports()" />
+              </div>
+
+              <div class="ops-list-body arrest-list-body" id="arrest-list">
+                <div class="ops-empty">Aucun dossier d'arrestation enregistré.</div>
+              </div>
+            </div>
+
+            <div class="ops-detail-col arrest-detail-col">
+              <div class="ops-detail-placeholder" id="arrest-detail-placeholder">
+                <div class="ico">📄</div>
+                <p>Sélectionnez un dossier d'arrestation</p>
+              </div>
+
+              <div id="arrest-report-viewer" class="report-viewer arrest-report-viewer" style="display:none"></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /page-arrest -->
+
+
+      <!-- ══════════════════════════════════════════
+           PAGE : DOSSIER PHOTOS
+      ══════════════════════════════════════════ -->
+      <div class="page" id="page-dossier-photos">
+        <div class="photo-folder-shell">
+          <div class="photo-folder-header">
+            <div>
+              <div class="card-title" id="photo-folder-title">Dossiers photos</div>
+              <div class="card-sub" id="photo-folder-meta">Tous les dossiers photos centralisés. Ouvrez un dossier pour consulter ou ajouter des photos.</div>
+            </div>
+            <div class="mdt-hdr-right photo-folder-header-actions">
+              <button class="btn btn-primary" id="photo-folder-create-btn" type="button" onclick="window.openPhotoFolderForm();return false;">Créer un dossier photo</button>
+              <button class="btn btn-ghost" id="photo-folder-back-btn" type="button" onclick="window.closePhotoFolderPage();return false;">Retour</button>
+            </div>
+          </div>
+
+          <div id="photo-folders-view" class="photo-folders-view">
+            <div class="photo-folders-grid" id="photo-folder-grid">
+              <div class="photo-folder-empty">Aucun dossier photo.</div>
+            </div>
+          </div>
+
+          <div id="photo-folder-detail-view" class="photo-folder-detail-view" style="display:none">
+            <div class="photo-folder-detail-topbar">
+              <button class="btn btn-ghost" type="button" onclick="window.backToPhotoFolders();return false;">← Retour aux dossiers</button>
+              <div class="photo-folder-detail-meta">
+                <div class="photo-folder-detail-title" id="photo-folder-detail-title">Dossier photo</div>
+                <div class="photo-folder-detail-sub" id="photo-folder-detail-sub">Sélectionnez un dossier.</div>
+              </div>
+            </div>
+
+            <div class="photo-folder-dropzone" id="photo-folder-dropzone" tabindex="0" contenteditable="true" spellcheck="false">
+              <div class="photo-folder-dropzone-inner">
+                <strong>Coller une image (CTRL + V)</strong>
+                <span>ou cliquez ici pour choisir une image / glissez-déposez un fichier</span>
+              </div>
+            </div>
+            <input id="photo-folder-file-input" type="file" accept="image/*" style="display:none" />
+
+            <div class="photo-folder-gallery" id="photo-folder-gallery">
+              <div class="photo-folder-empty">Aucune photo enregistrée dans ce dossier.</div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /page-dossier-photos -->
+
+      <div class="modal-backdrop" id="photo-folder-modal" aria-hidden="true" style="display:none" onclick="if(event.target===this)window.closePhotoFolderForm()">
+        <div class="modal-card photo-folder-modal-card" role="dialog" aria-modal="true" aria-labelledby="photo-folder-modal-title">
+          <div class="ops-op-head">
+            <div>
+              <div class="ops-op-title" id="photo-folder-modal-title">Créer un dossier photo</div>
+              <div class="ops-op-sub" id="photo-folder-modal-sub">Donnez un nom clair au dossier pour pouvoir le retrouver ensuite.</div>
+            </div>
+            <button type="button" class="ops-op-x" onclick="window.closePhotoFolderForm()">×</button>
+          </div>
+          <div class="ops-op-body photo-folder-modal-body">
+            <label class="op-field">
+              <span>Nom du dossier photo *</span>
+              <input type="text" id="photo-folder-name" placeholder="Ex: Braquage de convoi IRS" />
+            </label>
+          </div>
+          <div class="ops-op-actions">
+            <button class="btn" type="button" onclick="window.closePhotoFolderForm()">Annuler</button>
+            <button class="btn btn-primary" type="button" id="photo-folder-save-btn" onclick="window.submitPhotoFolderForm()">Ajouter le dossier</button>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- ═════════════════════════════════════���════
+           PAGE : EFFECTIFS NYPD  (Partie 2)
+      ══════════════════════════════════════════ -->
+      <div class="page" id="page-officers">
+        <div class="off-page-hdr">
+          <div>
+            <div class="card-title">Effectifs NYPD</div>
+            <div class="card-sub">Annuaire du personnel — joueurs en ligne uniquement</div>
+          </div>
+          <div class="off-hdr-right">
+            <div class="off-search-wrap">
+              <span class="off-search-ico">🔍</span>
+              <input type="text" id="off-search" placeholder="Rechercher un agent…" oninput="filterOfficers()"/>
+            </div>
+            <div class="off-count-badge" id="off-count">— agents</div>
+          </div>
+        </div>
+        <div class="dt-wrap">
+          <table class="dt-table" id="officers-table">
+            <thead>
+              <tr id="officers-head-row">
+                <th>Statut</th>
+                <th>Matricule</th>
+                <th>Prénom</th>
+                <th>Nom</th>
+                <th>Téléphone</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody id="officers-tbody">
+              <tr><td colspan="6" class="dt-empty">⏳&nbsp; Chargement des effectifs…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+      <!-- ══════════════════════════════════════════
+           PAGE : PROMOTIONS
+      ══════════════════════════════════════════ -->
+      <div class="page" id="page-promotions">
+        <div class="promo-page-hdr">
+          <div>
+            <div class="card-title">Promotions</div>
+            <div class="card-sub">Gestion des grades policiers via l'addon [Ranks]. Sélectionnez un agent à droite, un grade à gauche, puis appliquez la promotion.</div>
+          </div>
+        </div>
+
+        <div class="promo-shell">
+          <div class="promo-panel">
+            <div class="promo-section-title">Grade cible</div>
+            <select id="promo-rank-select" class="promo-select" onchange="window.onPromotionRankChange()">
+              <option value="">— Sélectionner un grade —</option>
+            </select>
+
+            <div class="promo-section-title">Récapitulatif</div>
+            <div class="promo-selected-box" id="promo-selected-summary">
+              <div class="promo-selected-line"><strong>Agent :</strong> Aucun agent sélectionné</div>
+              <div class="promo-selected-line"><strong>Grade cible :</strong> Aucun grade sélectionné</div>
+              <div class="promo-selected-line"><strong>Rang actuel :</strong> —</div>
+            </div>
+
+            <button class="promo-apply-btn" id="promo-apply-btn" type="button" onclick="window.applyPromotionAgent()" disabled>
+              Appliquer la promotion
+            </button>
+          </div>
+
+          <div class="promo-main">
+            <div class="promo-toolbar">
+              <input type="text" id="promo-search" class="promo-search" placeholder="Rechercher un agent..." oninput="window.filterPromotionAgents()" />
+              <div class="promo-count" id="promo-count">0 agent</div>
+            </div>
+
+            <div class="promo-agents" id="promo-agents-list">
+              <div class="promo-empty">Chargez la liste des agents pour commencer.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           PAGE : PÔLES / SPÉCIALITÉS
+      ══════════════════════════════════════════ -->
+      <div class="page" id="page-rank-permissions">
+        <div class="rankperm-page-hdr">
+          <div>
+            <div class="card-title">Permissions par grade</div>
+            <div class="card-sub">Sélectionne un grade de police, puis active ou retire précisément tout ce qu'il peut faire dans le MDT : consulter, créer, modifier, supprimer et gérer.</div>
+          </div>
+        </div>
+        <div class="rankperm-shell">
+          <section class="rankperm-panel">
+            <div class="promo-section-title">Grades de police</div>
+            <div id="rankperm-grade-list" class="rankperm-grade-list"></div>
+          </section>
+          <section class="rankperm-main">
+            <div class="rankperm-toolbar">
+              <div class="sw rankperm-group-wrap">
+                <select id="rankperm-group-select" onchange="window.onRankPermGroupChange()">
+                  <option value="">Chargement des groupes MRS...</option>
+                </select>
+              </div>
+              <input id="rankperm-search" class="rankperm-search" type="text" placeholder="Rechercher une permission..." oninput="window.onRankPermSearch()"/>
+              <button id="rankperm-save-btn" class="rankperm-save" onclick="window.saveRankPermissions()">Enregistrer les permissions</button>
+            </div>
+            <div class="rankperm-status" id="rankperm-group-status">Chargement des ranks [Ranks]...</div>
+            <div class="promo-selected-box">
+              <div class="promo-selected-line"><strong>Grade sélectionné :</strong> <span id="rankperm-current-grade">Aucun grade sélectionné</span></div>
+              <div class="promo-selected-line"><strong>Conseil :</strong> désactive tout ce que tu ne veux pas accorder, puis enregistre.</div>
+            </div>
+            <div id="rankperm-categories" class="rankperm-categories"></div>
+            <div class="rankperm-footer-actions">
+              <button id="rankperm-save-btn-bottom" class="rankperm-save rankperm-save-bottom" onclick="window.saveRankPermissions()">Enregistrer les permissions</button>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div class="page" id="page-poles">
+        <div class="pole-page-hdr">
+          <div>
+            <div class="card-title">Pôles / Spécialités</div>
+            <div class="card-sub">Répartition automatique par métier DarkRP — joueurs en ligne uniquement.</div>
+          </div>
+          <div class="pole-hdr-actions">
+            <div class="off-count-badge" id="poles-count">— pôles</div>
+            <button class="btn btn-primary" id="btn-manage-poles" onclick="openPolesManager()">Gérer les Pôles</button>
+          </div>
+        </div>
+        <div class="pole-grid" id="poles-grid">
+          <div class="pole-empty">⏳ Chargement des pôles…</div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           MODAL : GÉRER LES PÔLES
+      ══════════════════════════════════════════ -->
+      <div class="modal-backdrop" id="poles-modal" style="display:none" onclick="if(event.target===this)closePolesManager()">
+        <div class="modal-card manage-poles-modal" role="dialog" aria-modal="true" aria-labelledby="manage-poles-title">
+          <div class="manage-poles-hdr">
+            <div class="manage-poles-ico">🛡️</div>
+            <div class="manage-poles-txt">
+              <div class="manage-poles-title" id="manage-poles-title">Gérer les Pôles &amp; Spécialités</div>
+              <div class="manage-poles-sub">Créer, modifier ou supprimer les divisions du NYPD</div>
+            </div>
+            <button class="modal-close manage-poles-close" type="button" onclick="closePolesManager()">✕</button>
+          </div>
+
+          <div class="manage-poles-body">
+            <div class="manage-poles-create">
+              <div class="manage-poles-form-grid">
+                <div class="fg">
+                  <label for="manage-pole-name">Nom du pôle</label>
+                  <input
+                    type="text"
+                    id="manage-pole-name"
+                    autocomplete="off"
+                    placeholder="Ex : Nord - Crime, SWAT..."
+                  />
+                </div>
+
+                <div class="fg sw">
+                  <label for="manage-pole-job">Catégorie / Job lié (Optionnel)</label>
+                  <select id="manage-pole-job">
+                    <option value="">— Aucun métier spécifique —</option>
+                  </select>
+                </div>
+
+                <div class="manage-poles-create-actions">
+                  <button class="btn btn-primary" type="button" onclick="createManagePole()">
+                    + Créer ce pôle
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="manage-poles-sep"></div>
+
+            <div class="manage-poles-list-wrap">
+              <div class="manage-poles-list" id="manage-poles-list">
+                <div class="manage-poles-empty">Chargement des pôles…</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="manage-poles-footer">
+            <button class="btn btn-ghost" type="button" onclick="closePolesManager()">
+              Fermer
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <!-- ══════════════════════════════════════════
+           PAGE : RAPPORTS D'OPÉRATION
+      ══════════════════════════════════════════ -->
+      <div class="page" id="page-operations">
+        <div class="ops-page-shell">
+          <div class="ops-page-hdr">
+            <div>
+              <div class="card-title">Rapports d'opération</div>
+              <div class="card-sub">Dossiers autonomes — interface séparée des arrestations</div>
+            </div>
+            <div class="mdt-hdr-right">
+              <button class="btn btn-primary" id="ops-open-create-btn" type="button">Créer un rapport</button>
+            </div>
+          </div>
+
+          <div class="ops-layout">
+            <div class="ops-list-col">
+              <div class="ops-list-top">
+                <div class="ops-list-title">Liste des rapports</div>
+                <div class="ops-list-count" id="ops-count">0 rapport</div>
+              </div>
+              <div class="ops-list-body" id="ops-list">
+                <div class="ops-empty">Aucun rapport d'opération enregistré.</div>
+              </div>
+            </div>
+
+            <div class="ops-detail-col" id="ops-detail-col">
+              <div class="ops-detail-placeholder" id="ops-detail-placeholder">
+                <div class="ico">🗂️</div>
+                <p>Sélectionnez un rapport d'opération</p>
+              </div>
+
+              <div id="report-viewer" class="report-viewer" style="display:none"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           PAGE : REGISTRE DES PLAINTES
+      ══════════════════════════════════════════ -->
+
+      <div class="page" id="page-interrogatoires"></div>
+
+      <div class="page" id="page-mes-rapports">
+        <div class="my-reports-shell">
+          <div class="mdt-page-hdr">
+            <div>
+              <div class="card-title">Mes rapports d'incident</div>
+              <div class="card-sub">Vue personnelle — seuls les rapports rédigés par l'officier connecté sont affichés.</div>
+            </div>
+          </div>
+
+          <div class="armes-table-wrap my-reports-table-wrap">
+            <table class="armes-table my-reports-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Lieu</th>
+                  <th class="my-reports-col-actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="mes-rapports-table-body">
+                <tr><td colspan="4" class="armes-empty">Chargement des rapports…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-complaints">
+        <div id="page-plaintes" class="plaints-page-shell">
+          <div class="plaints-page-hdr">
+            <div>
+              <div class="card-title">Registre des plaintes</div>
+              <div class="card-sub">Interface type rapports d'opération d'origine, avec liste à gauche et aperçu à droite.</div>
+            </div>
+            <div class="mdt-hdr-right">
+              <button class="btn btn-primary" id="complaints-open-create-btn" type="button">Créer une plainte</button>
+            </div>
+          </div>
+
+          <div class="plaints-layout">
+            <div class="plaints-list-col">
+              <div class="plaints-list-top">
+                <div class="plaints-list-title">Liste des plaintes</div>
+                <div class="plaints-list-count" id="plaints-count">0 plainte</div>
+              </div>
+
+              <div class="plaints-list-tools">
+                <div class="sw plaints-filter-wrap">
+                  <select id="plaints-status-filter" onchange="filterComplaintsTable()">
+                    <option value="all">Tous les statuts</option>
+                    <option value="En cours">Ouvert</option>
+                    <option value="Terminee sans suite">Terminée sans suite</option>
+                  </select>
+                </div>
+
+                <div class="plaints-search-box">
+                  <span class="plaints-search-ico">🔎</span>
+                  <input type="text" id="plaints-search" placeholder="Rechercher une plainte..." oninput="filterComplaintsTable()" />
+                </div>
+              </div>
+
+              <div class="plaints-table-body" id="plaints-table-body">
+                <div class="plaints-empty">Aucune plainte enregistrée.</div>
+              </div>
+            </div>
+
+            <div class="plaints-detail-col">
+              <div class="ops-detail-placeholder" id="plaints-viewer-placeholder">
+                <div class="ico">📄</div>
+                <p>Sélectionnez une plainte pour l'afficher</p>
+              </div>
+
+              <div id="complaint-viewer" class="report-viewer" style="display:none"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<!-- ══════════════════════════════════════════
+           PAGE : REGISTRE DES ARMES
+      ══════════════════════════════════════════ -->
+      <div class="page" id="page-weapons">
+        <div id="page-armes" class="armes-page-shell">
+          <div class="armes-toolbar">
+            <div class="armes-toolbar-left">
+              <div class="sw armes-select-wrap">
+                <select id="armes-origin-filter" onchange="window.filterArmesTable()">
+                  <option value="all">Toutes les origines</option>
+                </select>
+              </div>
+
+              <div class="sw armes-select-wrap">
+                <select id="armes-status-filter" onchange="window.filterArmesTable()">
+                  <option value="all">Tous les états</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="armes-toolbar-right">
+              <div class="armes-search-box">
+                <input type="text" id="armes-search" placeholder="Rechercher une arme..." oninput="window.filterArmesTable()" />
+              </div>
+              <button class="btn btn-primary" id="armes-open-modal-btn" type="button" onclick="window.openModalArmes();return false;">Encoder une arme</button>
+            </div>
+          </div>
+
+          <div class="armes-table-wrap">
+            <table class="armes-table">
+              <thead>
+                <tr>
+                  <th class="armes-col-arrow"></th>
+                  <th>DATE D'ENREGISTREMENT</th>
+                  <th>N° DE SERIE</th>
+                  <th>MODELE</th>
+                  <th>STATUT</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody id="armes-table-body">
+                <tr>
+                  <td colspan="6" class="armes-empty">Aucune arme enregistrée.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           PAGE : REGISTRE DES DÉLITS
+      ══════════════════════════════════════════ -->
+      <div class="page" id="page-delits">
+        <div class="armes-page-shell" id="page-delits-shell">
+          <div class="armes-toolbar">
+            <div class="armes-toolbar-left">
+              <div class="sw armes-select-wrap">
+                <select id="delits-category-filter">
+                  <option value="all">Toutes categories</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="armes-toolbar-right">
+              <div class="armes-search-box">
+                <input type="text" id="delits-search" placeholder="Rechercher une charge..." />
+              </div>
+            </div>
+          </div>
+
+          <div class="armes-table-wrap">
+            <table class="armes-table" id="delits-table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>TYPE</th>
+                  <th>AMENDE</th>
+                  <th>INSTRUCTION</th>
+                  <th>TEMPS PRISON (HH:MM:SS)</th>
+                </tr>
+              </thead>
+              <tbody id="delits-table-body">
+                <tr>
+                  <td colspan="5" class="armes-empty">Aucune charge disponible.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:6px;align-items:center;padding:2px 2px 0 2px;">
+            <button class="btn btn-sm btn-ghost" type="button">1</button>
+            <button class="btn btn-sm btn-ghost" type="button">2</button>
+            <button class="btn btn-sm btn-ghost" type="button">3</button>
+            <span style="color:rgba(221,231,248,.56);font-size:12px;padding:0 3px;">…</span>
+            <button class="btn btn-sm btn-ghost" type="button">&gt;</button>
+          </div>
+        </div>
+      </div>
+
+
+
+<div class="page" id="page-vehicle-tickets">
+  <div class="armes-page-shell road-ticket-page-shell">
+    <div class="mdt-page-hdr">
+      <div>
+        <div class="card-title">Véhicules en infraction</div>
+        <div class="card-sub">Historique des tickets routiers rédigés depuis les fiches citoyens.</div>
+      </div>
+    </div>
+
+    <div class="armes-table-wrap road-ticket-table-wrap">
+      <table class="armes-table road-ticket-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>N° rapport</th>
+            <th>Citoyen</th>
+            <th>Plaque</th>
+            <th>Infraction</th>
+            <th>Amende</th>
+            <th>Rédigé par</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="road-ticket-table-body">
+          <tr><td colspan="8" class="armes-empty">Chargement des tickets routiers…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+      <!-- ══════════════════════════════════════════
+           MODAL : CRÉER UN RAPPORT D'OPÉRATION
+      ══════════════════════════════════════════ -->
+      <div class="modal-backdrop" id="operations-modal" style="display:none" onclick="if(event.target===this)closeOperationModal()">
+        <div class="modal-card ops-op-modal" role="dialog" aria-modal="true" aria-labelledby="ops-modal-title">
+          <div class="modal-hdr">
+            <div class="modal-ico">📝</div>
+            <div>
+              <div class="modal-title" id="ops-modal-title">Créer un rapport d'opération</div>
+              <div class="modal-sub">Dossier tactique indépendant, sans lien avec la page arrestation</div>
+            </div>
+            <button class="modal-close" type="button" onclick="closeOperationModal()">✕</button>
+          </div>
+
+          <div class="ops-modal-body">
+            <div class="ops-modal-grid">
+              <div class="fg">
+                <label for="ops-datetime">Date et heure</label>
+                <input type="datetime-local" id="ops-datetime"/>
+              </div>
+
+              <div class="fg">
+                <label class="req" for="ops-incident-type">Type d'incident</label>
+                <input type="text" id="ops-incident-type" placeholder="Braquage, prise d'otages, siège..."/>
+              </div>
+
+              <div class="fg">
+                <label for="ops-officers-input">Officiers impliqués</label>
+                <div class="ops-tags-wrap" id="ops-officers-wrap">
+                  <div id="ops-officers-tags"></div>
+                  <input type="text" id="ops-officers-input" placeholder="Ajouter un officier en ligne..."/>
+                  <div class="ops-suggest" id="ops-officers-suggest" style="display:none"></div>
+                </div>
+              </div>
+
+              <div class="fg">
+                <label for="ops-hostages-input">Otages</label>
+                <div class="ops-tags-wrap" id="ops-hostages-wrap">
+                  <div id="ops-hostages-tags"></div>
+                  <input type="text" id="ops-hostages-input" placeholder="Ajouter un civil en ligne..."/>
+                  <div class="ops-suggest" id="ops-hostages-suggest" style="display:none"></div>
+                </div>
+              </div>
+
+              <div class="fg">
+                <label class="req" for="ops-location">Lieu</label>
+                <input type="text" id="ops-location" placeholder="Ex : Banque de Vinewood"/>
+              </div>
+
+              <div class="fg">
+                <label for="ops-demands">Revendications</label>
+                <input type="text" id="ops-demands" placeholder="Somme d'argent, véhicule, passage libre..."/>
+              </div>
+
+              <div class="fg sw">
+                <label for="ops-lead-negotiator">Lead négociateur</label>
+                <select id="ops-lead-negotiator">
+                  <option value="">— Aucun —</option>
+                </select>
+              </div>
+
+              <div class="fg sw">
+                <label for="ops-lead-field">Lead terrain</label>
+                <select id="ops-lead-field">
+                  <option value="">— Aucun —</option>
+                </select>
+              </div>
+
+              <div class="fg full">
+                <label class="req">Rapport complet</label>
+                <div id="ops-quill"></div>
+              </div>
+
+              <div class="fg full">
+                <label for="ops-evidence-search">Dossiers photos</label>
+                <div class="ops-evidence-box">
+                  <input type="text" id="ops-evidence-search" class="ops-evidence-search" placeholder="Rechercher un dossier (min 2 caractères)..."/>
+                  <div class="ops-evidence-results" id="ops-evidence-results" style="display:none"></div>
+                </div>
+                <div class="ops-selected-evidence" id="ops-selected-evidence">Aucun dossier sélectionné.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ops-modal-footer">
+            <button class="btn btn-ghost" id="ops-close-modal-btn" type="button">Fermer</button>
+            <button class="btn btn-primary" id="ops-submit-report-btn" type="button">Créer le rapport</button>
+          </div>
+        </div>
+      </div>
+
+
+<div class="modal-backdrop" id="road-ticket-modal" style="display:none" onclick="if(event.target===this)closeRoadTicketModal()">
+  <div class="modal-card rt-modal-card" role="dialog" aria-modal="true" aria-labelledby="road-ticket-modal-title">
+    <div class="modal-hdr">
+      <div class="modal-ico">🎫</div>
+      <div>
+        <div class="modal-title" id="road-ticket-modal-title">Rédiger un ticket routier</div>
+        <div class="modal-sub">Ticket lié au citoyen actuellement sélectionné.</div>
+      </div>
+      <button class="modal-close" type="button" onclick="closeRoadTicketModal()">✕</button>
+    </div>
+    <div class="modal-body rt-modal-body">
+      <div class="lo-err lo-ok" id="road-ticket-msg" style="display:none"></div>
+      <input type="hidden" id="road-ticket-citizen-sid64"/>
+
+      <div class="rt-meta-banner">
+        <div class="rt-meta-pill"><span>Citoyen</span><strong id="road-ticket-citizen-name">—</strong></div>
+        <div class="rt-meta-pill"><span>Rédigé par</span><strong id="road-ticket-officer-name">—</strong></div>
+        <div class="rt-meta-pill"><span>N° rapport</span><strong id="road-ticket-number">—</strong></div>
+      </div>
+
+      <div class="rt-form-grid">
+        <div class="fg">
+          <label for="road-ticket-datetime">Date et heure</label>
+          <input type="datetime-local" id="road-ticket-datetime"/>
+        </div>
+
+        <div class="fg">
+          <label for="road-ticket-location">Lieu</label>
+          <input type="text" id="road-ticket-location" placeholder="Ex : Downtown, Vespucci Blvd..."/>
+        </div>
+
+        <div class="fg sw">
+          <label for="road-ticket-plate-select">Plaque du véhicule</label>
+          <select id="road-ticket-plate-select">
+            <option value="">— Sélectionner un véhicule —</option>
+          </select>
+        </div>
+
+        <div class="fg">
+          <label for="road-ticket-plate-manual">Plaque manuelle</label>
+          <input type="text" id="road-ticket-plate-manual" placeholder="Renseignez une plaque si le véhicule n'est pas listé"/>
+        </div>
+
+        <div class="fg sw">
+          <label for="road-ticket-infraction">Infraction</label>
+          <select id="road-ticket-infraction">
+            <option value="">— Sélectionner une infraction —</option>
+          </select>
+        </div>
+
+        <div class="fg">
+          <label for="road-ticket-fine">Amende</label>
+          <input type="text" id="road-ticket-fine" readonly />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" type="button" onclick="closeRoadTicketModal()">Annuler</button>
+      <button class="btn btn-primary" id="road-ticket-submit-btn" type="button" onclick="submitRoadTicket()">Créer le ticket</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="road-ticket-view-modal" style="display:none" onclick="if(event.target===this)closeRoadTicketViewModal()">
+  <div class="modal-card rt-view-card" role="dialog" aria-modal="true" aria-labelledby="road-ticket-view-title">
+    <div class="modal-hdr">
+      <div class="modal-ico">📄</div>
+      <div>
+        <div class="modal-title" id="road-ticket-view-title">Ticket routier</div>
+        <div class="modal-sub">Aperçu du ticket enregistré.</div>
+      </div>
+      <button class="modal-close" type="button" onclick="closeRoadTicketViewModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="road-ticket-viewer" class="rt-viewer"></div>
+    </div>
+  </div>
+</div>
+
+
+      <!-- ══════════════════════════════════════════
+           PAGE : BRACELETS
+      ══════════════════════════════════════════ -->
+      <div class="page" id="page-bracelets">
+        <div class="mdt-page-hdr bracelet-page-hdr">
+          <div>
+            <div class="card-title">Registre des bracelets</div>
+            <div class="card-sub">Historique des bracelets electroniques poses sur les citoyens.</div>
+          </div>
+        </div>
+
+        <div class="card bracelet-page-card">
+          <table class="dt-table" id="bracelets-table">
+            <thead>
+              <tr>
+                <th>Date de pose</th>
+                <th>Date de fin</th>
+                <th>Citoyen</th>
+                <th>Raison</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bracelets-tbody">
+              <tr><td colspan="5" class="dt-empty">⏳&nbsp; Chargement des bracelets…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           PAGE : MANDATS D'ARRÊT
+      ══════════════════════════════════════════ -->
+      <div class="page" id="page-mandats">
+        <div class="mdt-page-hdr">
+          <div>
+            <div class="card-title">Mandats d'arrêt</div>
+            <div class="card-sub">Gestion des mandats actifs, exécutés et archivés</div>
+          </div>
+          <div class="mdt-hdr-right">
+            <div class="status-filter" id="warrant-filter">
+              <button class="sf-btn sf-btn active" data-filter="all" onclick="filterWarrants('all',this)">Tous</button>
+              <button class="sf-btn sf-btn active-only" data-filter="active" onclick="filterWarrants('active',this)">Actifs</button>
+              <button class="sf-btn" data-filter="executed" onclick="filterWarrants('executed',this)">Exécutés</button>
+              <button class="sf-btn" data-filter="expired" onclick="filterWarrants('expired',this)">Expirés</button>
+            </div>
+            <button class="btn-create" onclick="openWarrantModal()">+ Émettre un mandat</button>
+          </div>
+        </div>
+
+        <div class="dt-wrap">
+          <table class="dt-table" id="warrants-table">
+            <thead>
+              <tr>
+                <th>N° Mandat</th>
+                <th>Type</th>
+                <th>Citoyen</th>
+                <th>Émis par</th>
+                <th>Motif</th>
+                <th>Statut</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="warrants-tbody">
+              <tr><td colspan="7" class="dt-empty">⏳&nbsp; Chargement des mandats…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           PAGE : ALERTES ACTIVES (BOLO / WANTED)
+      ══════════════════════════════════════════ -->
+      <div class="page" id="page-alerts">
+        <div class="mdt-page-hdr">
+          <div>
+            <div class="card-title">Alertes actives</div>
+            <div class="card-sub">Personnes recherchées et avis BOLO en cours</div>
+          </div>
+          <div class="mdt-hdr-right">
+            <div class="off-search-wrap">
+              <span class="off-search-ico">🔍</span>
+              <input type="text" id="alert-search" placeholder="Rechercher une alerte…" oninput="filterAlerts()"/>
+            </div>
+            <div class="off-count-badge" id="alert-count">— alertes</div>
+          </div>
+        </div>
+        <div class="alert-grid" id="alert-grid">
+          <div class="alert-empty">
+            <div class="alert-empty-ico">🔎</div>
+            <div class="alert-empty-txt">⏳ Chargement des alertes…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           MODAL : CRÉER UN MANDAT
+      ══════════════════════════════════════════ -->
+      <div class="modal-backdrop" id="warrant-modal" style="display:none" onclick="if(event.target===this)closeWarrantModal()">
+        <div class="modal-card">
+          <div class="modal-hdr">
+            <div class="modal-ico">⚖️</div>
+            <div>
+              <div class="modal-title">Émettre un mandat</div>
+              <div class="modal-sub">Nouveau mandat d'arrêt ou de perquisition</div>
+            </div>
+            <button class="modal-close" onclick="closeWarrantModal()">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="lo-err lo-ok" id="warrant-msg" style="display:none"></div>
+
+            <div class="lo-fg">
+              <label>Citoyen visé</label>
+              <input type="text" id="wf-citizen" placeholder="Nom complet ou sélectionnez un citoyen…" autocomplete="off"/>
+              <div id="wf-citizen-sid" style="display:none"></div>
+            </div>
+
+            <div class="lo-fg" style="margin-top:10px">
+              <label>Type de mandat</label>
+              <div class="sw"><select id="wf-type">
+                <option value="arrest">Mandat d'arrêt</option>
+                <option value="search">Mandat de perquisition</option>
+                <option value="eviction">Mandat d'expulsion</option>
+              </select></div>
+            </div>
+
+            <div class="lo-fg" style="margin-top:10px">
+              <label>Motif / Chefs d'accusation</label>
+              <input type="text" id="wf-reason" placeholder="Ex : Braquage armé, tentative d'homicide…"/>
+            </div>
+
+            <div class="lo-fg" style="margin-top:10px">
+              <label>Charges associées (optionnel)</label>
+              <input type="text" id="wf-charges" placeholder="Ex : homicide, trafic de stupéfiants…"/>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeWarrantModal()">Annuler</button>
+            <button class="btn-lo-p" id="wf-submit" onclick="submitWarrant()" style="width:auto;padding:9px 20px;font-size:11px">⚖️ Émettre le mandat</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-backdrop" id="bracelet-modal" style="display:none" onclick="if(event.target===this)closeBraceletModal()">
+        <div class="modal-card bracelet-modal-card" role="dialog" aria-modal="true" aria-labelledby="bracelet-modal-title">
+          <div class="modal-hdr bracelet-modal-hdr">
+            <div class="modal-ico">📡</div>
+            <div>
+              <div class="modal-title" id="bracelet-modal-title">Creer un bracelet electronique</div>
+            </div>
+            <button class="modal-close" type="button" onclick="closeBraceletModal()">✕</button>
+          </div>
+          <div class="modal-body bracelet-modal-body">
+            <input type="hidden" id="bracelet-citizen-sid64"/>
+            <input type="hidden" id="bracelet-citizen-name"/>
+            <div class="bracelet-msg" id="bracelet-msg" style="display:none"></div>
+
+            <div class="bracelet-form-grid">
+              <div class="bracelet-field">
+                <label for="bracelet-start-at">Date et heure de pose du bracelet *</label>
+                <input type="datetime-local" id="bracelet-start-at"/>
+              </div>
+
+              <div class="bracelet-field">
+                <label for="bracelet-end-at">Date et heure de la fin du bracelet</label>
+                <input type="datetime-local" id="bracelet-end-at" placeholder="Selectionnez la date et l'heure"/>
+              </div>
+
+              <div class="bracelet-field full">
+                <label for="bracelet-reason">Raison *</label>
+                <input type="text" id="bracelet-reason" class="bracelet-reason-input"/>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer bracelet-modal-footer">
+            <button class="btn btn-primary" id="bracelet-submit-btn" type="button" onclick="submitBracelet()">Ajouter le bracelet electronique</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast"><span id="toast-title">✓</span><pre id="toast-json"></pre></div>
+
+<!-- MDT custom confirm dialog (window.confirm always returns false in GMod DHTML) -->
+<div id="mdt-confirm-overlay" style="display:none;position:fixed;inset:0;z-index:199999;background:rgba(0,0,0,.68);align-items:center;justify-content:center;padding:20px">
+  <div id="mdt-confirm-box" style="background:#151923;border:1px solid #2b3648;border-radius:10px;padding:22px 24px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+    <div id="mdt-confirm-title" style="font-size:13px;font-weight:800;color:#e5edf7;margin-bottom:8px"></div>
+    <div id="mdt-confirm-body" style="font-size:12px;color:#8899b4;line-height:1.5;margin-bottom:20px"></div>
+    <div style="display:flex;justify-content:flex-end;gap:10px">
+      <button id="mdt-confirm-cancel" style="background:transparent;border:1px solid #2b3648;color:#8899b4;border-radius:5px;padding:8px 16px;font-size:11px;font-weight:700;cursor:pointer">Annuler</button>
+      <button id="mdt-confirm-ok" style="background:#ef4444;border:none;color:#fff;border-radius:5px;padding:8px 16px;font-size:11px;font-weight:700;cursor:pointer">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/error_guard.js"></script>
+<script src="js/data.js"></script>
+<script src="js/core.js"></script>
+<script src="js/citizens.js"></script>
+<script src="js/arrest.js"></script>
+<script src="js/officers.js"></script>
+<script src="js/promotions.js"></script>
+<script src="js/highgrade_permissions.js"></script>
+<script src="js/poles_page.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/warrants.js"></script>
+<script src="js/bracelets.js"></script>
+<script src="js/alerts.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/poles_modal.js"></script>
+<script src="js/photos.js"></script>
+<script src="js/operations.js"></script>
+<script src="js/my_reports.js"></script>
+<!-- ══════════════════════════════════════════
+     MODAL : CRÉER UNE PLAINTE
+══════════════════════════════════════════ -->
+<div class="modal-backdrop" id="complaint-modal" style="display:none" onclick="if(event.target===this)window.closePlainteModal()">
+  <div class="modal-card ops-op-modal complaint-modal-card" role="dialog" aria-modal="true" aria-labelledby="complaint-modal-title">
+    <div class="modal-hdr">
+      <div class="modal-ico">📣</div>
+      <div>
+        <div class="modal-title" id="complaint-modal-title">Créer une plainte</div>
+        <div class="modal-sub">Dossier indépendant du registre des plaintes</div>
+      </div>
+      <button class="modal-close" type="button" onclick="window.closePlainteModal()">✕</button>
+    </div>
+
+    <div class="ops-modal-body">
+      <div class="ops-modal-grid complaint-modal-grid">
+
+        <div class="fg">
+          <label for="complaint-datetime">Date et heure</label>
+          <input type="datetime-local" id="complaint-datetime"/>
+        </div>
+
+        <div class="fg">
+          <label class="req" for="complaint-reason">Motif de la plainte</label>
+          <input type="text" id="complaint-reason" placeholder="Ex : Tapage nocturne, menace, dégradation..."/>
+        </div>
+
+        <div class="fg">
+          <label class="req" for="complaint-citizen-search">Citoyen plaignant</label>
+          <div class="complaint-picker" id="complaint-citizen-wrap">
+            <input type="text" id="complaint-citizen-search" placeholder="Rechercher un civil en ligne..." autocomplete="off"/>
+            <div class="complaint-suggest" id="complaint-citizen-suggest" style="display:none"></div>
+          </div>
+          <div class="complaint-picked" id="complaint-citizen-picked"></div>
+        </div>
+
+
+        <div class="fg sw">
+          <label for="complaint-status">Statut initial</label>
+          <select id="complaint-status">
+            <option value="En cours">Ouvert</option>
+            <option value="Terminee sans suite">Terminée sans suite</option>
+          </select>
+        </div>
+
+        <div class="fg full">
+          <label class="req">Déclaration détaillée</label>
+          <div id="complaint-quill"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="ops-modal-footer">
+      <button class="btn btn-ghost" id="complaint-close-modal-btn" type="button">Annuler</button>
+      <button class="btn btn-primary" id="complaint-submit-btn" type="button">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL : ENCODER UNE ARME
+══════════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-armes" aria-hidden="true" style="display:none" onclick="if(event.target===this)window.closeModalArmes()">
+  <div class="modal-card armes-modal-card" role="dialog" aria-modal="true" aria-labelledby="armes-modal-title">
+    <div class="modal-hdr armes-modal-hdr">
+      <div>
+        <div class="modal-title" id="armes-modal-title">Encodage d'une arme</div>
+      </div>
+      <button class="modal-close" type="button" onclick="window.closeModalArmes()">✕</button>
+    </div>
+
+    <div class="armes-modal-body">
+      <div class="armes-form-grid">
+        <div class="fg armes-field-full citizen-col">
+          <label for="arme-citizen-search">Citoyen concerné</label>
+          <div class="armes-citizen-picker" id="arme-citizen-wrap">
+            <input type="text" id="arme-citizen-search" placeholder="Rechercher un citoyen..." autocomplete="off" />
+            <div class="armes-citizen-suggest" id="arme-citizen-suggest" style="display:none"></div>
+          </div>
+          <div class="armes-citizen-picked" id="arme-citizen-picked"></div>
+        </div>
+
+        <div class="fg">
+          <label for="arme-origin">Origine de l'arme</label>
+          <div class="sw armes-select-wrap">
+            <select id="arme-origin"></select>
+          </div>
+        </div>
+
+        <div class="fg">
+          <label for="arme-model">Modèle de l'arme</label>
+          <div class="sw armes-select-wrap">
+            <select id="arme-model"></select>
+          </div>
+        </div>
+
+        <div class="fg">
+          <label for="arme-serial">Numéro de série</label>
+          <div class="armes-serial-row">
+            <input type="text" id="arme-serial" placeholder="d4c3d58b-a2c4-..." />
+            <button class="btn armes-generate-btn" type="button" onclick="window.generateArmeSerial()">Générer</button>
+          </div>
+        </div>
+
+        <div class="fg">
+          <label for="arme-registered-at">Date d'enregistrement</label>
+          <input type="text" id="arme-registered-at" placeholder="19/03/2026 22:55" />
+        </div>
+
+        <div class="fg">
+          <label for="arme-status">Statut</label>
+          <div class="sw armes-select-wrap">
+            <select id="arme-status"></select>
+          </div>
+        </div>
+
+        <div class="fg armes-field-full">
+          <label for="arme-report-id">Rapport lié</label>
+          <div class="sw armes-select-wrap">
+            <select id="arme-report-id">
+              <option value="">— Aucun rapport lié —</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ops-modal-footer armes-modal-footer">
+      <button class="btn btn-primary" id="arme-submit-btn" type="button" onclick="window.submitArme();return false;">Encoder l'arme</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ══════════════════════════════════════════
+     MODAL : CRÉER UN DOSSIER D'ARRESTATION
+══════════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-arrestation" aria-hidden="true" style="display:none" onclick="if(event.target===this)window.closeModalArrestation()">
+  <div class="modal-card ops-op-modal arrestation-modal-card" role="dialog" aria-modal="true" aria-labelledby="arrestation-modal-title">
+    <div class="modal-hdr arrestation-modal-hdr">
+      <div class="arrestation-modal-headcopy">
+        <div class="modal-title" id="arrestation-modal-title">Créer un dossier d'arrestation</div>
+      </div>
+      <button class="modal-close" type="button" onclick="window.closeModalArrestation()">✕</button>
+    </div>
+
+    <div class="arrestation-modal-body ops-modal-body" id="arrestation-step-form">
+      <div class="arrestation-step-copy" id="arrestation-step-copy">ETAPE 1/2 — RÉDACTION</div>
+      <div class="arrestation-stepbar"><span id="arrestation-stepbar-fill"></span></div>
+
+      <div class="arrestation-linked-banner" id="arrestation-linked-inline">Citoyen concerné : aucun citoyen sélectionné</div>
+
+      <div class="arrestation-grid arrestation-grid-main">
+        <div class="fg">
+          <label for="arrestation-created-at-visible">Date et heure de l'arrestation <span class="arrestation-required">*</span></label>
+          <input type="text" id="arrestation-created-at-visible" />
+        </div>
+
+        <div class="fg">
+          <label for="arrestation-rights-read-at">Date et heure lecture des droits <span class="arrestation-required">*</span></label>
+          <input type="text" id="arrestation-rights-read-at" placeholder="Sélectionnez la date et l'heure" />
+        </div>
+
+        <div class="fg arrestation-select-wrap">
+          <label for="arrestation-precinct">Poste de police</label>
+          <select id="arrestation-precinct"></select>
+        </div>
+
+        <div class="fg arrestation-select-wrap">
+          <label for="arrestation-agents">Agents impliqués <span class="arrestation-required">*</span></label>
+          <input type="text" id="arrestation-agents" placeholder="Ajoutez des officiers impliqués..." />
+        </div>
+      </div>
+
+      <label class="arrestation-checkline" for="arrestation-force-used">
+        <input type="checkbox" id="arrestation-force-used" />
+        <span>Force utilisée pour neutraliser l'individu</span>
+      </label>
+
+      <div class="arrestation-people-block">
+        <label for="arrestation-participant-input">Avocats, procureurs, juges en charge de l'affaire</label>
+        <div class="arrestation-people-search arrestation-select-wrap">
+          <input type="text" id="arrestation-participant-input" list="arrestation-participant-datalist" placeholder="Rechercher et ajouter une personne..." />
+          <button class="btn arrestation-mini-btn" type="button" id="arrestation-participant-add-btn">Ajouter</button>
+          <datalist id="arrestation-participant-datalist"></datalist>
+        </div>
+        <div class="arrestation-participant-list" id="arrestation-participant-list"></div>
+      </div>
+
+      <div class="arrestation-editor-block">
+        <div class="arrestation-editor-head">
+          <label for="arrestation-quill">Rapport <span class="arrestation-required">*</span></label>
+        </div>
+        <div id="arrestation-quill"></div>
+        <div id="arrestation-required-msg">Ce champ est requis</div>
+      </div>
+
+      <div class="arrestation-grid arrestation-grid-secondary">
+        <div class="fg full arrestation-select-wrap">
+          <label for="arrestation-report-id">Lié un rapport d'opération</label>
+          <select id="arrestation-report-id">
+            <option value="">Rechercher un rapport d'opération</option>
+          </select>
+        </div>
+
+        <div class="fg full arrestation-select-wrap">
+          <label for="arrestation-evidence-folder">Dossiers photos (preuves)</label>
+          <select id="arrestation-evidence-folder">
+            <option value="">Rechercher un dossier (min 2 caractères)...</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="arrestation-proof-box">
+        <label for="arrestation-proof-drop">Photos preuves :</label>
+        <div class="arrestation-proof-drop" id="arrestation-proof-drop">Coller une ou plusieurs images (CTRL + V)</div>
+        <div class="arrestation-proof-preview" id="arrestation-proof-preview"></div>
+      </div>
+
+      <div class="arrestation-grid arrestation-grid-secondary arrestation-grid-charges">
+        <div class="fg arrestation-select-wrap">
+          <label for="arrestation-charge-select">Charges :</label>
+          <div class="arrestation-inline-add">
+            <select id="arrestation-charge-select">
+              <option value="">Sélectionnez les charges...</option>
+            </select>
+            <button class="btn arrestation-mini-btn" type="button" id="arrestation-charge-add-btn">Ajouter</button>
+          </div>
+          <div class="arrestation-chip-list" id="arrestation-charge-list"></div>
+        </div>
+
+        <div class="fg arrestation-select-wrap">
+          <label for="arrestation-fine-scale">Barème de l'amende</label>
+          <select id="arrestation-fine-scale"></select>
+        </div>
+      </div>
+
+      <div class="arrestation-subsection">
+        <div class="arrestation-subsection-title">Voiture(s) utilisée(s) :</div>
+        <div class="arrestation-grid arrestation-grid-tertiary">
+          <div class="fg">
+            <label for="arrestation-vehicle-model">Modèle du véhicule <span class="arrestation-required">*</span></label>
+            <input type="text" id="arrestation-vehicle-model" />
+          </div>
+          <div class="fg">
+            <label for="arrestation-vehicle-plate">Plaque <span class="arrestation-required">*</span></label>
+            <input type="text" id="arrestation-vehicle-plate" />
+          </div>
+          <label class="arrestation-checkline arrestation-checkline-compact" for="arrestation-vehicle-stolen">
+            <input type="checkbox" id="arrestation-vehicle-stolen" />
+            <span>Volé</span>
+          </label>
+        </div>
+        <button class="btn arrestation-mini-btn" type="button" id="arrestation-vehicle-add-btn">+ Ajouter un véhicule</button>
+        <div class="arrestation-simple-list" id="arrestation-vehicle-list"></div>
+      </div>
+
+      <div class="arrestation-subsection">
+        <div class="arrestation-subsection-title">Arme(s) utilisée(s) :</div>
+        <div class="arrestation-grid arrestation-grid-weapon">
+          <div class="fg">
+            <label for="arrestation-weapon-model">Modèle de l'arme <span class="arrestation-required">*</span></label>
+            <input type="text" id="arrestation-weapon-model" />
+          </div>
+          <div class="fg">
+            <label for="arrestation-weapon-serial">Numéro de série <span class="arrestation-required">*</span></label>
+            <input type="text" id="arrestation-weapon-serial" />
+          </div>
+          <div class="fg">
+            <label for="arrestation-weapon-ammo">Munitions</label>
+            <input type="number" id="arrestation-weapon-ammo" min="0" step="1" value="0" />
+          </div>
+          <label class="arrestation-checkline arrestation-checkline-compact" for="arrestation-weapon-used">
+            <input type="checkbox" id="arrestation-weapon-used" />
+            <span>Utilisée</span>
+          </label>
+        </div>
+        <button class="btn arrestation-mini-btn" type="button" id="arrestation-weapon-add-btn">+ Ajouter une arme</button>
+        <div class="arrestation-simple-list" id="arrestation-weapon-list"></div>
+      </div>
+    </div>
+
+    <div class="arrestation-modal-body arrestation-preview-body ops-modal-body" id="arrestation-step-preview" style="display:none">
+      <div class="arrestation-step-copy">ETAPE 2/2 — VÉRIFICATION</div>
+      <div class="arrestation-stepbar arrestation-stepbar-full"><span></span></div>
+      <div class="arrestation-preview-note">Vérifie le dossier. Le bouton final le marquera prêt pour transmission au futur MDT de la justice / procureur.</div>
+      <div id="arrestation-preview-doc" class="arrestation-preview-doc"></div>
+    </div>
+
+    <div class="ops-modal-footer arrestation-modal-footer">
+      <button class="btn" id="arrestation-back-btn" type="button" style="display:none" onclick="window.arrestationPreviewBack();return false;">Retour à l'édition</button>
+      <div class="arrestation-footer-spacer"></div>
+      <button class="btn btn-primary" id="arrestation-preview-btn" type="button" onclick="window.previewArrestation();return false;">Ajouter le dossier d'arrestation</button>
+      <button class="btn btn-primary" id="arrestation-submit-btn" type="button" style="display:none" onclick="window.submitArrestation();return false;">Confirmer et envoyer au parquet</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-backdrop" id="modal-historique-agent" style="display:none" onclick="if(event.target===this)window.closeHistoriqueAgentModal()">
+  <div class="modal-card agent-history-card" role="dialog" aria-modal="true" aria-labelledby="historique-agent-title">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="historique-agent-title">Historique de l'agent</div>
+        <div class="modal-sub" id="historique-agent-subtitle">Sélectionnez un agent pour voir ses dossiers rédigés.</div>
+      </div>
+      <button class="modal-close" type="button" onclick="window.closeHistoriqueAgentModal()">✕</button>
+    </div>
+    <div class="agent-history-body">
+      <div class="agent-history-summary" id="historique-agent-summary"></div>
+      <div class="agent-history-table-wrap">
+        <table class="agent-history-table">
+          <thead>
+            <tr>
+              <th>Type de registre</th>
+              <th>Nom/ID du rapport</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="historique-agent-tbody">
+            <tr><td colspan="3" class="dt-empty">Choisissez un agent pour charger son historique.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/delits.js"></script>
+<script src="js/arrestation.js"></script>
+<script src="js/weapons.js"></script>
+<script src="js/complaints.js"></script>
+<script src="js/road_tickets.js"></script>
+<script src="js/ui_hotfix.js"></script>
+<script src="js/debug_tools.js"></script>
+<script src="js/boot.js"></script>
+</body>
+</html>
