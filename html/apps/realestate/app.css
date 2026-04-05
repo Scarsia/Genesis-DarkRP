@@ -1,140 +1,34 @@
-/* Genesis Phone - Realestate App */
-.realestate-app {
-    display: flex; flex-direction: column; height: 100%;
-    background: var(--phone-bg, #000); color: var(--phone-text, #fff);
-    font-family: -apple-system, 'SF Pro Display', 'Nunito', sans-serif;
-    overflow: hidden;
-}
-.re-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.re-scroll::-webkit-scrollbar { display: none; }
-
-/* Header */
-.re-header { padding: 8px 16px 6px; }
-.re-header h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.3px; }
-.re-header p { font-size: 11px; color: var(--phone-text-secondary, #8e8e93); margin: 2px 0 0; }
-
-/* Stats bar */
-.re-stats {
-    display: flex; gap: 8px; padding: 8px 16px 12px; overflow-x: auto;
-}
-.re-stats::-webkit-scrollbar { display: none; }
-.re-stat {
-    flex: 1; min-width: 0; padding: 12px; border-radius: 14px;
-    background: rgba(255,255,255,0.04); text-align: center;
-}
-.re-stat-value { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
-.re-stat-label { font-size: 9px; color: var(--phone-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-.re-stat.owned .re-stat-value { color: #34C759; }
-.re-stat.rented .re-stat-value { color: #007AFF; }
-.re-stat.total .re-stat-value { color: #FF9500; }
-
-/* Filter tabs */
-.re-tabs {
-    display: flex; gap: 6px; padding: 0 16px 12px; overflow-x: auto;
-}
-.re-tabs::-webkit-scrollbar { display: none; }
-.re-tab {
-    padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;
-    white-space: nowrap; cursor: pointer; transition: all 0.2s ease;
-    background: rgba(255,255,255,0.05); color: var(--phone-text-secondary, #8e8e93);
-    border: 1px solid transparent;
-}
-.re-tab.active {
-    background: rgba(52,199,89,0.12); color: #34C759;
-    border-color: rgba(52,199,89,0.2);
-}
-
-/* Property cards */
-.re-list { padding: 0 16px; }
-.re-card {
-    border-radius: 16px; margin-bottom: 12px; overflow: hidden;
-    background: rgba(255,255,255,0.04); cursor: pointer;
-    transition: transform 0.15s ease;
-    border: 1px solid rgba(255,255,255,0.04);
-}
-.re-card:active { transform: scale(0.98); }
-.re-card-img {
-    height: 110px; background: linear-gradient(135deg, #1a1a2e, #16213e);
-    display: flex; align-items: center; justify-content: center;
-    position: relative; overflow: hidden;
-}
-.re-card-img-icon { font-size: 36px; opacity: 0.3; }
-.re-card-badge {
-    position: absolute; top: 10px; right: 10px;
-    padding: 3px 10px; border-radius: 6px;
-    font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-}
-.re-card-badge.owned { background: rgba(52,199,89,0.25); color: #34C759; }
-.re-card-badge.rented { background: rgba(0,122,255,0.25); color: #007AFF; }
-.re-card-badge.available { background: rgba(255,149,0,0.25); color: #FF9500; }
-.re-card-body { padding: 14px; }
-.re-card-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-.re-card-addr { font-size: 11px; color: var(--phone-text-secondary); margin-bottom: 8px; }
-.re-card-meta {
-    display: flex; gap: 12px; font-size: 10px; color: var(--phone-text-secondary);
-}
-.re-card-meta span { display: flex; align-items: center; gap: 4px; }
-.re-card-price { font-size: 14px; font-weight: 700; color: #34C759; margin-top: 8px; }
-
-/* Detail view */
-.re-back {
-    display: flex; align-items: center; gap: 4px; cursor: pointer;
-    color: #007AFF; font-size: 14px; font-weight: 500; padding: 8px 16px 6px;
-}
-.re-back:active { opacity: 0.6; }
-.re-detail { padding: 0 16px 24px; }
-.re-detail-hero {
-    height: 150px; border-radius: 18px; margin-bottom: 16px;
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
-    display: flex; align-items: center; justify-content: center;
-    position: relative; overflow: hidden;
-}
-.re-detail-hero-icon { font-size: 48px; opacity: 0.2; }
-.re-detail-badge-top {
-    position: absolute; top: 12px; left: 12px;
-    padding: 4px 12px; border-radius: 8px; font-size: 10px; font-weight: 700;
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-}
-.re-detail-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.3px; }
-.re-detail-addr { font-size: 12px; color: var(--phone-text-secondary); margin-bottom: 16px; }
-
-/* Info grid */
-.re-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
-.re-info-item {
-    padding: 14px; border-radius: 14px;
-    background: rgba(255,255,255,0.04);
-}
-.re-info-label { font-size: 9px; color: var(--phone-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 4px; }
-.re-info-value { font-size: 14px; font-weight: 700; }
-.re-info-value.green { color: #34C759; }
-.re-info-value.blue { color: #007AFF; }
-.re-info-value.orange { color: #FF9500; }
-
-/* Action buttons */
-.re-detail-actions { display: flex; gap: 10px; margin-top: 16px; }
-.re-btn {
-    flex: 1; padding: 14px; border: none; border-radius: 14px;
-    font-size: 13px; font-weight: 700; cursor: pointer; text-align: center;
-    font-family: inherit; transition: transform 0.15s ease;
-}
-.re-btn:active { transform: scale(0.97); }
-.re-btn.gps { background: rgba(0,122,255,0.15); color: #007AFF; }
-.re-btn.lock { background: rgba(255,149,0,0.15); color: #FF9500; }
-.re-btn.enter { background: rgba(52,199,89,0.15); color: #34C759; }
-
-/* Empty */
-.re-empty { text-align: center; padding: 60px 20px; }
-.re-empty-icon { font-size: 42px; margin-bottom: 12px; }
-.re-empty-text { font-size: 13px; color: var(--phone-text-secondary); }
-.re-empty-sub { font-size: 11px; color: var(--phone-text-secondary); margin-top: 4px; opacity: 0.6; }
-
-/* Loading */
-.re-loading { text-align: center; padding: 80px 0; }
-.re-spinner {
-    width: 28px; height: 28px; margin: 0 auto 12px;
-    border: 3px solid rgba(255,255,255,0.08);
-    border-top-color: #34C759; border-radius: 50%;
-    animation: reSpin 0.7s linear infinite;
-}
-@keyframes reSpin { to { transform: rotate(360deg); } }
+.re{display:flex;flex-direction:column;height:100%;background:var(--phone-bg,#000);color:var(--phone-text,#fff);font-family:-apple-system,'Nunito',sans-serif;overflow:hidden}
+.re-s{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}.re-s::-webkit-scrollbar{display:none}
+.re-h{padding:8px 16px 6px}.re-h h1{font-size:22px;font-weight:700;margin:0}.re-h p{font-size:11px;color:var(--phone-text-secondary,#8e8e93);margin:2px 0 0}
+.re-stats{display:flex;gap:8px;padding:8px 16px 12px}
+.re-st{flex:1;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);text-align:center}
+.re-st-v{font-size:20px;font-weight:800;margin-bottom:2px}.re-st-l{font-size:9px;color:var(--phone-text-secondary);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.re-st.own .re-st-v{color:#34C759}.re-st.rnt .re-st-v{color:#007AFF}.re-st.tot .re-st-v{color:#FF9500}
+.re-tabs{display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto}.re-tabs::-webkit-scrollbar{display:none}
+.re-tab{padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;cursor:pointer;background:rgba(255,255,255,.05);color:var(--phone-text-secondary);border:1px solid transparent}
+.re-tab.on{background:rgba(52,199,89,.12);color:#34C759;border-color:rgba(52,199,89,.2)}
+.re-list{padding:0 16px}
+.re-card{border-radius:16px;margin-bottom:12px;overflow:hidden;background:rgba(255,255,255,.04);cursor:pointer;border:1px solid rgba(255,255,255,.04)}.re-card:active{transform:scale(.98)}
+.re-card-top{height:90px;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;position:relative}
+.re-card-ico{font-size:32px;opacity:.25}
+.re-card-bdg{position:absolute;top:8px;right:8px;padding:3px 10px;border-radius:6px;font-size:9px;font-weight:700;backdrop-filter:blur(10px)}
+.re-card-bdg.own{background:rgba(52,199,89,.25);color:#34C759}.re-card-bdg.rnt{background:rgba(0,122,255,.25);color:#007AFF}.re-card-bdg.avl{background:rgba(255,149,0,.25);color:#FF9500}
+.re-card-bd{padding:12px 14px}.re-card-nm{font-size:14px;font-weight:700;margin-bottom:3px}
+.re-card-ad{font-size:11px;color:var(--phone-text-secondary);margin-bottom:6px}.re-card-pr{font-size:13px;font-weight:700;color:#34C759}
+.re-back{display:flex;align-items:center;gap:4px;cursor:pointer;color:#007AFF;font-size:14px;font-weight:500;padding:8px 16px 6px}.re-back:active{opacity:.6}
+.re-det{padding:0 16px 24px}
+.re-det-hero{height:130px;border-radius:18px;margin-bottom:16px;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.re-det-hero-ic{font-size:44px;opacity:.2}
+.re-det-bdg{position:absolute;top:12px;left:12px;padding:4px 12px;border-radius:8px;font-size:10px;font-weight:700;backdrop-filter:blur(10px)}
+.re-det-nm{font-size:20px;font-weight:800;margin-bottom:4px}.re-det-ad{font-size:12px;color:var(--phone-text-secondary);margin-bottom:16px}
+.re-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.re-gi{padding:14px;border-radius:14px;background:rgba(255,255,255,.04)}
+.re-gi-l{font-size:9px;color:var(--phone-text-secondary);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:4px}
+.re-gi-v{font-size:14px;font-weight:700}.re-gi-v.g{color:#34C759}.re-gi-v.b{color:#007AFF}.re-gi-v.o{color:#FF9500}
+.re-btns{display:flex;gap:10px;margin-top:16px}
+.re-btn{flex:1;padding:14px;border:none;border-radius:14px;font-size:13px;font-weight:700;cursor:pointer;text-align:center;font-family:inherit}.re-btn:active{transform:scale(.97)}
+.re-btn.gps{background:rgba(0,122,255,.15);color:#007AFF}.re-btn.lck{background:rgba(255,149,0,.15);color:#FF9500}
+.re-empty{text-align:center;padding:60px 20px}.re-empty-i{font-size:42px;margin-bottom:12px}.re-empty-t{font-size:13px;color:var(--phone-text-secondary)}.re-empty-sub{font-size:11px;color:var(--phone-text-secondary);margin-top:4px;opacity:.6}
+.re-load{text-align:center;padding:80px 0}.re-spin{width:28px;height:28px;margin:0 auto 12px;border:3px solid rgba(255,255,255,.08);border-top-color:#34C759;border-radius:50%;animation:res .7s linear infinite}
+@keyframes res{to{transform:rotate(360deg)}}

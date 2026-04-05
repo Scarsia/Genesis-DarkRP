@@ -1,14 +1,50 @@
-
-window.phoneAppManager && window.phoneAppManager.register('dealer', {
-    wrapper:null, data:{categories:[],vehicles:[]}, category:'all', selected:null,
-    getHTML(){return '<div class="vdapp"><div class="vd-shell"><div class="vd-top"><div><div class="vd-title">Genesis Motors</div><div class="vd-sub">Catalogue du concessionnaire</div></div><div class="vd-pill">Consultation uniquement</div></div><div class="vd-body"><div class="vd-side"><div id="vd-cats" class="vd-cats"></div><div id="vd-list" class="vd-list"></div></div><div id="vd-detail" class="vd-detail"></div></div></div></div>';},
-    onOpen(wrapper){this.wrapper=wrapper; this._h=this._onData.bind(this); WLCBridge.on('vdCatalogList', this._h); this._loading(); WLCBridge.send('vdListCatalog',{});},
-    onClose(){if(this._h) WLCBridge.off('vdCatalogList', this._h); this.wrapper=null;},
-    _loading(){var l=this.wrapper.querySelector('#vd-list'), d=this.wrapper.querySelector('#vd-detail'); if(l) l.innerHTML='<div class="vd-loading">Chargement du catalogue...</div>'; if(d) d.innerHTML='';},
-    _onData(msg){this.data=(msg&&msg.data)||{categories:[],vehicles:[]}; if(!this.selected && this.data.vehicles && this.data.vehicles[0]) this.selected=this.data.vehicles[0].id; this._render();},
-    _fmt(n){n=parseInt(n)||0; return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ')+' $';},
-    _esc(s){if(!s) return ''; var d=document.createElement('div'); d.textContent=s; return d.innerHTML;},
-    _vehicles(){var v=(this.data.vehicles||[]).slice(); if(this.category!=='all') v=v.filter(x=>x.category===this.category); return v;},
-    _render(){var cats=this.wrapper.querySelector('#vd-cats'), list=this.wrapper.querySelector('#vd-list'); var self=this; cats.innerHTML='<button class="'+(this.category==='all'?'active':'')+'" data-cat="all">Tout</button>' + (this.data.categories||[]).map(function(c){return '<button class="'+(self.category===c.id?'active':'')+'" data-cat="'+self._esc(c.id)+'">'+self._esc(c.name)+'</button>';}).join(''); cats.querySelectorAll('button').forEach(function(b){b.onclick=function(){self.category=b.dataset.cat; var items=self._vehicles(); self.selected=items[0]&&items[0].id||null; self._render();};}); var items=this._vehicles(); if(!items.length){ list.innerHTML='<div class="vd-loading">Aucun véhicule dans cette catégorie.</div>'; this._renderDetail(null); return; } list.innerHTML=items.map(function(v){ return '<div class="vd-card '+(self.selected===v.id?'active':'')+'" data-id="'+self._esc(v.id)+'"><div class="vd-card-top"><div class="vd-avatar">'+self._esc((v.name||'?').charAt(0))+'</div><div class="vd-card-meta"><div class="vd-name">'+self._esc(v.name)+'</div><div class="vd-cat">'+self._esc(v.category)+'</div></div><div class="vd-price">'+self._fmt(v.priceTTC)+'</div></div><div class="vd-desc">'+self._esc(v.description||'Aucune description')+'</div></div>'; }).join(''); list.querySelectorAll('.vd-card').forEach(function(c){ c.onclick=function(){self.selected=c.dataset.id; self._render();}; }); var current=items.find(v=>v.id===this.selected)||items[0]; this._renderDetail(current);},
-    _renderDetail(v){ var el=this.wrapper.querySelector('#vd-detail'); if(!el) return; if(!v){ el.innerHTML=''; return; } el.innerHTML='<div class="vd-preview"><div class="vd-preview-hero"><div class="vd-preview-badge">'+this._esc(v.category||'vehicle')+'</div><div class="vd-preview-name">'+this._esc(v.name||'Vehicle')+'</div><div class="vd-preview-model">'+this._esc(v.class||'Unknown class')+'</div></div><div class="vd-specs"><div><span>Prix HT</span><strong>'+this._fmt(v.priceHT)+'</strong></div><div><span>Taxe</span><strong>'+this._fmt(v.priceTax)+'</strong></div><div><span>Prix TTC</span><strong>'+this._fmt(v.priceTTC)+'</strong></div></div><div class="vd-lore">'+this._esc(v.description||'Aucune description fournie.')+'</div><div class="vd-note">Le téléphone affiche le catalogue et les prix. L’achat reste uniquement disponible au concessionnaire.</div></div>'; }
+/**
+ * Genesis Motors - Vehicle catalog
+ */
+window.phoneAppManager&&window.phoneAppManager.register('dealer',{
+w:null,d:{categories:[],vehicles:[]},cat:'all',sel:null,v:'list',_to:null,
+getHTML(){return'<div class="gm"><div class="gm-h"><h1>Genesis Motors</h1><p>Catalogue v\u00e9hicules</p></div><div id="gm-cats"></div><div class="gm-s" id="gm-c"></div></div>'},
+onOpen(wr){var s=this;s.w=wr;s.d={categories:[],vehicles:[]};s.cat='all';s.sel=null;s.v='list';
+s._h=function(m){s._onData(m)};WLCBridge.on('vdCatalogList',s._h);
+WLCBridge.send('vdListCatalog',{});s._load();
+s._to=setTimeout(function(){if(!s.d.vehicles.length&&s.w)s._draw()},5000)},
+onClose(){WLCBridge.off('vdCatalogList',this._h);if(this._to)clearTimeout(this._to);this.w=null},
+_c(){return this.w&&this.w.querySelector('#gm-c')},
+_load(){var e=this._c();if(e)e.innerHTML='<div class="gm-load"><div class="gm-spin"></div></div>'},
+_onData(m){if(this._to){clearTimeout(this._to);this._to=null}
+this.d=(m&&m.data)||{categories:[],vehicles:[]};this._renderCats();this._draw()},
+_renderCats(){var b=this.w&&this.w.querySelector('#gm-cats');if(!b)return;var s=this;
+var h='<div class="gm-cats"><div class="gm-cat'+(s.cat==='all'?' on':'')+'" data-c="all">Tout</div>';
+(this.d.categories||[]).forEach(function(c){h+='<div class="gm-cat'+(s.cat===c.id?' on':'')+'" data-c="'+s._e(c.id)+'">'+s._e(c.name)+'</div>'});
+h+='</div>';b.innerHTML=h;
+b.querySelectorAll('.gm-cat').forEach(function(c){c.addEventListener('click',function(){s.cat=c.dataset.c;s.sel=null;s.v='list';s._renderCats();s._draw()})})},
+_veh(){var v=(this.d.vehicles||[]).slice();if(this.cat!=='all')v=v.filter(function(x){return x.category===this.cat}.bind(this));return v},
+_draw(){if(this.v==='detail')return this._vDet();this._vList()},
+_vList(){var el=this._c();if(!el)return;var s=this,items=this._veh();
+if(!items.length){el.innerHTML='<div class="gm-empty"><div class="gm-empty-i">\u{1F697}</div><div class="gm-empty-t">Aucun v\u00e9hicule</div></div>';return}
+var h='<div class="gm-list">';items.forEach(function(v,i){
+var ico=['\u{1F697}','\u{1F3CE}','\u{1F69A}','\u{1F3CD}'][i%4];
+h+='<div class="gm-card" data-i="'+i+'"><div class="gm-card-top">'+
+'<div class="gm-card-av">'+ico+'</div>'+
+'<div class="gm-card-info"><div class="gm-card-nm">'+s._e(v.name)+'</div>'+
+'<div class="gm-card-cat">'+s._e(v.category||'V\u00e9hicule')+'</div></div>'+
+'<div class="gm-card-pr">'+s._f(v.priceTTC)+'</div></div>'+
+(v.description?'<div class="gm-card-desc">'+s._e(v.description.substring(0,80))+(v.description.length>80?'...':'')+'</div>':'')+'</div>'});
+h+='</div>';el.innerHTML=h;
+el.querySelectorAll('.gm-card').forEach(function(c){c.addEventListener('click',function(){var i=parseInt(c.dataset.i);var l=s._veh();if(l[i]){s.sel=l[i];s.v='detail';s._draw()}})})},
+_vDet(){var el=this._c();if(!el||!this.sel)return;var s=this,v=this.sel;
+el.innerHTML='<div class="gm-back" id="gm-bk">\u2190 Catalogue</div><div class="gm-det">'+
+'<div class="gm-det-hero"><div class="gm-det-hero-ic">\u{1F697}</div>'+
+'<div class="gm-det-bdg">'+s._e(v.category||'V\u00e9hicule')+'</div></div>'+
+'<div class="gm-det-nm">'+s._e(v.name)+'</div>'+
+'<div class="gm-det-cls">'+s._e(v.class||'Classe inconnue')+'</div>'+
+'<div class="gm-det-grid">'+
+'<div class="gm-det-gi"><div class="gm-det-gi-l">Prix HT</div><div class="gm-det-gi-v">'+s._f(v.priceHT)+'</div></div>'+
+'<div class="gm-det-gi"><div class="gm-det-gi-l">Taxe</div><div class="gm-det-gi-v o">'+s._f(v.priceTax)+'</div></div>'+
+'<div class="gm-det-gi"><div class="gm-det-gi-l">Prix TTC</div><div class="gm-det-gi-v g">'+s._f(v.priceTTC)+'</div></div></div>'+
+(v.description?'<div class="gm-det-desc">'+s._e(v.description)+'</div>':'')+
+'<div class="gm-det-note">Consultation uniquement \u2022 Achat au concessionnaire en ville</div></div>';
+el.querySelector('#gm-bk').addEventListener('click',function(){s.v='list';s._draw()})},
+_f(n){n=parseInt(n)||0;return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'\u00a0')+' $'},
+_e(s){if(!s)return'';var d=document.createElement('div');d.textContent=s;return d.innerHTML}
 });

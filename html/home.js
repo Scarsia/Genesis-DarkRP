@@ -3,15 +3,35 @@
  * App grid, dock, app icon management
  */
 
+// Apps to hide completely
+var _HIDDEN_APPS = ['camera', 'photos'];
+
+// App name overrides
+var _APP_NAMES = {
+    'darkchat': 'Telegram',
+};
+
+// Force these apps into the dock (in addition to hasDock)
+var _FORCE_DOCK = ['phone'];
+
 window.phoneHome = {
     apps: [],
     installedApps: [],
     dockApps: [],
 
     init(data) {
-        this.apps = data.apps || [];
-        this.installedApps = data.installedApps || [];
-        this.dockApps = this.apps.filter(a => a.hasDock);
+        // Filter out hidden apps
+        this.apps = (data.apps || []).filter(a => !_HIDDEN_APPS.includes(a.id));
+
+        // Apply name overrides
+        this.apps.forEach(a => { if (_APP_NAMES[a.id]) a.name = _APP_NAMES[a.id]; });
+
+        // Remove hidden from installed too
+        this.installedApps = (data.installedApps || []).filter(id => !_HIDDEN_APPS.includes(id));
+
+        // Dock: original dock apps + forced dock apps
+        this.dockApps = this.apps.filter(a => a.hasDock || _FORCE_DOCK.includes(a.id));
+
         this.renderGrid();
         this.renderDock();
     },
@@ -21,7 +41,6 @@ window.phoneHome = {
         if (!grid) return;
         grid.innerHTML = '';
 
-        // Only show installed apps (excluding dock apps from grid optionally — but SBF shows all)
         const visibleApps = this.apps.filter(app => this.installedApps.includes(app.id));
 
         visibleApps.forEach(app => {
@@ -75,9 +94,8 @@ window.phoneHome = {
         });
     },
 
-    // Refresh after app install/uninstall
     refresh(installedApps) {
-        this.installedApps = installedApps;
+        this.installedApps = (installedApps || []).filter(id => !_HIDDEN_APPS.includes(id));
         this.renderGrid();
         this.renderDock();
     }

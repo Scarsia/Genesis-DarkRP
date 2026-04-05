@@ -1,167 +1,49 @@
-/* Genesis Phone - Bank App */
-.bank-app {
-    display: flex; flex-direction: column; height: 100%;
-    background: var(--phone-bg, #000); color: var(--phone-text, #fff);
-    font-family: -apple-system, 'SF Pro Display', 'Nunito', sans-serif;
-    overflow: hidden;
-}
-.bank-scroll { flex: 1; overflow-y: auto; padding: 0 16px 24px; -webkit-overflow-scrolling: touch; }
-.bank-scroll::-webkit-scrollbar { display: none; }
-
-/* Header */
-.bank-header { padding: 8px 16px 12px; }
-.bank-header h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.3px; }
-.bank-header p { font-size: 11px; color: var(--phone-text-secondary, #8e8e93); margin: 2px 0 0; }
-
-/* Card */
-.bank-card {
-    border-radius: 18px; padding: 22px; margin-bottom: 16px;
-    position: relative; overflow: hidden;
-    background: linear-gradient(145deg, #1c1c2e 0%, #0d0d1a 100%);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-}
-.bank-card::before {
-    content: ''; position: absolute; top: -40px; right: -40px;
-    width: 120px; height: 120px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,59,48,0.08), transparent 70%);
-}
-.bank-card::after {
-    content: ''; position: absolute; bottom: -30px; left: -30px;
-    width: 100px; height: 100px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(0,122,255,0.06), transparent 70%);
-}
-.bank-card-tier {
-    font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-    color: rgba(255,255,255,0.35); margin-bottom: 20px;
-}
-.bank-card-balance { font-size: 32px; font-weight: 800; color: #fff; letter-spacing: -1px; margin-bottom: 2px; }
-.bank-card-currency { font-size: 18px; font-weight: 400; color: rgba(255,255,255,0.4); margin-left: 4px; }
-.bank-card-iban {
-    font-size: 10px; color: rgba(255,255,255,0.4); font-family: 'SF Mono', monospace;
-    letter-spacing: 1.5px; margin-top: 4px;
-}
-.bank-card-number {
-    font-size: 9px; color: rgba(255,255,255,0.2); font-family: 'SF Mono', monospace;
-    margin-top: 12px;
-}
-.bank-card-frozen {
-    position: absolute; top: 14px; right: 14px;
-    background: rgba(255,59,48,0.2); color: #FF3B30;
-    padding: 3px 10px; border-radius: 6px;
-    font-size: 9px; font-weight: 700; letter-spacing: 1px;
-}
-
-/* Card selector pills */
-.bank-pills { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding: 0 2px; }
-.bank-pills::-webkit-scrollbar { display: none; }
-.bank-pill {
-    padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;
-    white-space: nowrap; cursor: pointer; transition: all 0.2s ease;
-    background: rgba(255,255,255,0.05); color: var(--phone-text-secondary, #8e8e93);
-    border: 1px solid transparent;
-}
-.bank-pill.active {
-    background: rgba(255,59,48,0.12); color: #FF3B30;
-    border-color: rgba(255,59,48,0.2);
-}
-
-/* Action buttons */
-.bank-actions { display: flex; gap: 10px; margin-bottom: 20px; }
-.bank-action {
-    flex: 1; border-radius: 14px; padding: 14px 10px; text-align: center;
-    cursor: pointer; transition: transform 0.15s ease, opacity 0.15s ease;
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-}
-.bank-action:active { transform: scale(0.96); opacity: 0.8; }
-.bank-action-icon { font-size: 20px; margin-bottom: 4px; }
-.bank-action-label { font-size: 11px; font-weight: 600; }
-.bank-action.transfer { background: rgba(255,59,48,0.1); color: #FF3B30; }
-.bank-action.history { background: rgba(0,122,255,0.1); color: #007AFF; }
-.bank-action.refresh { background: rgba(52,199,89,0.1); color: #34C759; }
-
-/* Section label */
-.bank-section-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.2px; }
-
-/* Transaction list */
-.bank-tx-list { border-radius: 14px; overflow: hidden; background: rgba(255,255,255,0.03); }
-.bank-tx {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 14px; border-bottom: 0.5px solid rgba(255,255,255,0.04);
-    transition: background 0.15s ease;
-}
-.bank-tx:last-child { border-bottom: none; }
-.bank-tx:active { background: rgba(255,255,255,0.04); }
-.bank-tx-icon {
-    width: 34px; height: 34px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 700; flex-shrink: 0;
-}
-.bank-tx-icon.in { background: rgba(52,199,89,0.12); color: #34C759; }
-.bank-tx-icon.out { background: rgba(255,59,48,0.12); color: #FF3B30; }
-.bank-tx-info { flex: 1; min-width: 0; }
-.bank-tx-desc { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bank-tx-iban { font-size: 9px; color: var(--phone-text-secondary, #636366); font-family: monospace; }
-.bank-tx-amount { text-align: right; flex-shrink: 0; }
-.bank-tx-amount-value { font-size: 12px; font-weight: 600; }
-.bank-tx-amount-date { font-size: 9px; color: var(--phone-text-secondary, #636366); }
-
-/* Debt banner */
-.bank-debt {
-    background: rgba(255,59,48,0.06); border: 1px solid rgba(255,59,48,0.15);
-    border-radius: 12px; padding: 12px 14px; margin-top: 14px;
-    font-size: 11px; color: #FF3B30; display: flex; align-items: center; gap: 8px;
-}
-
-/* Transfer view */
-.bank-back {
-    display: flex; align-items: center; gap: 6px; cursor: pointer;
-    color: #007AFF; font-size: 14px; font-weight: 500; margin-bottom: 16px;
-}
-.bank-back:active { opacity: 0.6; }
-.bank-view-title { font-size: 20px; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.3px; }
-.bank-from-card {
-    background: rgba(255,255,255,0.04); border-radius: 14px;
-    padding: 14px 16px; margin-bottom: 14px;
-}
-.bank-from-label { font-size: 9px; font-weight: 600; color: var(--phone-text-secondary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
-.bank-from-iban { font-size: 13px; font-weight: 600; font-family: monospace; }
-.bank-from-bal { font-size: 11px; color: var(--phone-text-secondary); margin-top: 2px; }
-
-.bank-input {
-    width: 100%; padding: 14px 16px;
-    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px; color: var(--phone-text, #fff);
-    font-size: 14px; font-family: inherit; outline: none;
-    margin-bottom: 10px; transition: border-color 0.2s ease;
-    box-sizing: border-box;
-}
-.bank-input::placeholder { color: rgba(255,255,255,0.2); }
-.bank-input:focus { border-color: rgba(255,59,48,0.4); }
-.bank-input.mono { font-family: 'SF Mono', monospace; text-transform: uppercase; letter-spacing: 1px; }
-
-.bank-send-btn {
-    width: 100%; padding: 16px; border: none; border-radius: 14px;
-    background: linear-gradient(135deg, #FF3B30, #FF6B6B);
-    color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
-    margin-top: 6px; transition: transform 0.15s ease, opacity 0.15s ease;
-    font-family: inherit;
-}
-.bank-send-btn:active { transform: scale(0.97); opacity: 0.85; }
-
-/* Empty state */
-.bank-empty {
-    text-align: center; padding: 60px 20px;
-}
-.bank-empty-icon { font-size: 42px; margin-bottom: 12px; }
-.bank-empty-text { font-size: 13px; color: var(--phone-text-secondary); }
-
-/* Loading */
-.bank-loading { text-align: center; padding: 80px 0; }
-.bank-spinner {
-    width: 28px; height: 28px; margin: 0 auto 12px;
-    border: 3px solid rgba(255,255,255,0.08);
-    border-top-color: #FF3B30; border-radius: 50%;
-    animation: bankSpin 0.7s linear infinite;
-}
-.bank-loading-text { font-size: 11px; color: var(--phone-text-secondary); }
-@keyframes bankSpin { to { transform: rotate(360deg); } }
+/* Genesis Bank */
+.bk{display:flex;flex-direction:column;height:100%;background:var(--phone-bg,#000);color:var(--phone-text,#fff);font-family:-apple-system,'Nunito',sans-serif;overflow:hidden}
+.bk-s{flex:1;overflow-y:auto;padding:0 16px 24px;-webkit-overflow-scrolling:touch}.bk-s::-webkit-scrollbar{display:none}
+.bk-h{padding:8px 16px 12px}.bk-h h1{font-size:22px;font-weight:700;margin:0}.bk-h p{font-size:11px;color:var(--phone-text-secondary,#8e8e93);margin:2px 0 0}
+.bk-card{border-radius:18px;padding:22px;margin-bottom:16px;position:relative;overflow:hidden;background:linear-gradient(145deg,#1c1c2e,#0d0d1a);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.bk-card::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(255,59,48,.08),transparent 70%)}
+.bk-card.grp{background:linear-gradient(145deg,#0d1a2e,#0a1020)}.bk-card.grp::before{background:radial-gradient(circle,rgba(0,122,255,.1),transparent 70%)}
+.bk-card.frozen{opacity:.6}
+.bk-tier{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:20px}
+.bk-bal{font-size:32px;font-weight:800;color:#fff;letter-spacing:-1px}.bk-cur{font-size:18px;font-weight:400;color:rgba(255,255,255,.4);margin-left:4px}
+.bk-iban{font-size:10px;color:rgba(255,255,255,.4);font-family:monospace;letter-spacing:1.5px;margin-top:4px}
+.bk-cnum{font-size:9px;color:rgba(255,255,255,.2);font-family:monospace;margin-top:12px}
+.bk-badge{position:absolute;top:14px;right:14px;padding:3px 10px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:1px}
+.bk-badge.frozen{background:rgba(255,59,48,.2);color:#FF3B30}.bk-badge.group{background:rgba(0,122,255,.2);color:#007AFF}
+.bk-pills{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto}.bk-pills::-webkit-scrollbar{display:none}
+.bk-pill{padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.05);color:var(--phone-text-secondary,#8e8e93);border:1px solid transparent}
+.bk-pill.on{background:rgba(255,59,48,.12);color:#FF3B30;border-color:rgba(255,59,48,.2)}
+.bk-pill.grp{border-left:2px solid #007AFF}
+.bk-acts{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:20px}
+.bk-act{border-radius:14px;padding:12px 4px;text-align:center;cursor:pointer;transition:transform .15s}
+.bk-act:active{transform:scale(.96)}.bk-act-i{font-size:18px;margin-bottom:3px}.bk-act-l{font-size:10px;font-weight:600}
+.bk-act.xfer{background:rgba(255,59,48,.1);color:#FF3B30}.bk-act.hist{background:rgba(0,122,255,.1);color:#007AFF}
+.bk-act.lock{background:rgba(255,149,0,.1);color:#FF9500}.bk-act.cfg{background:rgba(142,142,147,.1);color:#8e8e93}
+.bk-act.lock.blocked{background:rgba(255,59,48,.15);color:#FF3B30}
+.bk-sec{font-size:13px;font-weight:700;margin-bottom:10px}
+.bk-txl{border-radius:14px;overflow:hidden;background:rgba(255,255,255,.03)}
+.bk-tx{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:.5px solid rgba(255,255,255,.04)}.bk-tx:last-child{border-bottom:none}
+.bk-tx-ic{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.bk-tx-ic.in{background:rgba(52,199,89,.12);color:#34C759}.bk-tx-ic.out{background:rgba(255,59,48,.12);color:#FF3B30}
+.bk-tx-nf{flex:1;min-width:0}.bk-tx-ds{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bk-tx-ib{font-size:9px;color:#636366;font-family:monospace}.bk-tx-am{text-align:right;flex-shrink:0}
+.bk-tx-av{font-size:12px;font-weight:600}.bk-tx-ad{font-size:9px;color:#636366}
+.bk-debt{background:rgba(255,59,48,.06);border:1px solid rgba(255,59,48,.15);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:11px;color:#FF3B30}
+.bk-back{display:flex;align-items:center;gap:4px;cursor:pointer;color:#007AFF;font-size:14px;font-weight:500;margin-bottom:16px}.bk-back:active{opacity:.6}
+.bk-vtit{font-size:20px;font-weight:700;margin-bottom:16px}
+.bk-from{background:rgba(255,255,255,.04);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.bk-from-lb{font-size:9px;font-weight:600;color:var(--phone-text-secondary);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.bk-from-ib{font-size:13px;font-weight:600;font-family:monospace}.bk-from-bl{font-size:11px;color:var(--phone-text-secondary);margin-top:2px}
+.bk-inp{width:100%;padding:14px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;color:var(--phone-text,#fff);font-size:14px;font-family:inherit;outline:none;margin-bottom:10px;box-sizing:border-box}
+.bk-inp::placeholder{color:rgba(255,255,255,.2)}.bk-inp:focus{border-color:rgba(255,59,48,.4)}.bk-inp.mono{font-family:monospace;text-transform:uppercase;letter-spacing:1px}
+.bk-btn{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(135deg,#FF3B30,#FF6B6B);color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px;font-family:inherit}.bk-btn:active{transform:scale(.97)}
+.bk-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(255,255,255,.03);border-radius:12px;margin-bottom:8px;cursor:pointer}.bk-row:active{background:rgba(255,255,255,.06)}
+.bk-row-l{font-size:13px;font-weight:500}.bk-row-v{font-size:12px;color:var(--phone-text-secondary)}.bk-row-a{color:rgba(255,255,255,.15);font-size:14px}
+.bk-tog{width:44px;height:26px;border-radius:13px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.bk-tog.off{background:rgba(255,255,255,.1)}.bk-tog.on{background:#34C759}
+.bk-tog::after{content:'';position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s}.bk-tog.off::after{left:3px}.bk-tog.on::after{left:21px}
+.bk-empty{text-align:center;padding:60px 20px}.bk-empty-i{font-size:42px;margin-bottom:12px}.bk-empty-t{font-size:13px;color:var(--phone-text-secondary)}
+.bk-load{text-align:center;padding:80px 0}.bk-spin{width:28px;height:28px;margin:0 auto 12px;border:3px solid rgba(255,255,255,.08);border-top-color:#FF3B30;border-radius:50%;animation:bks .7s linear infinite}
+@keyframes bks{to{transform:rotate(360deg)}}
