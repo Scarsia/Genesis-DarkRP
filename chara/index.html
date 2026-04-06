@@ -1040,11 +1040,6 @@ html,body {
               <select class="fsel" id="f_civil_status" onchange="sf('civil_status',this.value)"></select>
             </div>
 
-            <div>
-              <div class="sh">Langues</div>
-              <input class="fi" id="f_languages" type="text" maxlength="64" oninput="sf('languages',this.value)" placeholder="Français, Anglais…">
-            </div>
-
           </div>
 
         </div><!-- /form-cols -->
@@ -1107,7 +1102,7 @@ const S={
   currentSlot:1, slots:{},
   data:{first_name:'',last_name:'',nickname:'',gender:'Homme',birthdate:'',
     age:25,height_cm:175,weight_kg:70,shoe_size:42,
-    origin_country:'',birth_place:'',languages:'',civil_status:'Celibataire',
+    origin_country:'',birth_place:'',civil_status:'Celibataire',
     traits:[],hair_id:'',hair_color:{r:20,g:16,b:14},hair_scale:1.0}
 };
 
@@ -1322,7 +1317,6 @@ function renderSum(){
       <div class="id-f"><div class="id-l">Nationalité</div><div class="id-v">${d.origin_country||'—'}</div></div>
       <div class="id-f"><div class="id-l">Ville natale</div><div class="id-v">${d.birth_place||'—'}</div></div>
       <div class="id-f"><div class="id-l">État civil</div><div class="id-v">${d.civil_status||'—'}</div></div>
-      <div class="id-f"><div class="id-l">Langues</div><div class="id-v">${d.languages||'—'}</div></div>
     </div>
     ${d.traits&&d.traits.length?`<div style="margin-top:10px"><div class="id-l" style="margin-bottom:5px">Personnalité</div>
     <div class="id-traits">${d.traits.map(t=>`<span class="id-trait">${t}</span>`).join('')}</div></div>`:''}`;
@@ -1333,7 +1327,7 @@ function populateSels(){
 }
 function populateForm(){
   const d=S.data;
-  ['first_name','last_name','nickname','birthdate','origin_country','birth_place','languages']
+  ['first_name','last_name','nickname','birthdate','origin_country','birth_place']
     .forEach(k=>{const e=document.getElementById('f_'+k);if(e)e.value=d[k]||'';});
   ['age','height_cm','weight_kg','shoe_size'].forEach(k=>{
     const e=document.getElementById('f_'+k);if(!e)return;
@@ -1368,7 +1362,7 @@ function GCC_Bootstrap(data){
     gender:d.gender||'Homme',birthdate:d.birthdate||'',
     age:parseInt(d.age)||25,height_cm:parseInt(d.height_cm)||175,
     weight_kg:parseInt(d.weight_kg)||70,shoe_size:parseInt(d.shoe_size)||42,
-    origin_country:d.origin_country||'',birth_place:d.birth_place||'',languages:d.languages||'',
+    origin_country:d.origin_country||'',birth_place:d.birth_place||'',
     civil_status:d.civil_status||'Celibataire',traits:Array.isArray(d.traits)?d.traits:[],
     hair_id:d.hair_id||'',hair_color:d.hair_color||{r:20,g:16,b:14},hair_scale:parseFloat(d.hair_scale)||1.0
   };
