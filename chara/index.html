@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   GENESIS CHARACTER CREATOR — DHTML UI
+   Identity: Dark Industrial, Rajdhani, Silver/Blue accent
+   ═══════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --accent:       #4fa3e8;
+  --accent-glow:  rgba(79,163,232,0.25);
+  --accent-dim:   rgba(79,163,232,0.10);
+  --bg-sidebar:   rgba(5, 7, 11, 0.97);
+  --bg-panel:     rgba(8, 10, 16, 0.94);
+  --bg-input:     rgba(3, 5, 9, 0.92);
+  --bg-hover:     rgba(255,255,255,0.04);
+  --text:         #cdd5e0;
+  --text-bright:  #e8edf5;
+  --text-muted:   #4a5568;
+  --border:       rgba(255,255,255,0.06);
+  --border-hover: rgba(255,255,255,0.12);
+  --green:        #2ecc71;
+  --red:          #e74c3c;
+  --radius:       5px;
+  --t:            0.16s ease;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  background: transparent !important;
+  overflow: hidden;
+  font-family: 'Rajdhani', 'Arial Narrow', Arial, sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── APP SHELL ───────────────────────────────────────────────── */
+#app {
+  display: flex;
+  width: 100%; height: 100%;
+  padding: 28px 0 28px 28px;
+  gap: 0;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  position: relative;
+}
+#app.visible { opacity: 1; }
+
+/* ── SIDEBAR ─────────────────────────────────────────────────── */
+#sidebar {
+  width: 258px;
+  height: 100%;
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border);
+  border-radius: 8px 0 0 8px;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 18px 22px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Scan-lines texture on sidebar */
+#sidebar::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(255,255,255,0.007) 3px, rgba(255,255,255,0.007) 4px
+  );
+  pointer-events: none;
+}
+
+/* ── LOGO ───────────────────────────────────── */
+.logo { margin-bottom: 28px; position: relative; z-index: 1; }
+
+.logo-eyebrow {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.logo-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 14px; height: 1px;
+  background: var(--accent);
+  opacity: 0.6;
+}
+
+.logo-name {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  color: #fff;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.logo-sub {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 2.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+/* ── DIVIDER ────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 18px 0;
+  position: relative; z-index: 1;
+}
+
+/* ── SECTION LABEL ──────────────────────────── */
+.sidebar-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  position: relative; z-index: 1;
+}
+
+/* ── SLOT BUTTONS ───────────────────────────── */
+#slot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  position: relative; z-index: 1;
+}
+
+.slot-btn {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--t), background var(--t);
+}
+.slot-btn:hover { border-color: var(--border-hover); background: var(--bg-hover); }
+.slot-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+.slot-btn.active::before {
+  content: '';
+  position: absolute; left: 0; top: 0;
+  width: 3px; height: 100%;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+}
+.slot-name {
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 1px; color: var(--text-bright);
+  text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.slot-meta {
+  font-size: 10px; color: var(--text-muted);
+  margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.spacer { flex: 1; }
+
+/* ── SAVE BUTTON ────────────────────────────── */
+#btn-save {
+  width: 100%;
+  padding: 13px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 2.5px;
+  color: #fff;
+  text-transform: uppercase;
+  transition: background var(--t), box-shadow var(--t), transform 0.1s;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  position: relative; z-index: 1;
+}
+#btn-save:hover { background: #68b4f0; box-shadow: 0 0 22px var(--accent-glow); }
+#btn-save:active { transform: scale(0.975); }
+
+/* ── CONTENT PANEL ───────────────────────────────────────────── */
+#content-panel {
+  width: 410px;
+  height: 100%;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* ── TAB BAR ────────────────────────────────── */
+#tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  padding: 0 18px;
+  flex-shrink: 0;
+  background: rgba(5,7,11,0.5);
+}
+
+.tab-btn {
+  padding: 16px 14px 15px;
+  background: none; border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 2.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  position: relative;
+  transition: color var(--t);
+  flex: 1; text-align: center;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: #fff; }
+.tab-btn.active::after {
+  content: '';
+  position: absolute; bottom: -1px; left: 50%;
+  transform: translateX(-50%);
+  width: 20px; height: 2px;
+  background: var(--accent);
+  border-radius: 1px;
+}
+
+/* ── TAB PAGES ──────────────────────────────── */
+.tab-page {
+  display: none; flex: 1;
+  overflow-y: auto; overflow-x: hidden;
+  padding: 22px 18px 28px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.06) transparent;
+}
+.tab-page::-webkit-scrollbar { width: 3px; }
+.tab-page::-webkit-scrollbar-track { background: transparent; }
+.tab-page::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.tab-page.active { display: block; }
+
+/* ── SECTION HEADER ─────────────────────────── */
+.sec-hdr {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 2.5px; color: var(--text-muted);
+  text-transform: uppercase;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px; margin-top: 20px;
+}
+.sec-hdr:first-child { margin-top: 0; }
+
+/* ── FORM ROWS ──────────────────────────────── */
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.row1 { margin-bottom: 12px; }
+
+.fg { display: flex; flex-direction: column; gap: 5px; }
+
+.fl {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 1.5px; color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.fi, .fsel {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 9px 11px;
+  color: var(--text-bright);
+  font-family: inherit;
+  font-size: 13px; font-weight: 500;
+  transition: border-color var(--t), background var(--t);
+  width: 100%; outline: none;
+}
+.fi:focus, .fsel:focus {
+  border-color: rgba(79,163,232,0.5);
+  background: rgba(3,5,9,0.99);
+}
+.fi::placeholder { color: var(--text-muted); font-weight: 400; }
+
+.fsel {
+  cursor: pointer; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%234a5568'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+.fsel option { background: #090c14; color: #cdd5e0; }
+
+/* ── SLIDERS ────────────────────────────────── */
+.sg { margin-bottom: 14px; }
+.sg-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+.sg-lbl { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; }
+.sg-val { font-size: 13px; font-weight: 700; color: var(--accent); min-width: 40px; text-align: right; }
+
+.sl {
+  width: 100%; -webkit-appearance: none;
+  height: 2px; background: var(--border);
+  border-radius: 2px; outline: none; cursor: pointer;
+}
+.sl::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 7px var(--accent-glow);
+  cursor: pointer; transition: box-shadow var(--t);
+}
+.sl:hover::-webkit-slider-thumb { box-shadow: 0 0 13px var(--accent-glow); }
+
+/* ── HAIR GRID ──────────────────────────────── */
+#hair-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+  margin-bottom: 4px;
+}
+.hc {
+  padding: 10px 6px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer; text-align: center;
+  transition: border-color var(--t), color var(--t), background var(--t);
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.3px; color: var(--text-muted);
+  text-transform: uppercase; line-height: 1.3;
+}
+.hc:hover { border-color: var(--border-hover); color: var(--text); background: var(--bg-hover); }
+.hc.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.hc-ico { font-size: 16px; display: block; margin-bottom: 3px; opacity: 0.6; }
+.hc.active .hc-ico { opacity: 1; }
+
+/* ── COLOR PRESETS ──────────────────────────── */
+#color-presets {
+  display: flex; flex-wrap: wrap;
+  gap: 8px; margin-bottom: 14px;
+}
+.cs {
+  width: 30px; height: 30px;
+  border-radius: 50%; cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform var(--t), border-color var(--t);
+  position: relative;
+}
+.cs:hover { transform: scale(1.15); border-color: rgba(255,255,255,0.35); }
+.cs.active { border-color: #fff; box-shadow: 0 0 9px rgba(255,255,255,0.25); }
+.cs[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: calc(100% + 7px); left: 50%;
+  transform: translateX(-50%);
+  background: #12151e;
+  border: 1px solid var(--border);
+  padding: 3px 8px; border-radius: 3px;
+  font-size: 10px; white-space: nowrap;
+  color: var(--text); pointer-events: none;
+}
+
+.color-custom-row {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 4px;
+}
+.color-custom-lbl { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; }
+input[type="color"] {
+  width: 38px; height: 38px;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg-input);
+  cursor: pointer; padding: 2px;
+}
+
+/* ── TRAITS ─────────────────────────────────── */
+.traits-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 14px; }
+#traits-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.tc {
+  padding: 8px 16px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 20px; cursor: pointer;
+  font-family: inherit;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.5px; color: var(--text-muted);
+  text-transform: uppercase;
+  transition: border-color var(--t), color var(--t), background var(--t);
+}
+.tc:hover { border-color: var(--border-hover); color: var(--text); }
+.tc.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+/* ── SUMMARY CARD ───────────────────────────── */
+#summary-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative; overflow: hidden;
+}
+#summary-card::before {
+  content: 'GENESIS NETWORK';
+  position: absolute; top: 14px; right: 16px;
+  font-size: 8px; font-weight: 700;
+  letter-spacing: 2px; color: var(--accent);
+  opacity: 0.5;
+}
+.sum-name {
+  font-size: 20px; font-weight: 700;
+  letter-spacing: 2.5px; color: #fff;
+  text-transform: uppercase; margin-bottom: 2px;
+}
+.sum-alias { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; font-style: italic; }
+.sum-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.sum-field { display: flex; flex-direction: column; gap: 3px; }
+.sum-lbl { font-size: 8px; font-weight: 700; letter-spacing: 1.5px; color: var(--text-muted); text-transform: uppercase; }
+.sum-val { font-size: 13px; font-weight: 600; color: var(--text-bright); }
+.sum-traits { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.sum-trait {
+  padding: 3px 11px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(79,163,232,0.25);
+  border-radius: 20px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.5px; color: var(--accent);
+  text-transform: uppercase;
+}
+
+/* ── TAB HEADER ─────────────────────────────── */
+.tab-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px;
+}
+.tab-hdr-lbl { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; }
+.btn-rnd {
+  width: 28px; height: 28px;
+  background: var(--bg-input); border: 1px solid var(--border);
+  border-radius: var(--radius); cursor: pointer;
+  color: var(--text-muted); font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  transition: color var(--t), border-color var(--t);
+}
+.btn-rnd:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ── CLOSE ───────────────────────────────────── */
+#btn-close {
+  position: fixed; top: 18px; right: 18px;
+  width: 34px; height: 34px;
+  background: var(--bg-input); border: 1px solid var(--border);
+  border-radius: 50%; cursor: pointer;
+  font-size: 15px; color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  transition: color var(--t), border-color var(--t);
+  z-index: 100;
+}
+#btn-close:hover { color: var(--red); border-color: var(--red); }
+
+/* ── SAVE STAMP ──────────────────────────────── */
+#save-stamp {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(1.6);
+  font-size: 28px; font-weight: 700;
+  letter-spacing: 8px; color: var(--green);
+  border: 2px solid var(--green);
+  padding: 16px 38px; opacity: 0;
+  transition: opacity 0.25s, transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  text-transform: uppercase; pointer-events: none; z-index: 200;
+  text-shadow: 0 0 20px rgba(46,204,113,0.4);
+}
+#save-stamp.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* ── NOTIFICATIONS ───────────────────────────── */
+#notifs {
+  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; gap: 6px;
+  z-index: 300; pointer-events: none;
+}
+.ntf {
+  background: rgba(8,10,16,0.97);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.5px; color: var(--text);
+  animation: ntfIn 0.25s ease, ntfOut 0.25s ease 2.75s forwards;
+}
+@keyframes ntfIn  { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes ntfOut { to { opacity: 0; } }
+
+/* ── HIDDEN ──────────────────────────────────── */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ═══ SIDEBAR ════════════════════════════════════════════════ -->
+  <aside id="sidebar">
+    <div class="logo">
+      <div class="logo-eyebrow">Network</div>
+      <div class="logo-name">Genesis</div>
+      <div class="logo-sub">Character Creator</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="sidebar-label">Vos profils</div>
+    <div id="slot-list"></div>
+
+    <div class="spacer"></div>
+
+    <button id="btn-save" onclick="onSave()">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+        <path d="M1.5 6.5L5.5 10.5L11.5 2.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Sauvegarder
+    </button>
+  </aside>
+
+  <!-- ═══ CONTENT PANEL ══════════════════════════════════════════ -->
+  <main id="content-panel">
+
+    <!-- Tabs -->
+    <nav id="tab-bar">
+      <button class="tab-btn active"  data-tab="identity"    onclick="switchTab('identity')">INFO</button>
+      <button class="tab-btn"         data-tab="appearance"  onclick="switchTab('appearance')">CORPS</button>
+      <button class="tab-btn"         data-tab="personality" onclick="switchTab('personality')">TRAITS</button>
+      <button class="tab-btn"         data-tab="summary"     onclick="switchTab('summary')">ID</button>
+    </nav>
+
+    <!-- ── TAB: INFO ──────────────────────────────── -->
+    <div id="tab-identity" class="tab-page active">
+      <div class="tab-hdr">
+        <span class="tab-hdr-lbl">Identité civile</span>
+        <button class="btn-rnd" title="Aléatoire" onclick="onRandomize()">⚄</button>
+      </div>
+
+      <div class="row2">
+        <div class="fg"><label class="fl">Prénom</label>
+          <input class="fi" id="f_first_name" type="text" maxlength="24" oninput="setField('first_name',this.value)" placeholder="Alexandre"></div>
+        <div class="fg"><label class="fl">Nom</label>
+          <input class="fi" id="f_last_name" type="text" maxlength="28" oninput="setField('last_name',this.value)" placeholder="Dubois"></div>
+      </div>
+
+      <div class="row1">
+        <div class="fg"><label class="fl">Alias / Surnom</label>
+          <input class="fi" id="f_nickname" type="text" maxlength="24" oninput="setField('nickname',this.value)" placeholder="(optionnel)"></div>
+      </div>
+
+      <div class="row2">
+        <div class="fg"><label class="fl">Genre</label>
+          <select class="fsel" id="f_gender" onchange="setField('gender',this.value)"></select></div>
+        <div class="fg"><label class="fl">Date de naissance</label>
+          <input class="fi" id="f_birthdate" type="text" maxlength="10" oninput="setField('birthdate',this.value)" placeholder="JJ/MM/AAAA"></div>
+      </div>
+
+      <div class="sg">
+        <div class="sg-hdr"><span class="sg-lbl">Âge</span><span class="sg-val" id="sv_age">25</span></div>
+        <input class="sl" id="f_age" type="range" min="16" max="95" value="25" oninput="setSlider('age',this.value)">
+      </div>
+
+      <div class="row2">
+        <div class="sg">
+          <div class="sg-hdr"><span class="sg-lbl">Taille (cm)</span><span class="sg-val" id="sv_height_cm">175</span></div>
+          <input class="sl" id="f_height_cm" type="range" min="140" max="220" value="175" oninput="setSlider('height_cm',this.value)">
+        </div>
+        <div class="sg">
+          <div class="sg-hdr"><span class="sg-lbl">Poids (kg)</span><span class="sg-val" id="sv_weight_kg">70</span></div>
+          <input class="sl" id="f_weight_kg" type="range" min="40" max="200" value="70" oninput="setSlider('weight_kg',this.value)">
+        </div>
+      </div>
+
+      <div class="sg">
+        <div class="sg-hdr"><span class="sg-lbl">Pointure</span><span class="sg-val" id="sv_shoe_size">42</span></div>
+        <input class="sl" id="f_shoe_size" type="range" min="30" max="55" value="42" oninput="setSlider('shoe_size',this.value)">
+      </div>
+
+      <div class="row2">
+        <div class="fg"><label class="fl">Nationalité</label>
+          <input class="fi" id="f_origin_country" type="text" maxlength="32" oninput="setField('origin_country',this.value)" placeholder="Belgique"></div>
+        <div class="fg"><label class="fl">Ville de naissance</label>
+          <input class="fi" id="f_birth_place" type="text" maxlength="48" oninput="setField('birth_place',this.value)" placeholder="Bruxelles"></div>
+      </div>
+
+      <div class="row1">
+        <div class="fg"><label class="fl">État Civil</label>
+          <select class="fsel" id="f_civil_status" onchange="setField('civil_status',this.value)"></select></div>
+      </div>
+
+      <div class="row1">
+        <div class="fg"><label class="fl">Langues parlées</label>
+          <input class="fi" id="f_languages" type="text" maxlength="64" oninput="setField('languages',this.value)" placeholder="Français, Anglais…"></div>
+      </div>
+    </div>
+
+    <!-- ── TAB: CORPS ─────────────────────────────── -->
+    <div id="tab-appearance" class="tab-page">
+
+      <div class="sec-hdr">Modèle de cheveux</div>
+      <div id="hair-grid"></div>
+
+      <div class="sec-hdr">Couleur des cheveux</div>
+      <div id="color-presets"></div>
+      <div class="color-custom-row">
+        <span class="color-custom-lbl">Couleur libre</span>
+        <input type="color" id="f_hair_color_picker" value="#141008" oninput="onCustomColor(this.value)">
+      </div>
+
+      <div class="sec-hdr">Échelle des cheveux</div>
+      <div class="sg">
+        <div class="sg-hdr">
+          <span class="sg-lbl">Taille des cheveux</span>
+          <span class="sg-val" id="sv_hair_scale">1.00×</span>
+        </div>
+        <input class="sl" id="f_hair_scale" type="range" min="50" max="180" value="100" oninput="onHairScale(this.value)">
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+          <span style="font-size:9px;color:var(--text-muted)">0.5×</span>
+          <span style="font-size:9px;color:var(--text-muted)">1.0×</span>
+          <span style="font-size:9px;color:var(--text-muted)">1.8×</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── TAB: TRAITS ────────────────────────────── -->
+    <div id="tab-personality" class="tab-page">
+      <div class="tab-hdr">
+        <span class="tab-hdr-lbl">Personnalité</span>
+      </div>
+      <div class="traits-meta" id="traits-meta">Choisissez jusqu'à 4 traits</div>
+      <div id="traits-grid"></div>
+    </div>
+
+    <!-- ── TAB: ID ────────────────────────────────── -->
+    <div id="tab-summary" class="tab-page">
+      <div class="tab-hdr">
+        <span class="tab-hdr-lbl">Carte d'identité</span>
+      </div>
+      <div id="summary-card"></div>
+    </div>
+
+  </main>
+
+</div><!-- #app -->
+
+<!-- Close -->
+<button id="btn-close" onclick="onClose()">✕</button>
+
+<!-- Save stamp overlay -->
+<div id="save-stamp">SAUVEGARDÉ</div>
+
+<!-- Notifications -->
+<div id="notifs"></div>
+
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// CONFIG (filled on bootstrap)
+// ════════════════════════════════════════════════════════════════
+const cfg = {
+  maxTraits: 4, maxSlots: 3,
+  genderChoices: ['Homme','Femme','Non-binaire','Autre'],
+  civilStatusChoices: ['Celibataire','En couple','Marie(e)','Divorce(e)','Veuf / Veuve'],
+  personalityTraits: [],
+  hairChoices: [],
+  hairColorPresets: []
+};
+
+// ════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════
+const state = {
+  currentSlot: 1,
+  slots: {},
+  data: {
+    first_name:'', last_name:'', nickname:'',
+    gender:'Homme', birthdate:'',
+    age:25, height_cm:175, weight_kg:70, shoe_size:42,
+    origin_country:'', birth_place:'', languages:'',
+    civil_status:'Celibataire',
+    traits:[],
+    hair_id:'', hair_color:{r:20,g:16,b:14},
+    hair_scale: 1.0
+  }
+};
+
+// ════════════════════════════════════════════════════════════════
+// BRIDGE  JS → Lua via AddFunction
+// ════════════════════════════════════════════════════════════════
+function bridge(fn, ...args) {
+  try {
+    if (window.gcc_js && window.gcc_js[fn])
+      window.gcc_js[fn](...args.map(a => String(a)));
+  } catch(_) {}
+}
+
+// ════════════════════════════════════════════════════════════════
+// FIELD / SLIDER UPDATES
+// ════════════════════════════════════════════════════════════════
+function setField(key, val) {
+  state.data[key] = val;
+}
+
+function setSlider(key, raw) {
+  const v = parseInt(raw);
+  state.data[key] = v;
+  const el = document.getElementById('sv_' + key);
+  if (el) el.textContent = v;
+}
+
+function onHairScale(raw) {
+  // slider 50→180 maps to 0.50→1.80
+  const scale = parseFloat((parseInt(raw) / 100).toFixed(2));
+  state.data.hair_scale = scale;
+  document.getElementById('sv_hair_scale').textContent = scale.toFixed(2) + '×';
+  bridge('previewHairScale', scale.toFixed(2));
+}
+
+function onCustomColor(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  state.data.hair_color = {r,g,b};
+  document.querySelectorAll('.cs').forEach(s => s.classList.remove('active'));
+  bridge('previewHairColor', r, g, b);
+}
+
+// ════════════════════════════════════════════════════════════════
+// HAIR
+// ════════════════════════════════════════════════════════════════
+function selectHair(id) {
+  state.data.hair_id = id;
+  document.querySelectorAll('.hc').forEach(c => c.classList.toggle('active', c.dataset.id === id));
+  bridge('previewHair', id);
+  bridge('setCameraProfile', 'appearance');
+}
+
+function selectColorPreset(r, g, b, el) {
+  state.data.hair_color = {r,g,b};
+  document.querySelectorAll('.cs').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  const hex = '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('');
+  document.getElementById('f_hair_color_picker').value = hex;
+  bridge('previewHairColor', r, g, b);
+}
+
+// ════════════════════════════════════════════════════════════════
+// TRAITS
+// ════════════════════════════════════════════════════════════════
+function toggleTrait(trait) {
+  const idx = state.data.traits.indexOf(trait);
+  if (idx >= 0) {
+    state.data.traits.splice(idx, 1);
+  } else {
+    if (state.data.traits.length >= cfg.maxTraits) {
+      notify('Maximum ' + cfg.maxTraits + ' traits');
+      return;
+    }
+    state.data.traits.push(trait);
+  }
+  renderTraits();
+}
+
+// ════════════════════════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+
+  const cams = { identity:'identity', appearance:'appearance', personality:'personality', summary:'summary' };
+  bridge('setCameraProfile', cams[tab] || 'identity');
+
+  if (tab === 'summary') renderSummary();
+}
+
+// ════════════════════════════════════════════════════════════════
+// SLOTS
+// ════════════════════════════════════════════════════════════════
+function renderSlots() {
+  const c = document.getElementById('slot-list');
+  c.innerHTML = '';
+  for (let i = 1; i <= cfg.maxSlots; i++) {
+    const s = state.slots[String(i)] || state.slots[i] || {};
+    const active = state.currentSlot === i;
+    const name = (s.first_name && s.first_name !== '')
+      ? (s.first_name + ' ' + (s.last_name || '')).toUpperCase()
+      : 'Identité ' + i;
+    const meta = s.origin_country || (s.first_name ? 'Profil existant' : 'Nouveau personnage');
+
+    const btn = document.createElement('button');
+    btn.className = 'slot-btn' + (active ? ' active' : '');
+    btn.innerHTML = `<div class="slot-name">${name}</div><div class="slot-meta">${meta}</div>`;
+    btn.onclick = () => bridge('selectSlot', i);
+    c.appendChild(btn);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// RENDER FUNCTIONS
+// ════════════════════════════════════════════════════════════════
+function renderHairGrid() {
+  const grid = document.getElementById('hair-grid');
+  grid.innerHTML = '';
+
+  const none = document.createElement('div');
+  none.className = 'hc' + (state.data.hair_id === '' ? ' active' : '');
+  none.dataset.id = '';
+  none.innerHTML = '<span class="hc-ico">◯</span>Aucun';
+  none.onclick = () => selectHair('');
+  grid.appendChild(none);
+
+  cfg.hairChoices.forEach(h => {
+    const c = document.createElement('div');
+    c.className = 'hc' + (state.data.hair_id === h.id ? ' active' : '');
+    c.dataset.id = h.id;
+    c.innerHTML = '<span class="hc-ico">✦</span>' + h.name;
+    c.onclick = () => selectHair(h.id);
+    grid.appendChild(c);
+  });
+}
+
+function renderColorPresets() {
+  const c = document.getElementById('color-presets');
+  c.innerHTML = '';
+  const cur = state.data.hair_color;
+
+  cfg.hairColorPresets.forEach(p => {
+    const r = p.color.r !== undefined ? p.color.r : (p.color[1] || 0);
+    const g = p.color.g !== undefined ? p.color.g : (p.color[2] || 0);
+    const b = p.color.b !== undefined ? p.color.b : (p.color[3] || 0);
+
+    const active = cur && Math.abs(cur.r-r) < 6 && Math.abs(cur.g-g) < 6 && Math.abs(cur.b-b) < 6;
+    const sw = document.createElement('div');
+    sw.className = 'cs' + (active ? ' active' : '');
+    sw.style.background = `rgb(${r},${g},${b})`;
+    sw.title = p.name;
+    sw.onclick = () => selectColorPreset(r, g, b, sw);
+    c.appendChild(sw);
+  });
+}
+
+function renderTraits() {
+  const grid = document.getElementById('traits-grid');
+  grid.innerHTML = '';
+  const n = state.data.traits.length;
+  document.getElementById('traits-meta').textContent = `${n}/${cfg.maxTraits} traits sélectionnés`;
+
+  cfg.personalityTraits.forEach(t => {
+    const chip = document.createElement('button');
+    chip.className = 'tc' + (state.data.traits.includes(t) ? ' active' : '');
+    chip.textContent = t;
+    chip.onclick = () => toggleTrait(t);
+    grid.appendChild(chip);
+  });
+}
+
+function renderSummary() {
+  const d = state.data;
+  const fullName = [d.first_name, d.last_name].filter(Boolean).join(' ') || '—';
+  document.getElementById('summary-card').innerHTML = `
+    <div class="sum-name">${fullName.toUpperCase()}</div>
+    <div class="sum-alias">${d.nickname ? '"'+d.nickname+'"' : '&nbsp;'}</div>
+    <div class="sum-grid">
+      <div class="sum-field"><div class="sum-lbl">Genre</div><div class="sum-val">${d.gender||'—'}</div></div>
+      <div class="sum-field"><div class="sum-lbl">Naissance</div><div class="sum-val">${d.birthdate||'—'}</div></div>
+      <div class="sum-field"><div class="sum-lbl">Âge</div><div class="sum-val">${d.age||'—'} ans</div></div>
+      <div class="sum-field"><div class="sum-lbl">Taille · Poids</div><div class="sum-val">${d.height_cm||'—'} cm · ${d.weight_kg||'—'} kg</div></div>
+      <div class="sum-field"><div class="sum-lbl">Nationalité</div><div class="sum-val">${d.origin_country||'—'}</div></div>
+      <div class="sum-field"><div class="sum-lbl">Ville natale</div><div class="sum-val">${d.birth_place||'—'}</div></div>
+      <div class="sum-field"><div class="sum-lbl">État civil</div><div class="sum-val">${d.civil_status||'—'}</div></div>
+      <div class="sum-field"><div class="sum-lbl">Langues</div><div class="sum-val">${d.languages||'—'}</div></div>
+    </div>
+    ${d.traits && d.traits.length ? `
+      <div style="margin-top:14px">
+        <div class="sum-lbl" style="margin-bottom:8px">Personnalité</div>
+        <div class="sum-traits">${d.traits.map(t=>`<span class="sum-trait">${t}</span>`).join('')}</div>
+      </div>` : ''}
+  `;
+}
+
+function populateSelects() {
+  const gs = document.getElementById('f_gender');
+  gs.innerHTML = cfg.genderChoices.map(g =>
+    `<option value="${g}"${g===state.data.gender?' selected':''}>${g}</option>`).join('');
+
+  const cs = document.getElementById('f_civil_status');
+  cs.innerHTML = cfg.civilStatusChoices.map(c =>
+    `<option value="${c}"${c===state.data.civil_status?' selected':''}>${c}</option>`).join('');
+}
+
+function populateForm() {
+  const d = state.data;
+  ['first_name','last_name','nickname','birthdate','origin_country','birth_place','languages']
+    .forEach(k => { const el = document.getElementById('f_'+k); if(el) el.value = d[k]||''; });
+
+  ['age','height_cm','weight_kg','shoe_size'].forEach(k => {
+    const el = document.getElementById('f_'+k); if(!el) return;
+    el.value = d[k]||0;
+    const dv = document.getElementById('sv_'+k); if(dv) dv.textContent = d[k]||0;
+  });
+
+  // Hair scale
+  const hs = document.getElementById('f_hair_scale');
+  if(hs) {
+    hs.value = Math.round((d.hair_scale||1.0)*100);
+    document.getElementById('sv_hair_scale').textContent = (d.hair_scale||1.0).toFixed(2)+'×';
+  }
+
+  // Hair color picker
+  if(d.hair_color) {
+    const {r,g,b} = d.hair_color;
+    document.getElementById('f_hair_color_picker').value =
+      '#' + [r,g,b].map(x=>(x||0).toString(16).padStart(2,'0')).join('');
+  }
+
+  populateSelects();
+}
+
+// ════════════════════════════════════════════════════════════════
+// ACTIONS
+// ════════════════════════════════════════════════════════════════
+function onSave() {
+  const d = state.data;
+  if (!d.first_name || !d.last_name) {
+    notify('Prénom et nom requis'); switchTab('identity'); return;
+  }
+  const payload = { ...d, slot_id: state.currentSlot };
+  bridge('saveCharacter', JSON.stringify(payload));
+}
+
+function onClose()    { bridge('close'); }
+function onRandomize(){ bridge('randomize'); }
+
+// ════════════════════════════════════════════════════════════════
+// CALLED FROM LUA (RunJavascript)
+// ════════════════════════════════════════════════════════════════
+function GCC_Bootstrap(data) {
+  if (data.hair_choices)        cfg.hairChoices        = data.hair_choices;
+  if (data.hair_color_presets)  cfg.hairColorPresets   = data.hair_color_presets;
+  if (data.personality_traits)  cfg.personalityTraits  = data.personality_traits;
+  if (data.gender_choices)      cfg.genderChoices      = data.gender_choices;
+  if (data.civil_status_choices)cfg.civilStatusChoices = data.civil_status_choices;
+  if (data.max_traits)          cfg.maxTraits          = data.max_traits;
+  if (data.max_slots)           cfg.maxSlots           = data.max_slots;
+
+  state.slots        = data.slots       || {};
+  state.currentSlot  = parseInt(data.active_slot) || 1;
+
+  const d = data.current_data || {};
+  state.data = {
+    first_name:     d.first_name     || '',
+    last_name:      d.last_name      || '',
+    nickname:       d.nickname       || '',
+    gender:         d.gender         || 'Homme',
+    birthdate:      d.birthdate      || '',
+    age:            parseInt(d.age)  || 25,
+    height_cm:      parseInt(d.height_cm) || 175,
+    weight_kg:      parseInt(d.weight_kg) || 70,
+    shoe_size:      parseInt(d.shoe_size) || 42,
+    origin_country: d.origin_country || '',
+    birth_place:    d.birth_place    || '',
+    languages:      d.languages      || '',
+    civil_status:   d.civil_status   || 'Celibataire',
+    traits:         Array.isArray(d.traits) ? d.traits : [],
+    hair_id:        d.hair_id        || '',
+    hair_color:     d.hair_color     || {r:20,g:16,b:14},
+    hair_scale:     parseFloat(d.hair_scale) || 1.0
+  };
+
+  renderSlots();
+  populateForm();
+  renderHairGrid();
+  renderColorPresets();
+  renderTraits();
+
+  const app = document.getElementById('app');
+  app.classList.remove('hidden');
+  requestAnimationFrame(() => app.classList.add('visible'));
+}
+
+function GCC_ShowSaved() {
+  const s = document.getElementById('save-stamp');
+  s.classList.add('show');
+  setTimeout(() => s.classList.remove('show'), 1600);
+}
+
+function GCC_UpdateData(d) {
+  if (!d) return;
+  Object.assign(state.data, d);
+  populateForm();
+  renderHairGrid();
+  renderColorPresets();
+  renderTraits();
+}
+
+function GCC_Notify(msg) { notify(msg); }
+
+// ════════════════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ════════════════════════════════════════════════════════════════
+function notify(msg) {
+  const el = document.createElement('div');
+  el.className = 'ntf'; el.textContent = msg;
+  document.getElementById('notifs').appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+// ════════════════════════════════════════════════════════════════
+// READY → signal Lua
+// ════════════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  setTimeout(() => bridge('pageReady'), 150);
+});
+</script>
+
+</body>
+</html>
