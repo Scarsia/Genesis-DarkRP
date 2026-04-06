@@ -1691,6 +1691,20 @@ function GCC_Bootstrap(data){
   showSelectScreen();
 }
 function GCC_ShowSaved(){const s=document.getElementById('stamp');s.classList.add('show');setTimeout(()=>s.classList.remove('show'),2600);}
+function GCC_SaveCompleted(payload){
+  payload = payload || {};
+  if(payload.slots) S.slots = payload.slots;
+  if(payload.force_selection !== undefined) S.forceSelection = !!payload.force_selection;
+  if(payload.active_slot) S.currentSlot = parseInt(payload.active_slot)||S.currentSlot;
+  if(payload.slot_id) S.currentSlot = parseInt(payload.slot_id)||S.currentSlot;
+  renderSlots();
+  renderSlotCards();
+  syncActiveSlotUI(S.currentSlot);
+  focusSlotView(S.currentSlot);
+  setTimeout(()=>{
+    showSelectScreen();
+  }, 1200);
+}
 function GCC_UpdateData(d){if(!d)return;Object.assign(S.data,d);populateForm();renderHairGrid();renderCP();renderTraits();}
 function GCC_Notify(msg){notif(msg);}
 function notif(msg){const e=document.createElement('div');e.className='ntf';e.textContent=msg;document.getElementById('notifs').appendChild(e);setTimeout(()=>e.remove(),5200);}
