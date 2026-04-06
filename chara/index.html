@@ -935,25 +935,16 @@ body.creator-mode #main {
   opacity:1; visibility:visible; pointer-events:auto; transform:none;
 }
 
-/* Header accueil visible */
+/* Header accueil masqué mais padding conservé */
 #select-header {
-  width:100%;
-  max-width:760px;
   min-height:148px;
-  margin-bottom:54px;
+  margin-bottom:30px;
   flex-shrink:0;
-  position:relative;
-  padding:14px 0 0 122px;
+  width:100%;
 }
 #select-header .brand-mark,
 #select-header .brand-stack {
-  display:block;
-}
-#select-header .darkrp-script {
-  display:block;
-}
-#select-header .logo-sub {
-  margin-top:20px;
+  display:none !important;
 }
 
 /* Grid de cartes */
@@ -1099,7 +1090,7 @@ body.creator-mode #btn-back {
           </g>
           <path class="na-outline" d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
         </svg>
-        <div class="darkrp-script">DarkRP</div>
+        <div class="darkrp-script"></div>
       </div>
       <div class="brand-stack">
         <div class="logo-eyebrow">Character Creator</div>
@@ -1147,7 +1138,7 @@ body.creator-mode #btn-back {
         </g>
         <path class="na-outline" d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
       </svg>
-      <div class="darkrp-script">DarkRP</div>
+      <div class="darkrp-script"></div>
     </div>
     <div class="brand-stack">
       <div class="logo-eyebrow">Character Creator</div>
@@ -1620,7 +1611,12 @@ function goToSelectScreen(){
 
 function slotHasCharacter(slotId){
   const s = S.slots[String(slotId)] || S.slots[slotId] || null;
-  return !!(s && ((s.first_name && String(s.first_name).trim() !== '') || (s.last_name && String(s.last_name).trim() !== '') || (s.nickname && String(s.nickname).trim() !== '') || (s.created_at || s.updated_at || s.origin_country || s.birthdate || s.gender || s.hair_id)));
+  return !!(s && (
+    (s.first_name && String(s.first_name).trim() !== '') ||
+    (s.last_name && String(s.last_name).trim() !== '') ||
+    (s.nickname && String(s.nickname).trim() !== '') ||
+    s.created_at || s.updated_at || s.origin_country || s.birthdate || s.gender || s.hair_id
+  ));
 }
 
 function syncActiveSlotUI(slotId){
@@ -1695,9 +1691,11 @@ function renderSlotCards(){
   for(let i=1; i<=cfg.maxSlots; i++){
     const s = S.slots[String(i)] || S.slots[i] || null;
     const hasChar = slotHasCharacter(i);
-    const name = hasChar ? (s.first_name + ' ' + (s.last_name||'')).toUpperCase() : 'Nouveau personnage';
+    const safeFirst = s && s.first_name ? s.first_name : '';
+    const safeLast = s && s.last_name ? s.last_name : '';
+    const name = hasChar ? `${safeFirst} ${safeLast}`.trim().toUpperCase() : 'Nouveau personnage';
     const meta = hasChar
-      ? [s.origin_country, s.age ? s.age+' ans' : null].filter(Boolean).join(' · ') || 'Profil existant'
+      ? [s && s.origin_country, s && s.age ? s.age+' ans' : null].filter(Boolean).join(' · ') || 'Profil existant'
       : 'Aucun personnage créé';
 
     const card = document.createElement('div');
