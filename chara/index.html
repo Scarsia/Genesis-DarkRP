@@ -1158,6 +1158,21 @@ html,body {
 .btn-back-screen:hover { color:var(--dim); }
 .btn-back-screen::before { content:'←'; font-size:13px; }
 
+/* ── ÉCRAN 2 : SLOTS BODY ───────────────────────────────────── */
+.slots-body {
+  display:flex; flex-direction:column; gap:12px;
+  max-width:480px;
+  overflow-y:auto;
+  padding-right:6px;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(160,135,80,0.35) rgba(60,45,20,0.08);
+}
+.slots-body::-webkit-scrollbar { width:4px; }
+.slots-body::-webkit-scrollbar-thumb {
+  background:linear-gradient(to bottom,rgba(180,148,78,0.5),rgba(130,105,55,0.35),rgba(180,148,78,0.5));
+  border-radius:2px;
+}
+
 /* ── ÉCRAN 3 : ÉDITEUR ──────────────────────────────────────── */
 #s-editor {
   padding:0;                   /* reset — utilise #app-editor interne */
@@ -1365,7 +1380,7 @@ html,body {
       <!-- SIDEBAR -->
       <aside id="sidebar">
 
-        <div id="slot-badge" onclick="goChoice()">← <span>PROFIL 01</span></div>
+        <div id="slot-badge" onclick="goSlots()">← <span>PROFIL 01</span></div>
 
         <div class="nav-lbl">Navigation</div>
         <nav id="nav">
@@ -1797,23 +1812,149 @@ function GCC_Bootstrap(data){
     hair_id:d.hair_id||'',hair_color:d.hair_color||{r:20,g:16,b:14},hair_scale:parseFloat(d.hair_scale)||1.0
   };
   renderSlots();
+  renderSlotCards();
   ensureTabVisible(getCurrentTabName());
   if(!uiMotionBooted) bootMotion();
-  // Montrer l'écran choix en premier
-  showScreen('s-choice');
+  // Entrée directe sur l'écran des slots (workflow : connexion → slots)
+  showScreen('s-slots');
 }
 function GCC_ShowSaved(){const s=document.getElementById('stamp');s.classList.add('show');setTimeout(()=>s.classList.remove('show'),1600);}
 function GCC_UpdateData(d){if(!d)return;Object.assign(S.data,d);populateForm();renderHairGrid();renderCP();renderTraits();}
 function GCC_Notify(msg){notif(msg);}
 function notif(msg){const e=document.createElement('div');e.className='ntf';e.textContent=msg;document.getElementById('notifs').appendChild(e);setTimeout(()=>e.remove(),5200);}
-// Créer → auto-sélectionner le premier slot vide (ou slot 1)
-function goChoice_create(){
-  let target = 1;
+/* ══════════════════════════════════════════════════════════════
+   NAVIGATION ENTRE ÉCRANS
+   ══════════════════════════════════════════════════════════════ */
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{
+    if(s.id===id){
+      s.classList.remove('exit-left');
+      // force reflow avant d'ajouter active pour déclencher la transition
+      void s.offsetWidth;
+      s.classList.add('active');
+    } else {
+      if(s.classList.contains('active')){
+        s.classList.add('exit-left');
+        setTimeout(()=>s.classList.remove('exit-left'),420);
+      }
+      s.classList.remove('active');
+    }
+  });
+}
+
+function goChoice(){
+  showScreen('s-choice');
+}
+
+function goSlots(){
+  renderSlotCards();
+  showScreen('s-slots');
+}
+
+/* Ouvre l'éditeur sur un slot précis, charge ses données */
+function goEditor(slotId){
+  S.currentSlot=parseInt(slotId)||1;
+  const sd=S.slots[String(S.currentSlot)]||S.slots[S.currentSlot]||{};
+  S.data={
+    first_name:  sd.first_name||'',
+    last_name:   sd.last_name||'',
+    nickname:    sd.nickname||'',
+    gender:      sd.gender||'Homme',
+    birthdate:   sd.birthdate||'',
+    age:         parseInt(sd.age)||25,
+    height_cm:   parseInt(sd.height_cm)||175,
+    weight_kg:   parseInt(sd.weight_kg)||70,
+    shoe_size:   parseInt(sd.shoe_size)||42,
+    origin_country:sd.origin_country||'',
+    birth_place: sd.birth_place||'',
+    civil_status:sd.civil_status||'Celibataire',
+    traits:      Array.isArray(sd.traits)?[...sd.traits]:[],
+    hair_id:     sd.hair_id||'',
+    hair_color:  sd.hair_color||{r:20,g:16,b:14},
+    hair_scale:  parseFloat(sd.hair_scale)||1.0
+  };
+  // Mettre à jour le badge slot dans la sidebar
+  const badge=document.getElementById('slot-badge');
+  if(badge) badge.innerHTML=`← <span>PROFIL 0${S.currentSlot}</span>`;
+  // Peupler le formulaire
+  switchTab('identity');
+  populateForm();
+  renderHairGrid();
+  renderCP();
+  renderTraits();
+  renderSlots();
+  showScreen('s-editor');
+  B('selectSlot',S.currentSlot);
+  B('setCameraProfile','identity');
+}
+
+/* Render les cartes de slots sur l'écran s-slots */
+function renderSlotCards(){
+  const c=document.getElementById('slot-cards');
+  c.innerHTML='';
   for(let i=1;i<=cfg.maxSlots;i++){
-    const s = S.slots[String(i)] || S.slots[i] || null;
-    if(!s || !s.first_name){ target=i; break; }
+    const s=S.slots[String(i)]||S.slots[i]||null;
+    const hasChar=!!(s&&s.first_name&&s.first_name!=='');
+
+    const card=document.createElement('div');
+    card.className='slot-card'+(hasChar?' has-char':'');
+
+    const left=document.createElement('div');
+    left.className='sc-left';
+
+    const num=document.createElement('div');
+    num.className='sc-num';
+    num.textContent='Emplacement '+i;
+
+    const name=document.createElement('div');
+    name.className='sc-name';
+    name.textContent=hasChar
+      ?(s.first_name+' '+(s.last_name||'')).trim().toUpperCase()
+      :'Nouveau personnage';
+
+    const meta=document.createElement('div');
+    meta.className='sc-meta';
+    if(hasChar){
+      const parts=[];
+      if(s.origin_country) parts.push(s.origin_country);
+      if(s.age)            parts.push(s.age+' ans');
+      meta.textContent=parts.join(' · ')||'Profil existant';
+    } else {
+      meta.textContent='Emplacement disponible';
+    }
+
+    left.appendChild(num);
+    left.appendChild(name);
+    left.appendChild(meta);
+
+    const btn=document.createElement('button');
+    btn.className='sc-btn '+(hasChar?'play':'new-char');
+    btn.textContent=hasChar?'Jouer':'Créer';
+
+    if(hasChar){
+      btn.onclick=(e)=>{e.stopPropagation();B('selectSlot',i);};
+      card.onclick=()=>B('selectSlot',i);
+    } else {
+      btn.onclick=(e)=>{e.stopPropagation();goEditor(i);};
+      card.onclick=()=>goEditor(i);
+    }
+
+    card.appendChild(left);
+    card.appendChild(btn);
+    c.appendChild(card);
   }
-  goEditor(target);
+}
+
+/* Créer → premier slot vide ; si tous pleins → écran slots pour choisir lequel éditer */
+function goChoice_create(){
+  let target=null;
+  for(let i=1;i<=cfg.maxSlots;i++){
+    const s=S.slots[String(i)]||S.slots[i]||null;
+    if(!s||!s.first_name){target=i;break;}
+  }
+  if(target!==null) goEditor(target);
+  else goSlots(); // tous les slots sont remplis
 }
 
 window.addEventListener('load',()=>{
