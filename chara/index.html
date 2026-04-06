@@ -880,6 +880,119 @@ html,body {
   .darkrp-script { font-size:18px; left:10px; top:22px; }
 }
 
+
+/* ══ SCREEN SELECT ═══════════════════════════════════════════ */
+#screen-select {
+  position:absolute; inset:0; z-index:10;
+  display:flex; flex-direction:column;
+  padding:42px 0 34px 58px;
+  transition:opacity 0.38s var(--ease-soft), transform 0.38s var(--ease-soft);
+}
+#screen-select.hidden {
+  opacity:0; pointer-events:none;
+  transform:translateX(-18px);
+}
+#main {
+  transition:opacity 0.38s var(--ease-soft), transform 0.38s var(--ease-soft);
+}
+#main.hidden {
+  opacity:0; pointer-events:none;
+  transform:translateX(18px);
+}
+
+/* Header identique */
+#select-header { margin-bottom:42px; flex-shrink:0; }
+
+/* Grid de cartes */
+#slot-cards {
+  display:flex; flex-direction:column; gap:12px;
+  max-width:480px;
+}
+
+.slot-card {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 22px;
+  background:rgba(255,255,255,0.035);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:10px; cursor:pointer;
+  transition:background var(--dur-fast), border-color var(--dur-fast),
+             transform var(--dur-fast), box-shadow var(--dur-fast);
+  position:relative; overflow:hidden; isolation:isolate;
+}
+.slot-card::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:var(--accent); border-radius:0 2px 2px 0;
+  opacity:0; transform:scaleY(0);
+  transition:opacity var(--dur-fast), transform var(--dur-fast);
+}
+.slot-card:hover {
+  background:rgba(255,255,255,0.06);
+  border-color:rgba(255,255,255,0.13);
+  transform:translateX(6px);
+  box-shadow:0 18px 32px -22px rgba(255,255,255,0.15);
+}
+.slot-card:hover::before { opacity:1; transform:scaleY(1); }
+.slot-card.has-char { border-color:rgba(200,203,214,0.15); }
+.slot-card.has-char::before { background:var(--accent); }
+
+.sc-left { display:flex; flex-direction:column; gap:4px; }
+
+.sc-num {
+  font-size:8px; font-weight:700; letter-spacing:0.3em;
+  color:var(--muted); text-transform:uppercase;
+}
+.sc-name {
+  font-size:18px; font-weight:800; letter-spacing:0.06em;
+  color:var(--text); text-transform:uppercase; line-height:1;
+}
+.sc-meta {
+  font-size:9px; color:var(--muted); letter-spacing:0.08em; margin-top:2px;
+}
+
+.sc-btn {
+  padding:9px 22px;
+  border-radius:999px; font-family:inherit;
+  font-size:9px; font-weight:700; letter-spacing:0.2em;
+  text-transform:uppercase; cursor:pointer;
+  transition:all var(--dur-fast); border:none;
+  white-space:nowrap; flex-shrink:0;
+}
+.sc-btn.play {
+  background:var(--accent); color:#0a0a0f;
+}
+.sc-btn.play:hover { background:#f0f0f5; box-shadow:0 0 16px var(--a-glow); }
+.sc-btn.create {
+  background:transparent; color:var(--muted);
+  border:1px solid rgba(255,255,255,0.1);
+}
+.sc-btn.create:hover {
+  color:var(--text); border-color:var(--accent);
+  background:rgba(200,203,214,0.06);
+}
+
+/* Bouton fermer select screen */
+#select-close {
+  position:absolute; bottom:36px; left:58px;
+  background:transparent; border:1px solid var(--border);
+  border-radius:999px; padding:10px 24px;
+  font-family:inherit; font-size:9px; font-weight:700;
+  letter-spacing:0.2em; color:var(--muted); cursor:pointer;
+  text-transform:uppercase;
+  transition:color var(--dur-fast), border-color var(--dur-fast);
+}
+#select-close:hover { color:var(--text); border-color:var(--accent); }
+
+/* Bouton retour dans sidebar */
+#btn-back {
+  width:100%; padding:9px 0; margin-bottom:8px;
+  background:transparent; border:none; cursor:pointer;
+  font-family:inherit; font-size:9px; font-weight:700;
+  letter-spacing:0.2em; color:var(--muted); text-transform:uppercase;
+  text-align:left; display:flex; align-items:center; gap:8px;
+  transition:color var(--dur-fast);
+}
+#btn-back:hover { color:var(--dim); }
+#btn-back::before { content:'←'; font-size:12px; }
 </style>
 </head>
 <body>
@@ -887,6 +1000,56 @@ html,body {
 <div id="fade-overlay"></div>
 
 <div id="app">
+
+  <!-- ══ SCREEN SELECT (premier écran) ══════════════════════ -->
+  <div id="screen-select">
+
+    <div id="select-header">
+      <div class="brand-mark" aria-hidden="true">
+        <svg class="na-continents" viewBox="0 0 220 160" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <defs>
+            <clipPath id="naClip2">
+              <path d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
+            </clipPath>
+            <linearGradient id="naGloss2" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.34"/>
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path class="na-shadow" d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
+          <g clip-path="url(#naClip2)">
+            <rect x="0" y="0" width="220" height="160" fill="#ffffff"/>
+            <rect x="0" y="0" width="220" height="14" fill="#b22234"/>
+            <rect x="0" y="26" width="220" height="13" fill="#b22234"/>
+            <rect x="0" y="52" width="220" height="13" fill="#b22234"/>
+            <rect x="0" y="78" width="220" height="13" fill="#b22234"/>
+            <rect x="0" y="104" width="220" height="13" fill="#b22234"/>
+            <rect x="0" y="130" width="220" height="13" fill="#b22234"/>
+            <path d="M20 16 L106 16 L117 60 L30 60 Z" fill="#263b7a" opacity="0.98"/>
+            <g fill="#ffffff" opacity="0.9">
+              <circle cx="38" cy="28" r="2.1"/><circle cx="52" cy="28" r="2.1"/><circle cx="66" cy="28" r="2.1"/><circle cx="80" cy="28" r="2.1"/>
+              <circle cx="45" cy="39" r="2.1"/><circle cx="59" cy="39" r="2.1"/><circle cx="73" cy="39" r="2.1"/><circle cx="87" cy="39" r="2.1"/>
+              <circle cx="38" cy="50" r="2.1"/><circle cx="52" cy="50" r="2.1"/><circle cx="66" cy="50" r="2.1"/><circle cx="80" cy="50" r="2.1"/>
+            </g>
+            <path d="M18 20 C42 10, 88 12, 118 20 C144 27, 166 36, 182 48 C159 34, 122 32, 95 30 C69 28, 45 29, 18 37 Z" fill="url(#naGloss2)" opacity="0.55"/>
+          </g>
+          <path class="na-outline" d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
+        </svg>
+        <div class="darkrp-script"></div>
+      </div>
+      <div class="brand-stack">
+        <div class="logo-eyebrow">Character Creator</div>
+        <div class="logo-title">GENESIS NETWORK</div>
+        <div class="logo-sub">Choisissez votre identité</div>
+      </div>
+    </div>
+
+    <div id="slot-cards"></div>
+
+    <button id="select-close" onclick="onClose()">✕  Fermer</button>
+
+  </div>
+
 
   <!-- ══ HEADER PLEINE LARGEUR ═══════════════════════════════ -->
   <div id="header">
@@ -930,12 +1093,12 @@ html,body {
   </div>
 
   <!-- ══ MAIN ROW ════════════════════════════════════════════ -->
-  <div id="main">
+  <div id="main" class="hidden">
 
     <!-- SIDEBAR -->
     <aside id="sidebar">
 
-      <div class="sec-lbl">Profils</div>
+      <button id="btn-back" onclick="goToSelectScreen()">Profils</button>
       <div class="slots-track-wrap">
         <div id="slot-track"><div id="slot-cursor"></div></div>
         <div id="slot-list"></div>
@@ -1366,15 +1529,114 @@ function GCC_Bootstrap(data){
     civil_status:d.civil_status||'Celibataire',traits:Array.isArray(d.traits)?d.traits:[],
     hair_id:d.hair_id||'',hair_color:d.hair_color||{r:20,g:16,b:14},hair_scale:parseFloat(d.hair_scale)||1.0
   };
-  renderSlots();populateForm();renderHairGrid();renderCP();renderTraits();
+  renderSlots();
+  renderSlotCards();
   ensureTabVisible(getCurrentTabName());
   if(!uiMotionBooted) bootMotion();
-  else animateCurrentTab(true);
+  // Montrer l'écran de sélection en premier
+  document.getElementById('screen-select').classList.remove('hidden');
+  document.getElementById('main').classList.add('hidden');
 }
 function GCC_ShowSaved(){const s=document.getElementById('stamp');s.classList.add('show');setTimeout(()=>s.classList.remove('show'),1600);}
 function GCC_UpdateData(d){if(!d)return;Object.assign(S.data,d);populateForm();renderHairGrid();renderCP();renderTraits();}
 function GCC_Notify(msg){notif(msg);}
 function notif(msg){const e=document.createElement('div');e.className='ntf';e.textContent=msg;document.getElementById('notifs').appendChild(e);setTimeout(()=>e.remove(),5200);}
+
+
+/* ── SELECT SCREEN ──────────────────────────────────────────── */
+function showSelectScreen(){
+  document.getElementById('screen-select').classList.remove('hidden');
+  document.getElementById('main').classList.add('hidden');
+  renderSlotCards();
+}
+
+function goToSelectScreen(){
+  showSelectScreen();
+}
+
+function selectSlotAndEdit(slotId){
+  S.currentSlot = slotId;
+  // Update active slot visually in sidebar
+  document.querySelectorAll('.slot-btn').forEach((b,i)=>{
+    b.classList.toggle('active', (i+1)===slotId);
+  });
+  requestAnimationFrame(updateSlotCursor);
+
+  // Transition
+  document.getElementById('screen-select').classList.add('hidden');
+  document.getElementById('main').classList.remove('hidden');
+
+  // Charge les données du slot
+  const slotData = S.slots[String(slotId)] || S.slots[slotId] || null;
+  if(slotData){
+    S.data = {
+      first_name:slotData.first_name||'',
+      last_name:slotData.last_name||'',
+      nickname:slotData.nickname||'',
+      gender:slotData.gender||'Homme',
+      birthdate:slotData.birthdate||'',
+      age:parseInt(slotData.age)||25,
+      height_cm:parseInt(slotData.height_cm)||175,
+      weight_kg:parseInt(slotData.weight_kg)||70,
+      shoe_size:parseInt(slotData.shoe_size)||42,
+      origin_country:slotData.origin_country||'',
+      birth_place:slotData.birth_place||'',
+      civil_status:slotData.civil_status||'Celibataire',
+      traits:Array.isArray(slotData.traits)?slotData.traits:[],
+      hair_id:slotData.hair_id||'',
+      hair_color:slotData.hair_color||{r:20,g:16,b:14},
+      hair_scale:parseFloat(slotData.hair_scale)||1.0,
+      slot_id: slotId
+    };
+  } else {
+    // Nouveau personnage
+    S.data = {
+      first_name:'',last_name:'',nickname:'',gender:'Homme',birthdate:'',
+      age:25,height_cm:175,weight_kg:70,shoe_size:42,
+      origin_country:'',birth_place:'',civil_status:'Celibataire',
+      traits:[],hair_id:'',hair_color:{r:20,g:16,b:14},hair_scale:1.0,
+      slot_id: slotId
+    };
+  }
+
+  populateForm();
+  renderHairGrid();
+  renderCP();
+  renderTraits();
+  switchTab('identity');
+
+  // Notifier le serveur
+  B('selectSlot', slotId);
+}
+
+function renderSlotCards(){
+  const c = document.getElementById('slot-cards');
+  if(!c) return;
+  c.innerHTML = '';
+  for(let i=1; i<=cfg.maxSlots; i++){
+    const s = S.slots[String(i)] || S.slots[i] || null;
+    const hasChar = s && s.first_name && s.first_name !== '';
+    const name = hasChar ? (s.first_name + ' ' + (s.last_name||'')).toUpperCase() : 'Nouveau personnage';
+    const meta = hasChar
+      ? [s.origin_country, s.age ? s.age+' ans' : null].filter(Boolean).join(' · ') || 'Profil existant'
+      : 'Aucun personnage créé';
+
+    const card = document.createElement('div');
+    card.className = 'slot-card' + (hasChar ? ' has-char' : '');
+    card.innerHTML = `
+      <div class="sc-left">
+        <div class="sc-num">Profil 0${i}</div>
+        <div class="sc-name">${name}</div>
+        <div class="sc-meta">${meta}</div>
+      </div>
+      <button class="sc-btn ${hasChar ? 'play' : 'create'}"
+        onclick="event.stopPropagation(); selectSlotAndEdit(${i})">
+        ${hasChar ? 'Jouer' : 'Créer'}
+      </button>`;
+    card.onclick = () => selectSlotAndEdit(i);
+    c.appendChild(card);
+  }
+}
 
 window.addEventListener('load',()=>{
   document.querySelectorAll('.sl').forEach(s=>{fill(s);s.addEventListener('input',()=>fill(s));});
