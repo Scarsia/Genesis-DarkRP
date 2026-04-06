@@ -29,14 +29,14 @@ html,body {
   width:100%; min-width:100%; height:100%; min-height:100%;
   background:
     linear-gradient(to right,
-      rgba(2,2,5,0.988) 0%,
-      rgba(2,2,5,0.978) 14%,
-      rgba(2,2,5,0.95) 28%,
-      rgba(2,2,5,0.88) 40%,
-      rgba(2,2,5,0.72) 52%,
-      rgba(2,2,5,0.42) 64%,
-      rgba(2,2,5,0.14) 74%,
-      transparent 82%
+      rgba(2,2,5,0.72) 0%,
+      rgba(2,2,5,0.64) 10%,
+      rgba(2,2,5,0.50) 21%,
+      rgba(2,2,5,0.34) 32%,
+      rgba(2,2,5,0.20) 42%,
+      rgba(2,2,5,0.10) 50%,
+      rgba(2,2,5,0.04) 56%,
+      transparent 62%
     ) !important;
   overflow:hidden;
   font-family:'Rajdhani',sans-serif;
@@ -50,14 +50,14 @@ html,body {
   position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; overflow:hidden;
   background:
     linear-gradient(to right,
-      rgba(2,2,5,0.992) 0%,
-      rgba(2,2,5,0.98) 16%,
-      rgba(2,2,5,0.955) 30%,
-      rgba(2,2,5,0.89) 42%,
-      rgba(2,2,5,0.74) 54%,
-      rgba(2,2,5,0.46) 66%,
-      rgba(2,2,5,0.18) 76%,
-      transparent 84%
+      rgba(2,2,5,0.58) 0%,
+      rgba(2,2,5,0.50) 10%,
+      rgba(2,2,5,0.36) 20%,
+      rgba(2,2,5,0.22) 30%,
+      rgba(2,2,5,0.12) 40%,
+      rgba(2,2,5,0.05) 48%,
+      rgba(2,2,5,0.02) 54%,
+      transparent 60%
     );
 }
 #fade-overlay::before,
@@ -66,23 +66,23 @@ html,body {
 }
 #fade-overlay::before {
   background:
-    radial-gradient(circle at 18% 24%, rgba(200,203,214,0.04) 0%, rgba(200,203,214,0.016) 18%, transparent 44%),
-    radial-gradient(circle at 24% 72%, rgba(255,255,255,0.014) 0%, transparent 36%),
-    radial-gradient(circle at 56% 48%, rgba(255,255,255,0.012) 0%, transparent 30%);
-  filter:blur(10px);
-  animation:ambientDrift 22s ease-in-out infinite alternate;
+    radial-gradient(circle at 18% 24%, rgba(200,203,214,0.014) 0%, rgba(200,203,214,0.006) 18%, transparent 44%),
+    radial-gradient(circle at 24% 72%, rgba(255,255,255,0.006) 0%, transparent 36%),
+    radial-gradient(circle at 56% 48%, rgba(255,255,255,0.003) 0%, transparent 30%);
+  filter:blur(6px);
+  animation:ambientDrift 24s ease-in-out infinite alternate;
 }
 #fade-overlay::after {
   background:
     linear-gradient(105deg,
       transparent 0%,
-      rgba(255,255,255,0.008) 43%,
-      rgba(255,255,255,0.018) 49%,
-      rgba(255,255,255,0.006) 56%,
+      rgba(255,255,255,0.004) 43%,
+      rgba(255,255,255,0.006) 49%,
+      rgba(255,255,255,0.002) 56%,
       transparent 70%);
-  transform:translateX(-42%);
-  animation:sweepGlow 20s linear infinite;
-  opacity:0.10;
+  transform:translateX(-54%);
+  animation:sweepGlow 24s linear infinite;
+  opacity:0.035;
 }
 
 /* ── APP : colonne principale ─────────────────────────────── */
