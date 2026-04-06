@@ -1670,6 +1670,17 @@ function GCC_Bootstrap(data){
   S.slots=data.slots||{}; S.currentSlot=parseInt(data.active_slot)||1;
   S.forceSelection=!!data.force_selection;
   S.hasAnyCharacter=!!data.has_any_character;
+  // WLC FIX: mise à jour du badge DB status
+  if(data.db_state){
+    const ok = data.db_state.ready && data.db_state.setup;
+    const lbl = document.getElementById('gcc-db-label');
+    const dot = document.getElementById('gcc-db-dot');
+    const badge = document.getElementById('gcc-db-badge');
+    if(lbl) lbl.textContent = (data.db_state.label||'SQLite') + (ok?' ✓':' ✗');
+    const col = ok ? '#4ade80' : '#f87171';
+    if(dot){ dot.style.background=col; dot.style.boxShadow='0 0 6px '+col; }
+    if(badge) badge.style.color=col;
+  }
   const d=data.current_data||{};
   S.data={
     first_name:d.first_name||'',last_name:d.last_name||'',nickname:d.nickname||'',
@@ -1855,5 +1866,21 @@ window.addEventListener('load',()=>{
   setTimeout(()=>B('pageReady'),150);
 });
 </script>
+
+<!-- WLC FIX: badge statut base de données -->
+<div id="gcc-db-badge" style="
+  position:fixed; bottom:14px; right:18px; z-index:9999;
+  font-family:'Rajdhani',sans-serif; font-size:11px; font-weight:700;
+  letter-spacing:0.18em; text-transform:uppercase;
+  color:#4ade80; opacity:0.5; pointer-events:none;
+  display:flex; align-items:center; gap:5px;
+">
+  <span id="gcc-db-dot" style="
+    display:inline-block; width:6px; height:6px; border-radius:50%;
+    background:#4ade80; box-shadow:0 0 6px #4ade80; flex-shrink:0;
+  "></span>
+  <span id="gcc-db-label">SQLite</span>
+</div>
+
 </body>
 </html>
