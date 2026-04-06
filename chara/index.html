@@ -1690,7 +1690,7 @@ function GCC_Bootstrap(data){
   // Montrer l'écran de sélection en premier
   showSelectScreen();
 }
-function GCC_ShowSaved(){const s=document.getElementById('stamp');s.classList.add('show');setTimeout(()=>s.classList.remove('show'),1600);}
+function GCC_ShowSaved(){const s=document.getElementById('stamp');s.classList.add('show');setTimeout(()=>s.classList.remove('show'),2600);}
 function GCC_UpdateData(d){if(!d)return;Object.assign(S.data,d);populateForm();renderHairGrid();renderCP();renderTraits();}
 function GCC_Notify(msg){notif(msg);}
 function notif(msg){const e=document.createElement('div');e.className='ntf';e.textContent=msg;document.getElementById('notifs').appendChild(e);setTimeout(()=>e.remove(),5200);}
