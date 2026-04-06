@@ -1568,7 +1568,7 @@ function onSave(){
   if(!S.data.first_name||!S.data.last_name){notif('Prénom et nom requis');switchTab('identity');return;}
   B('saveCharacter',JSON.stringify({...S.data,slot_id:S.currentSlot}));
 }
-function onClose(){B('close');}
+function onClose(){if(S.forceSelection){notif("Sélection obligatoire avant de jouer");return;}B('close');}
 function onRandomize(){B('randomize');}
 
 function GCC_Bootstrap(data){
@@ -1580,6 +1580,8 @@ function GCC_Bootstrap(data){
   if(data.max_traits)           cfg.maxTraits         =data.max_traits;
   if(data.max_slots)            cfg.maxSlots          =data.max_slots;
   S.slots=data.slots||{}; S.currentSlot=parseInt(data.active_slot)||1;
+  S.forceSelection=!!data.force_selection;
+  S.hasAnyCharacter=!!data.has_any_character;
   const d=data.current_data||{};
   S.data={
     first_name:d.first_name||'',last_name:d.last_name||'',nickname:d.nickname||'',
@@ -1592,6 +1594,9 @@ function GCC_Bootstrap(data){
   };
   renderSlots();
   renderSlotCards();
+  focusSlotView(S.currentSlot);
+  const closeBtn=document.getElementById('select-close');
+  if(closeBtn) closeBtn.style.display=S.forceSelection?'none':'';
   ensureTabVisible(getCurrentTabName());
   if(!uiMotionBooted) bootMotion();
   // Montrer l'écran de sélection en premier
@@ -1602,6 +1607,10 @@ function GCC_UpdateData(d){if(!d)return;Object.assign(S.data,d);populateForm();r
 function GCC_Notify(msg){notif(msg);}
 function notif(msg){const e=document.createElement('div');e.className='ntf';e.textContent=msg;document.getElementById('notifs').appendChild(e);setTimeout(()=>e.remove(),5200);}
 
+function focusSlotView(slotId){
+  S.currentSlot = parseInt(slotId)||1;
+  B('focusSlot', S.currentSlot);
+}
 
 /* ── SELECT SCREEN ──────────────────────────────────────────── */
 function showSelectScreen(){
@@ -1717,6 +1726,7 @@ function renderSlotCards(){
         ${hasChar ? 'Jouer' : 'Créer'}
       </button>`;
     card.onclick = () => hasChar ? playSlot(i) : createSlot(i);
+    card.onmouseenter = () => focusSlotView(i);
     c.appendChild(card);
   }
 }
