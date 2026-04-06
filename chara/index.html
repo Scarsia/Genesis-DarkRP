@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-
 :root {
   --accent:    #c8cbd6;
   --a-glow:    rgba(200,203,214,0.18);
@@ -883,16 +882,50 @@ html,body {
 
 
 /* ══ SCREEN SELECT ═══════════════════════════════════════════ */
+#screen-select {
+  position:absolute; inset:0; z-index:10;
+  display:flex; flex-direction:column;
+  padding:42px 0 34px 58px;
+  transition:opacity 0.38s var(--ease-soft), transform 0.38s var(--ease-soft);
+}
+#screen-select.hidden {
+  opacity:0; pointer-events:none;
+  transform:translateX(-18px);
+  display:none;
+}
 #main {
   transition:opacity 0.38s var(--ease-soft), transform 0.38s var(--ease-soft);
 }
 #main.hidden {
   opacity:0; pointer-events:none;
   transform:translateX(18px);
+  display:none;
 }
 
-/* Header identique */
-#select-header { margin-bottom:42px; flex-shrink:0; }
+/* Mode création : pas besoin d'afficher les autres profils */
+#app.creating #sidebar .sec-lbl,
+#app.creating #sidebar .slots-track-wrap {
+  display:none;
+}
+#app.creating #sidebar {
+  gap:0;
+}
+#app.creating #btn-back {
+  margin-bottom:18px;
+}
+
+/* Accueil sans header décoratif, mais avec le même espace visuel */
+#select-header {
+  width:100%; max-width:760px; min-height:148px;
+  margin-bottom:86px; flex-shrink:0;
+  position:relative; padding:14px 0 0 122px;
+  visibility:hidden; pointer-events:none;
+}
+#select-header * {
+  display:none !important;
+}
+#screen-select { justify-content:flex-start; }
+#slot-cards { margin-top:14px; }
 
 /* Grid de cartes */
 #slot-cards {
@@ -984,219 +1017,6 @@ html,body {
 }
 #btn-back:hover { color:var(--dim); }
 #btn-back::before { content:'←'; font-size:12px; }
-
-
-/* ══════════════════════════════════════════════════════════════
-   3 ÉCRANS — SÉPARÉS, PAS D'ENTREMÊLEMENT
-   s-choice → s-slots ou s-editor
-   Chaque écran occupe tout #app, un seul visible à la fois
-   ══════════════════════════════════════════════════════════════ */
-
-/* Conteneur #app devient un stacking context */
-#app {
-  position:relative; z-index:1;
-  width:min(860px, calc(100vw - 96px)); height:100%;
-  padding:42px 0 34px 58px;
-}
-
-/* Écran générique */
-.screen {
-  position:absolute; inset:0;
-  padding:42px 0 34px 58px;
-  display:flex; flex-direction:column;
-  opacity:0; pointer-events:none;
-  transform:translateX(20px);
-  transition: opacity 0.38s var(--ease-soft),
-              transform 0.38s var(--ease-soft);
-  will-change: opacity, transform;
-}
-.screen.active {
-  opacity:1; pointer-events:all;
-  transform:none;
-}
-.screen.exit-left {
-  opacity:0; pointer-events:none;
-  transform:translateX(-20px);
-}
-
-/* Header commun réutilisé dans chaque écran */
-.screen-header {
-  flex-shrink:0; margin-bottom:36px;
-  position:relative; padding-left:122px; min-height:120px;
-}
-
-/* ── ÉCRAN 1 : CHOIX ────────────────────────────────────────── */
-#s-choice .choice-body {
-  display:flex; flex-direction:column; gap:14px;
-  max-width:440px;
-}
-
-.choice-card {
-  display:flex; align-items:center; gap:24px;
-  padding:22px 26px;
-  background:rgba(255,255,255,0.032);
-  border:1px solid rgba(255,255,255,0.07);
-  border-radius:12px; cursor:pointer;
-  position:relative; overflow:hidden; isolation:isolate;
-  transition: background var(--dur-fast),
-              border-color var(--dur-fast),
-              transform var(--dur-fast),
-              box-shadow var(--dur-fast);
-}
-.choice-card::before {
-  content:''; position:absolute;
-  left:0; top:0; bottom:0; width:3px;
-  background:var(--accent); border-radius:0 2px 2px 0;
-  opacity:0; transform:scaleY(0);
-  transition:opacity var(--dur-fast), transform var(--dur-fast);
-}
-.choice-card:hover {
-  background:rgba(255,255,255,0.055);
-  border-color:rgba(255,255,255,0.14);
-  transform:translateX(6px);
-  box-shadow:0 18px 36px -22px rgba(255,255,255,0.12);
-}
-.choice-card:hover::before { opacity:1; transform:scaleY(1); }
-.choice-card.primary { border-color:rgba(200,203,214,0.18); }
-.choice-card.primary:hover { border-color:var(--accent); }
-
-.cc-icon {
-  width:42px; height:42px; flex-shrink:0;
-  border-radius:10px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:20px;
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.09);
-}
-.choice-card.primary .cc-icon {
-  background:rgba(200,203,214,0.12);
-  border-color:rgba(200,203,214,0.2);
-}
-
-.cc-text { display:flex; flex-direction:column; gap:4px; }
-.cc-title {
-  font-size:16px; font-weight:800;
-  letter-spacing:0.08em; color:var(--text);
-  text-transform:uppercase;
-}
-.cc-desc {
-  font-size:9px; color:var(--muted);
-  letter-spacing:0.18em; font-weight:600;
-  text-transform:uppercase;
-}
-
-.cc-arrow {
-  margin-left:auto; font-size:16px;
-  color:var(--muted); transition:transform var(--dur-fast), color var(--dur-fast);
-  flex-shrink:0;
-}
-.choice-card:hover .cc-arrow { transform:translateX(5px); color:var(--accent); }
-
-/* ── ÉCRAN 2 : PROFILS ──────────────────────────────────────── */
-#s-slots .slots-body { display:flex; flex-direction:column; gap:10px; max-width:480px; }
-
-.slot-card {
-  display:flex; align-items:center; gap:20px;
-  padding:18px 22px;
-  background:rgba(255,255,255,0.032);
-  border:1px solid rgba(255,255,255,0.07);
-  border-radius:10px; cursor:pointer;
-  position:relative; overflow:hidden; isolation:isolate;
-  transition: background var(--dur-fast), border-color var(--dur-fast),
-              transform var(--dur-fast), box-shadow var(--dur-fast);
-}
-.slot-card::before {
-  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
-  background:var(--accent); border-radius:0 2px 2px 0;
-  opacity:0; transform:scaleY(0);
-  transition:opacity var(--dur-fast), transform var(--dur-fast);
-}
-.slot-card:hover {
-  background:rgba(255,255,255,0.055);
-  border-color:rgba(255,255,255,0.13);
-  transform:translateX(6px);
-  box-shadow:0 16px 32px -22px rgba(255,255,255,0.13);
-}
-.slot-card:hover::before { opacity:1; transform:scaleY(1); }
-.slot-card.has-char { border-color:rgba(200,203,214,0.14); }
-
-.sc-num {
-  font-size:8px; font-weight:700; letter-spacing:0.3em;
-  color:var(--muted); text-transform:uppercase; margin-bottom:4px;
-}
-.sc-name {
-  font-size:15px; font-weight:800; letter-spacing:0.07em;
-  color:var(--text); text-transform:uppercase; line-height:1;
-}
-.sc-meta { font-size:9px; color:var(--muted); margin-top:3px; }
-
-.sc-btn {
-  margin-left:auto; flex-shrink:0;
-  padding:8px 20px; border-radius:999px;
-  font-family:inherit; font-size:8px; font-weight:700;
-  letter-spacing:0.22em; text-transform:uppercase;
-  cursor:pointer; border:none;
-  transition:all var(--dur-fast);
-}
-.sc-btn.play { background:var(--accent); color:#0a0a0f; }
-.sc-btn.play:hover { background:#f0f0f5; box-shadow:0 0 16px var(--a-glow); }
-.sc-btn.new-char {
-  background:transparent; color:var(--muted);
-  border:1px solid rgba(255,255,255,0.1);
-}
-.sc-btn.new-char:hover { color:var(--text); border-color:var(--accent); background:rgba(200,203,214,0.06); }
-
-/* Bouton retour commun */
-.btn-back-screen {
-  position:absolute; bottom:36px; left:0;
-  background:transparent; border:none; cursor:pointer;
-  font-family:inherit; font-size:9px; font-weight:700;
-  letter-spacing:0.2em; color:var(--muted); text-transform:uppercase;
-  display:flex; align-items:center; gap:8px;
-  transition:color var(--dur-fast);
-}
-.btn-back-screen:hover { color:var(--dim); }
-.btn-back-screen::before { content:'←'; font-size:13px; }
-
-/* ── ÉCRAN 2 : SLOTS BODY ───────────────────────────────────── */
-.slots-body {
-  display:flex; flex-direction:column; gap:12px;
-  max-width:480px;
-  overflow-y:auto;
-  padding-right:6px;
-  scrollbar-width:thin;
-  scrollbar-color:rgba(160,135,80,0.35) rgba(60,45,20,0.08);
-}
-.slots-body::-webkit-scrollbar { width:4px; }
-.slots-body::-webkit-scrollbar-thumb {
-  background:linear-gradient(to bottom,rgba(180,148,78,0.5),rgba(130,105,55,0.35),rgba(180,148,78,0.5));
-  border-radius:2px;
-}
-
-/* ── ÉCRAN 3 : ÉDITEUR ──────────────────────────────────────── */
-#s-editor {
-  padding:0;                   /* reset — utilise #app-editor interne */
-}
-#app-editor {
-  width:100%; height:100%;
-  display:flex; flex-direction:column;
-  padding:42px 0 34px 58px;
-}
-/* Petit badge slot actif en sidebar */
-#slot-badge {
-  font-size:8px; font-weight:700; letter-spacing:0.25em;
-  color:var(--muted); text-transform:uppercase;
-  margin-bottom:6px; padding-left:2px;
-  display:flex; align-items:center; gap:8px;
-  cursor:pointer; transition:color var(--dur-fast);
-}
-#slot-badge:hover { color:var(--dim); }
-#slot-badge span {
-  font-size:9px; font-weight:800;
-  color:var(--accent); letter-spacing:0.1em;
-}
-#slot-badge::before { content:'←'; opacity:0.5; }
-
 </style>
 </head>
 <body>
@@ -1205,25 +1025,23 @@ html,body {
 
 <div id="app">
 
-  <!-- ════════════════════════════════════════════════════════
-       ÉCRAN 1 — CHOIX : Créer ou Choisir
-       ════════════════════════════════════════════════════════ -->
-  <div id="s-choice" class="screen">
+  <!-- ══ SCREEN SELECT (premier écran) ══════════════════════ -->
+  <div id="screen-select">
 
-    <div class="screen-header">
+    <div id="select-header">
       <div class="brand-mark" aria-hidden="true">
         <svg class="na-continents" viewBox="0 0 220 160" xmlns="http://www.w3.org/2000/svg" focusable="false">
           <defs>
-            <clipPath id="naClip">
+            <clipPath id="naClip2">
               <path d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
             </clipPath>
-            <linearGradient id="naGloss" x1="0" y1="0" x2="1" y2="1">
+            <linearGradient id="naGloss2" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stop-color="#ffffff" stop-opacity="0.34"/>
               <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
             </linearGradient>
           </defs>
           <path class="na-shadow" d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
-          <g clip-path="url(#naClip)">
+          <g clip-path="url(#naClip2)">
             <rect x="0" y="0" width="220" height="160" fill="#ffffff"/>
             <rect x="0" y="0" width="220" height="14" fill="#b22234"/>
             <rect x="0" y="26" width="220" height="13" fill="#b22234"/>
@@ -1237,7 +1055,7 @@ html,body {
               <circle cx="45" cy="39" r="2.1"/><circle cx="59" cy="39" r="2.1"/><circle cx="73" cy="39" r="2.1"/><circle cx="87" cy="39" r="2.1"/>
               <circle cx="38" cy="50" r="2.1"/><circle cx="52" cy="50" r="2.1"/><circle cx="66" cy="50" r="2.1"/><circle cx="80" cy="50" r="2.1"/>
             </g>
-            <path d="M18 20 C42 10, 88 12, 118 20 C144 27, 166 36, 182 48 C159 34, 122 32, 95 30 C69 28, 45 29, 18 37 Z" fill="url(#naGloss)" opacity="0.55"/>
+            <path d="M18 20 C42 10, 88 12, 118 20 C144 27, 166 36, 182 48 C159 34, 122 32, 95 30 C69 28, 45 29, 18 37 Z" fill="url(#naGloss2)" opacity="0.55"/>
           </g>
           <path class="na-outline" d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
         </svg>
@@ -1246,159 +1064,87 @@ html,body {
       <div class="brand-stack">
         <div class="logo-eyebrow">Character Creator</div>
         <div class="logo-title">GENESIS NETWORK</div>
-        <div class="logo-sub">Votre personnage vous attend</div>
+        <div class="logo-sub">Sélectionnez un emplacement</div>
       </div>
     </div>
 
-    <div class="choice-body">
+    <div id="slot-cards"></div>
 
-      <div class="choice-card primary" onclick="goChoice_create()">
-        <div class="cc-icon">✦</div>
-        <div class="cc-text">
-          <div class="cc-title">Créer un personnage</div>
-          <div class="cc-desc">Nouveau profil · identité · apparence</div>
-        </div>
-        <div class="cc-arrow">→</div>
-      </div>
-
-      <div class="choice-card" onclick="goSlots()">
-        <div class="cc-icon">◈</div>
-        <div class="cc-text">
-          <div class="cc-title">Choisir un personnage</div>
-          <div class="cc-desc">Reprendre un profil existant</div>
-        </div>
-        <div class="cc-arrow">→</div>
-      </div>
-
-    </div>
-
-    <button class="btn-back-screen" onclick="onClose()">Fermer</button>
+    <button id="select-close" onclick="onClose()">✕  Fermer</button>
 
   </div>
 
-  <!-- ════════════════════════════════════════════════════════
-       ÉCRAN 2 — SÉLECTION DE PROFIL
-       ════════════════════════════════════════════════════════ -->
-  <div id="s-slots" class="screen">
 
-    <div class="screen-header">
-      <div class="brand-mark" aria-hidden="true">
-        <svg class="na-continents" viewBox="0 0 220 160" xmlns="http://www.w3.org/2000/svg" focusable="false">
-          <defs>
-            <clipPath id="naClip">
-              <path d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
-            </clipPath>
-            <linearGradient id="naGloss" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.34"/>
-              <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
-            </linearGradient>
-          </defs>
-          <path class="na-shadow" d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
-          <g clip-path="url(#naClip)">
-            <rect x="0" y="0" width="220" height="160" fill="#ffffff"/>
-            <rect x="0" y="0" width="220" height="14" fill="#b22234"/>
-            <rect x="0" y="26" width="220" height="13" fill="#b22234"/>
-            <rect x="0" y="52" width="220" height="13" fill="#b22234"/>
-            <rect x="0" y="78" width="220" height="13" fill="#b22234"/>
-            <rect x="0" y="104" width="220" height="13" fill="#b22234"/>
-            <rect x="0" y="130" width="220" height="13" fill="#b22234"/>
-            <path d="M20 16 L106 16 L117 60 L30 60 Z" fill="#263b7a" opacity="0.98"/>
-            <g fill="#ffffff" opacity="0.9">
-              <circle cx="38" cy="28" r="2.1"/><circle cx="52" cy="28" r="2.1"/><circle cx="66" cy="28" r="2.1"/><circle cx="80" cy="28" r="2.1"/>
-              <circle cx="45" cy="39" r="2.1"/><circle cx="59" cy="39" r="2.1"/><circle cx="73" cy="39" r="2.1"/><circle cx="87" cy="39" r="2.1"/>
-              <circle cx="38" cy="50" r="2.1"/><circle cx="52" cy="50" r="2.1"/><circle cx="66" cy="50" r="2.1"/><circle cx="80" cy="50" r="2.1"/>
-            </g>
-            <path d="M18 20 C42 10, 88 12, 118 20 C144 27, 166 36, 182 48 C159 34, 122 32, 95 30 C69 28, 45 29, 18 37 Z" fill="url(#naGloss)" opacity="0.55"/>
+  <!-- ══ HEADER PLEINE LARGEUR ═══════════════════════════════ -->
+  <div id="header">
+    <div class="brand-mark" aria-hidden="true">
+      <svg class="na-continents" viewBox="0 0 220 160" xmlns="http://www.w3.org/2000/svg" focusable="false">
+        <defs>
+          <clipPath id="naClip">
+            <path d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
+          </clipPath>
+          <linearGradient id="naGloss" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.34"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path class="na-shadow" d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
+        <g clip-path="url(#naClip)">
+          <rect x="0" y="0" width="220" height="160" fill="#ffffff"/>
+          <rect x="0" y="0" width="220" height="14" fill="#b22234"/>
+          <rect x="0" y="26" width="220" height="13" fill="#b22234"/>
+          <rect x="0" y="52" width="220" height="13" fill="#b22234"/>
+          <rect x="0" y="78" width="220" height="13" fill="#b22234"/>
+          <rect x="0" y="104" width="220" height="13" fill="#b22234"/>
+          <rect x="0" y="130" width="220" height="13" fill="#b22234"/>
+          <path d="M20 16 L106 16 L117 60 L30 60 Z" fill="#263b7a" opacity="0.98"/>
+          <g fill="#ffffff" opacity="0.9">
+            <circle cx="38" cy="28" r="2.1"/><circle cx="52" cy="28" r="2.1"/><circle cx="66" cy="28" r="2.1"/><circle cx="80" cy="28" r="2.1"/>
+            <circle cx="45" cy="39" r="2.1"/><circle cx="59" cy="39" r="2.1"/><circle cx="73" cy="39" r="2.1"/><circle cx="87" cy="39" r="2.1"/>
+            <circle cx="38" cy="50" r="2.1"/><circle cx="52" cy="50" r="2.1"/><circle cx="66" cy="50" r="2.1"/><circle cx="80" cy="50" r="2.1"/>
           </g>
-          <path class="na-outline" d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
-        </svg>
-        <div class="darkrp-script"></div>
-      </div>
-      <div class="brand-stack">
-        <div class="logo-eyebrow">Character Creator</div>
-        <div class="logo-title">GENESIS NETWORK</div>
-        <div class="logo-sub">Choisissez votre profil</div>
-      </div>
+          <path d="M18 20 C42 10, 88 12, 118 20 C144 27, 166 36, 182 48 C159 34, 122 32, 95 30 C69 28, 45 29, 18 37 Z" fill="url(#naGloss)" opacity="0.55"/>
+        </g>
+        <path class="na-outline" d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
+      </svg>
+      <div class="darkrp-script"></div>
     </div>
-
-    <div class="slots-body" id="slot-cards"></div>
-
-    <button class="btn-back-screen" onclick="goChoice()">Retour</button>
-
+    <div class="brand-stack">
+      <div class="logo-eyebrow">Character Creator</div>
+      <div class="logo-title">GENESIS NETWORK</div>
+      <div class="logo-sub">Créez votre identité</div>
+    </div>
   </div>
 
-  <!-- ════════════════════════════════════════════════════════
-       ÉCRAN 3 — ÉDITEUR (sidebar + form)
-       ════════════════════════════════════════════════════════ -->
-  <div id="s-editor" class="screen">
-  <div id="app-editor">
+  <!-- ══ MAIN ROW ════════════════════════════════════════════ -->
+  <div id="main" class="hidden">
 
-    <!-- Header éditeur -->
-    <div id="header">
-<div class="brand-mark" aria-hidden="true">
-        <svg class="na-continents" viewBox="0 0 220 160" xmlns="http://www.w3.org/2000/svg" focusable="false">
-          <defs>
-            <clipPath id="naClip">
-              <path d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
-            </clipPath>
-            <linearGradient id="naGloss" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.34"/>
-              <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
-            </linearGradient>
-          </defs>
-          <path class="na-shadow" d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
-          <g clip-path="url(#naClip)">
-            <rect x="0" y="0" width="220" height="160" fill="#ffffff"/>
-            <rect x="0" y="0" width="220" height="14" fill="#b22234"/>
-            <rect x="0" y="26" width="220" height="13" fill="#b22234"/>
-            <rect x="0" y="52" width="220" height="13" fill="#b22234"/>
-            <rect x="0" y="78" width="220" height="13" fill="#b22234"/>
-            <rect x="0" y="104" width="220" height="13" fill="#b22234"/>
-            <rect x="0" y="130" width="220" height="13" fill="#b22234"/>
-            <path d="M20 16 L106 16 L117 60 L30 60 Z" fill="#263b7a" opacity="0.98"/>
-            <g fill="#ffffff" opacity="0.9">
-              <circle cx="38" cy="28" r="2.1"/><circle cx="52" cy="28" r="2.1"/><circle cx="66" cy="28" r="2.1"/><circle cx="80" cy="28" r="2.1"/>
-              <circle cx="45" cy="39" r="2.1"/><circle cx="59" cy="39" r="2.1"/><circle cx="73" cy="39" r="2.1"/><circle cx="87" cy="39" r="2.1"/>
-              <circle cx="38" cy="50" r="2.1"/><circle cx="52" cy="50" r="2.1"/><circle cx="66" cy="50" r="2.1"/><circle cx="80" cy="50" r="2.1"/>
-            </g>
-            <path d="M18 20 C42 10, 88 12, 118 20 C144 27, 166 36, 182 48 C159 34, 122 32, 95 30 C69 28, 45 29, 18 37 Z" fill="url(#naGloss)" opacity="0.55"/>
-          </g>
-          <path class="na-outline" d="M22 65 L35 45 L31 29 L42 17 L63 20 L82 10 L100 18 L116 15 L130 20 L145 18 L160 29 L176 34 L186 48 L179 59 L186 69 L177 80 L163 84 L151 96 L137 102 L130 114 L118 128 L101 133 L86 125 L70 126 L58 137 L45 130 L39 116 L28 106 L26 93 L15 84 L10 72 Z M154 9 L171 4 L187 12 L182 26 L167 29 L154 20 Z"/>
-        </svg>
-        <div class="darkrp-script"></div>
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+
+      <button id="btn-back" onclick="goToSelectScreen()">Retour</button>
+      <div class="slots-track-wrap">
+        <div id="slot-track"><div id="slot-cursor"></div></div>
+        <div id="slot-list"></div>
       </div>
-      <div class="brand-stack">
-        <div class="logo-eyebrow">Character Creator</div>
-        <div class="logo-title">GENESIS NETWORK</div>
-        <div class="logo-sub">Créer votre personnage</div>
-      </div>
-    </div>
 
-    <!-- Main row -->
-    <div id="main">
+      <div class="nav-lbl">Navigation</div>
+      <nav id="nav">
+        <button class="nb active" data-tab="identity"    onclick="switchTab('identity')">Identité</button>
+        <button class="nb"        data-tab="appearance"  onclick="switchTab('appearance')">Apparence</button>
+        <button class="nb"        data-tab="personality" onclick="switchTab('personality')">Personnalité</button>
+        <button class="nb"        data-tab="summary"     onclick="switchTab('summary')">Récapitulatif</button>
+      </nav>
 
-      <!-- SIDEBAR -->
-      <aside id="sidebar">
-
-        <div id="slot-badge" onclick="goSlots()">← <span>PROFIL 01</span></div>
-
-        <div class="nav-lbl">Navigation</div>
-        <nav id="nav">
-          <button class="nb active" data-tab="identity"    onclick="switchTab('identity')">Identité</button>
-          <button class="nb"        data-tab="appearance"  onclick="switchTab('appearance')">Apparence</button>
-          <button class="nb"        data-tab="personality" onclick="switchTab('personality')">Personnalité</button>
-          <button class="nb"        data-tab="summary"     onclick="switchTab('summary')">Récapitulatif</button>
-        </nav>
-
-        <div id="actions">
-          <button id="btn-save" onclick="onSave()">Commencer</button>
-          <div class="action-row">
-            <button class="btn-icon" onclick="onRandomize()" title="Aléatoire">⚄</button>
-            <button class="btn-icon" onclick="onClose()" title="Fermer">✕</button>
-          </div>
+      <div id="actions">
+        <button id="btn-save" onclick="onSave()">Commencer</button>
+        <div class="action-row">
+          <button class="btn-icon" onclick="onRandomize()" title="Aléatoire">⚄</button>
+          <button class="btn-icon" onclick="onClose()" title="Fermer">✕</button>
         </div>
+      </div>
 
-      </aside>
+    </aside>
 
     <!-- FORM -->
     <div id="form-area">
@@ -1526,17 +1272,13 @@ html,body {
 
     </div><!-- /form-area -->
 
-    </div><!-- /main -->
-  </div><!-- /app-editor -->
-  </div><!-- /s-editor -->
-
-</div><!-- /app -->
+  </div><!-- /main -->
+</div>
 
 <div id="stamp">SAUVEGARDÉ</div>
 <div id="notifs"></div>
 
 <script>
-
 const cfg={
   maxTraits:4, maxSlots:3,
   genderChoices:['Homme','Femme','Non-binaire','Autre'],
@@ -1552,6 +1294,99 @@ const S={
 };
 
 function B(fn,...a){try{if(window.gcc_js&&window.gcc_js[fn])window.gcc_js[fn](...a.map(x=>String(x)));}catch(_){}}
+
+function getSlot(slotId){
+  return S.slots[String(slotId)] ?? S.slots[slotId] ?? null;
+}
+function slotHasCharacter(slot){
+  if(!slot || typeof slot !== 'object') return false;
+  const meaningfulKeys = Object.keys(slot).filter(k=>{
+    const v = slot[k];
+    if(v === null || v === undefined || v === '') return false;
+    if(Array.isArray(v) && v.length === 0) return false;
+    if(typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === 0) return false;
+    return !['slot_id','slotId','index'].includes(k);
+  });
+  return meaningfulKeys.length > 0;
+}
+function buildSlotData(slotId, slotData){
+  if(slotHasCharacter(slotData)){
+    return {
+      first_name:slotData.first_name||'',
+      last_name:slotData.last_name||'',
+      nickname:slotData.nickname||'',
+      gender:slotData.gender||'Homme',
+      birthdate:slotData.birthdate||'',
+      age:parseInt(slotData.age)||25,
+      height_cm:parseInt(slotData.height_cm)||175,
+      weight_kg:parseInt(slotData.weight_kg)||70,
+      shoe_size:parseInt(slotData.shoe_size)||42,
+      origin_country:slotData.origin_country||'',
+      birth_place:slotData.birth_place||'',
+      civil_status:slotData.civil_status||'Celibataire',
+      traits:Array.isArray(slotData.traits)?slotData.traits:[],
+      hair_id:slotData.hair_id||'',
+      hair_color:slotData.hair_color||{r:20,g:16,b:14},
+      hair_scale:parseFloat(slotData.hair_scale)||1.0,
+      slot_id: slotId
+    };
+  }
+  return {
+    first_name:'',last_name:'',nickname:'',gender:'Homme',birthdate:'',
+    age:25,height_cm:175,weight_kg:70,shoe_size:42,
+    origin_country:'',birth_place:'',civil_status:'Celibataire',
+    traits:[],hair_id:'',hair_color:{r:20,g:16,b:14},hair_scale:1.0,
+    slot_id: slotId
+  };
+}
+function getSlotName(slotId, slotData){
+  if(slotHasCharacter(slotData)){
+    const nm = [slotData.first_name, slotData.last_name].filter(Boolean).join(' ').trim();
+    return nm ? nm.toUpperCase() : ('Profil 0'+slotId);
+  }
+  return 'EMPLACEMENT VIDE';
+}
+function getSlotMeta(slotData){
+  if(slotHasCharacter(slotData)){
+    return [slotData.origin_country, slotData.age ? slotData.age+' ans' : null].filter(Boolean).join(' · ') || 'Personnage existant';
+  }
+  return 'Créer un nouveau personnage';
+}
+function setEditorVisible(isVisible){
+  const app = document.getElementById('app');
+  const select = document.getElementById('screen-select');
+  const main = document.getElementById('main');
+
+  app.classList.toggle('creating', !!isVisible);
+  select.classList.toggle('hidden', !!isVisible);
+  main.classList.toggle('hidden', !isVisible);
+
+  select.style.display = isVisible ? 'none' : 'flex';
+  main.style.display = isVisible ? 'grid' : 'none';
+}
+function syncSlotSelection(slotId){
+  S.currentSlot = parseInt(slotId) || 1;
+  document.querySelectorAll('.slot-btn').forEach((b,i)=>{
+    b.classList.toggle('active', (i+1)===S.currentSlot);
+  });
+  requestAnimationFrame(updateSlotCursor);
+}
+function openCreateFlow(slotId){
+  const slotData = getSlot(slotId);
+  syncSlotSelection(slotId);
+  S.data = buildSlotData(slotId, slotData);
+  populateForm();
+  renderHairGrid();
+  renderCP();
+  renderTraits();
+  switchTab('identity');
+  setEditorVisible(true);
+  B('selectSlot', slotId);
+}
+function chooseExistingSlot(slotId){
+  syncSlotSelection(slotId);
+  B('selectSlot', slotId);
+}
 
 let uiMotionBooted=false;
 let staticMotionPlayed=false;
@@ -1702,13 +1537,12 @@ function triggerButtonFx(el){
 function renderSlots(){
   const c=document.getElementById('slot-list'); c.innerHTML='';
   for(let i=1;i<=cfg.maxSlots;i++){
-    const s=S.slots[String(i)]||S.slots[i]||{};
-    const nm=(s.first_name&&s.first_name!=='')?(s.first_name+' '+(s.last_name||'')).toUpperCase():'Identité '+i;
-    const mt=s.origin_country||(s.first_name?'Profil existant':'Nouveau personnage');
+    const s=getSlot(i);
+    const filled=slotHasCharacter(s);
     const b=document.createElement('button');
     b.className='slot-btn'+(S.currentSlot===i?' active':'');
-    b.innerHTML=`<div class="sn">${nm}</div><div class="sm">${mt}</div>`;
-    b.onclick=()=>B('selectSlot',i);
+    b.innerHTML=`<div class="sn">${getSlotName(i, s)}</div><div class="sm">${filled ? 'Personnage existant' : 'Créer un personnage'}</div>`;
+    b.onclick=()=>filled ? chooseExistingSlot(i) : openCreateFlow(i);
     c.appendChild(b);
   }
   if(uiMotionBooted) animateNodeList([...c.children], 180, 55, true);
@@ -1815,146 +1649,53 @@ function GCC_Bootstrap(data){
   renderSlotCards();
   ensureTabVisible(getCurrentTabName());
   if(!uiMotionBooted) bootMotion();
-  // Entrée directe sur l'écran des slots (workflow : connexion → slots)
-  showScreen('s-slots');
+  // Montrer directement les slots au joueur à l'ouverture
+  setEditorVisible(false);
 }
 function GCC_ShowSaved(){const s=document.getElementById('stamp');s.classList.add('show');setTimeout(()=>s.classList.remove('show'),1600);}
-function GCC_UpdateData(d){if(!d)return;Object.assign(S.data,d);populateForm();renderHairGrid();renderCP();renderTraits();}
+function GCC_UpdateData(d){if(!d)return;Object.assign(S.data,d);populateForm();renderHairGrid();renderCP();renderTraits();renderSlots();renderSlotCards();}
 function GCC_Notify(msg){notif(msg);}
 function notif(msg){const e=document.createElement('div');e.className='ntf';e.textContent=msg;document.getElementById('notifs').appendChild(e);setTimeout(()=>e.remove(),5200);}
-/* ══════════════════════════════════════════════════════════════
-   NAVIGATION ENTRE ÉCRANS
-   ══════════════════════════════════════════════════════════════ */
 
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>{
-    if(s.id===id){
-      s.classList.remove('exit-left');
-      // force reflow avant d'ajouter active pour déclencher la transition
-      void s.offsetWidth;
-      s.classList.add('active');
-    } else {
-      if(s.classList.contains('active')){
-        s.classList.add('exit-left');
-        setTimeout(()=>s.classList.remove('exit-left'),420);
-      }
-      s.classList.remove('active');
-    }
-  });
-}
 
-function goChoice(){
-  showScreen('s-choice');
-}
-
-function goSlots(){
+/* ── SELECT SCREEN ──────────────────────────────────────────── */
+function showSelectScreen(){
+  setEditorVisible(false);
   renderSlotCards();
-  showScreen('s-slots');
 }
 
-/* Ouvre l'éditeur sur un slot précis, charge ses données */
-function goEditor(slotId){
-  S.currentSlot=parseInt(slotId)||1;
-  const sd=S.slots[String(S.currentSlot)]||S.slots[S.currentSlot]||{};
-  S.data={
-    first_name:  sd.first_name||'',
-    last_name:   sd.last_name||'',
-    nickname:    sd.nickname||'',
-    gender:      sd.gender||'Homme',
-    birthdate:   sd.birthdate||'',
-    age:         parseInt(sd.age)||25,
-    height_cm:   parseInt(sd.height_cm)||175,
-    weight_kg:   parseInt(sd.weight_kg)||70,
-    shoe_size:   parseInt(sd.shoe_size)||42,
-    origin_country:sd.origin_country||'',
-    birth_place: sd.birth_place||'',
-    civil_status:sd.civil_status||'Celibataire',
-    traits:      Array.isArray(sd.traits)?[...sd.traits]:[],
-    hair_id:     sd.hair_id||'',
-    hair_color:  sd.hair_color||{r:20,g:16,b:14},
-    hair_scale:  parseFloat(sd.hair_scale)||1.0
-  };
-  // Mettre à jour le badge slot dans la sidebar
-  const badge=document.getElementById('slot-badge');
-  if(badge) badge.innerHTML=`← <span>PROFIL 0${S.currentSlot}</span>`;
-  // Peupler le formulaire
-  switchTab('identity');
-  populateForm();
-  renderHairGrid();
-  renderCP();
-  renderTraits();
-  renderSlots();
-  showScreen('s-editor');
-  B('setSlot',S.currentSlot);
-  B('setCameraProfile','identity');
+function goToSelectScreen(){
+  showSelectScreen();
 }
 
-/* Render les cartes de slots sur l'écran s-slots */
+function selectSlotAndEdit(slotId){
+  openCreateFlow(slotId);
+}
+
 function renderSlotCards(){
-  const c=document.getElementById('slot-cards');
-  c.innerHTML='';
-  for(let i=1;i<=cfg.maxSlots;i++){
-    const s=S.slots[String(i)]||S.slots[i]||null;
-    const hasChar=!!(s&&s.first_name&&s.first_name!=='');
-
-    const card=document.createElement('div');
-    card.className='slot-card'+(hasChar?' has-char':'');
-
-    const left=document.createElement('div');
-    left.className='sc-left';
-
-    const num=document.createElement('div');
-    num.className='sc-num';
-    num.textContent='Emplacement '+i;
-
-    const name=document.createElement('div');
-    name.className='sc-name';
-    name.textContent=hasChar
-      ?(s.first_name+' '+(s.last_name||'')).trim().toUpperCase()
-      :'Nouveau personnage';
-
-    const meta=document.createElement('div');
-    meta.className='sc-meta';
-    if(hasChar){
-      const parts=[];
-      if(s.origin_country) parts.push(s.origin_country);
-      if(s.age)            parts.push(s.age+' ans');
-      meta.textContent=parts.join(' · ')||'Profil existant';
-    } else {
-      meta.textContent='Emplacement disponible';
-    }
-
-    left.appendChild(num);
-    left.appendChild(name);
-    left.appendChild(meta);
-
-    const btn=document.createElement('button');
-    btn.className='sc-btn '+(hasChar?'play':'new-char');
-    btn.textContent=hasChar?'Jouer':'Créer';
-
-    if(hasChar){
-      btn.onclick=(e)=>{e.stopPropagation();B('selectSlot',i);};
-      card.onclick=()=>B('selectSlot',i);
-    } else {
-      btn.onclick=(e)=>{e.stopPropagation();goEditor(i);};
-      card.onclick=()=>goEditor(i);
-    }
-
-    card.appendChild(left);
-    card.appendChild(btn);
+  const c = document.getElementById('slot-cards');
+  if(!c) return;
+  c.innerHTML = '';
+  for(let i=1; i<=cfg.maxSlots; i++){
+    const s = getSlot(i);
+    const hasChar = slotHasCharacter(s);
+    const action = hasChar ? 'chooseExistingSlot' : 'openCreateFlow';
+    const actionLabel = hasChar ? 'Choisir' : 'Créer';
+    const card = document.createElement('div');
+    card.className = 'slot-card' + (hasChar ? ' has-char' : '');
+    card.innerHTML = `
+      <div class="sc-left">
+        <div class="sc-num">Profil 0${i}</div>
+        <div class="sc-name">${getSlotName(i, s)}</div>
+        <div class="sc-meta">${getSlotMeta(s)}</div>
+      </div>
+      <button class="sc-btn ${hasChar ? 'play' : 'create'}"
+        onclick="event.stopPropagation(); window['${action}'](${i})">
+        ${actionLabel}
+      </button>`;
+    card.onclick = () => window[action](i);
     c.appendChild(card);
   }
-}
-
-/* Créer → premier slot vide ; si tous pleins → écran slots pour choisir lequel éditer */
-function goChoice_create(){
-  let target=null;
-  for(let i=1;i<=cfg.maxSlots;i++){
-    const s=S.slots[String(i)]||S.slots[i]||null;
-    if(!s||!s.first_name){target=i;break;}
-  }
-  if(target!==null) goEditor(target);
-  else goSlots(); // tous les slots sont remplis
 }
 
 window.addEventListener('load',()=>{
@@ -1964,8 +1705,11 @@ window.addEventListener('load',()=>{
     if(btn) triggerButtonFx(btn);
   });
   renderGenderToggle();
+  renderSlots();
+  renderSlotCards();
   ensureTabVisible(getCurrentTabName());
   bootMotion();
+  setEditorVisible(false);
   setTimeout(()=>B('pageReady'),150);
 });
 </script>
