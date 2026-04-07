@@ -642,6 +642,98 @@ html,body {
 /* Hair grid */
 #hgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
 
+/* ── Sous-navigation Apparence ── */
+.ap-subnav {
+  display:flex; gap:6px; margin-bottom:16px;
+}
+.ap-nb {
+  padding:6px 18px; background:rgba(255,255,255,0.04);
+  border:1px solid var(--border); border-radius:20px; cursor:pointer;
+  font-family:inherit; font-size:11px; font-weight:700; letter-spacing:0.12em;
+  color:var(--muted); text-transform:uppercase;
+  transition:all var(--dur-fast);
+}
+.ap-nb:hover { background:rgba(255,255,255,0.08); color:var(--dim); }
+.ap-nb.active {
+  background:rgba(200,203,214,0.12); border-color:var(--accent);
+  color:var(--accent);
+}
+.ap-panel { display:none; }
+.ap-panel.active { display:block; }
+
+/* ── Grille overlays (4 colonnes avec thumbnail) ── */
+#scar-grid, #fp-grid {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:6px;
+  max-height:200px; overflow-y:auto;
+}
+.ov-item {
+  position:relative; aspect-ratio:1/1; overflow:hidden;
+  background:rgba(255,255,255,0.03); border:1px solid var(--border);
+  border-radius:6px; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+  transition:all var(--dur-fast);
+}
+.ov-item:hover { border-color:rgba(255,255,255,0.15); transform:translateY(-1px); }
+.ov-item.active { border-color:var(--gold); box-shadow:0 0 0 1px var(--gold); }
+.ov-item.none   { border-style:dashed; justify-content:center; }
+.ov-thumb {
+  position:absolute; inset:0;
+  background-size:contain; background-repeat:no-repeat; background-position:center;
+  opacity:0.85;
+}
+.ov-item.active .ov-thumb { opacity:1; }
+.ov-lbl-inner {
+  position:relative; z-index:1; width:100%;
+  padding:2px 3px; background:rgba(0,0,0,0.55);
+  font-size:9px; font-weight:700; letter-spacing:0.06em;
+  color:rgba(255,255,255,0.7); text-align:center;
+  text-transform:uppercase;
+}
+.ov-item.active .ov-lbl-inner { color:var(--gold); }
+.ov-none-ico { font-size:18px; opacity:0.25; }
+
+/* ── Crosshair position ── */
+.ov-crosshair-wrap {
+  display:flex; justify-content:center; margin:8px 0 6px;
+}
+.ov-crosshair {
+  position:relative; width:200px; height:160px;
+  background:rgba(0,0,0,0.35); border:1px solid var(--border); border-radius:10px;
+  cursor:crosshair; user-select:none; overflow:hidden;
+}
+.ov-ch-h {
+  position:absolute; left:0; right:0; top:50%; height:1px;
+  background:rgba(255,255,255,0.18);
+}
+.ov-ch-v {
+  position:absolute; top:0; bottom:0; left:50%; width:1px;
+  background:rgba(255,255,255,0.18);
+}
+.ov-ch-dot {
+  position:absolute; width:14px; height:14px;
+  border-radius:50%; background:var(--accent);
+  box-shadow:0 0 8px var(--accent);
+  transform:translate(-50%,-50%);
+  left:50%; top:50%;
+  pointer-events:none; transition:background 0.15s;
+}
+.ov-ch-lbl {
+  position:absolute; font-size:9px; font-weight:700;
+  letter-spacing:0.1em; color:rgba(255,255,255,0.25); text-transform:uppercase;
+}
+.ov-ch-lbl-h { right:6px; top:50%; transform:translateY(-14px); }
+.ov-ch-lbl-v { left:50%; bottom:6px; transform:translateX(6px); }
+
+/* ── Contrôles overlay ── */
+.ov-controls {}
+.ov-row {
+  display:flex; align-items:center; gap:10px; margin-top:8px;
+}
+.ov-lbl {
+  min-width:48px; font-size:10px; font-weight:700;
+  letter-spacing:0.1em; color:var(--muted); text-transform:uppercase;
+}
+
 /* ── Overlays visage (cicatrices / facepaints) ── */
 #scar-grid, #fp-grid {
   display:grid; grid-template-columns:repeat(4,1fr); gap:6px;
@@ -1285,7 +1377,6 @@ body.ui-busy #select-close {
       <nav id="nav">
         <button class="nb active" data-tab="identity"    onclick="switchTab('identity')">Identité</button>
         <button class="nb"        data-tab="appearance"  onclick="switchTab('appearance')">Apparence</button>
-        <button class="nb"        data-tab="visage"      onclick="switchTab('visage')">Visage</button>
         <button class="nb"        data-tab="personality" onclick="switchTab('personality')">Personnalité</button>
         <button class="nb"        data-tab="summary"     onclick="switchTab('summary')">Récapitulatif</button>
       </nav>
@@ -1387,60 +1478,102 @@ body.ui-busy #select-close {
       </div>
 
       <!-- APPARENCE -->
+      <!-- APPARENCE (cheveux + cicatrices + tatouages) -->
       <div id="tab-appearance" class="tp">
-        <div class="col-l" style="max-width:360px">
 
+        <!-- Sous-navigation apparence -->
+        <div class="ap-subnav">
+          <button class="ap-nb active" data-ap="cheveux"    onclick="switchAp('cheveux')">Cheveux</button>
+          <button class="ap-nb"        data-ap="cicatrices" onclick="switchAp('cicatrices')">Cicatrices</button>
+          <button class="ap-nb"        data-ap="tatouages"  onclick="switchAp('tatouages')">Tatouages</button>
+        </div>
+
+        <!-- ── Panel CHEVEUX ── -->
+        <div id="ap-cheveux" class="ap-panel active" style="max-width:380px">
           <div>
             <div class="sh">Coiffure</div>
             <div id="hgrid"></div>
           </div>
-
           <div>
             <div class="sh">Couleur</div>
             <div id="cpreset"></div>
           </div>
-
           <div>
-            <div class="sh">Échelle cheveux</div>
+            <div class="sh">Échelle</div>
             <div class="sc">
               <div class="sl-wrap"><input class="sl" id="f_hair_scale" type="range" min="50" max="180" value="100" oninput="onHS(this.value)"></div>
               <span class="sg-v" id="sv_hair_scale">1.00×</span>
             </div>
           </div>
-
         </div>
-      </div>
 
-      <!-- VISAGE (cicatrices + facepaints) -->
-      <div id="tab-visage" class="tp">
-        <div class="col-l" style="max-width:400px">
-
-          <!-- CICATRICES -->
-          <div>
-            <div class="sh">Cicatrice</div>
-            <div id="scar-grid"></div>
-            <div class="ov-alpha">
-              <span class="sg-v" style="min-width:56px;color:var(--muted);font-size:11px">Opacité</span>
-              <div class="sl-wrap"><input class="sl" id="f_scar_opacity" type="range" min="0" max="100" value="100"
-                oninput="onScarAlpha(this.value)"></div>
+        <!-- ── Panel CICATRICES ── -->
+        <div id="ap-cicatrices" class="ap-panel" style="max-width:380px">
+          <div class="sh">Cicatrice</div>
+          <div id="scar-grid"></div>
+          <div class="ov-controls" id="scar-controls" style="display:none">
+            <!-- Crosshair position -->
+            <div class="sh" style="margin-top:14px">Position</div>
+            <div class="ov-crosshair-wrap">
+              <div class="ov-crosshair" id="scar-crosshair"
+                   onmousedown="startOvDrag(event,'scar')"
+                   onmousemove="moveOvDrag(event,'scar')"
+                   onmouseup="endOvDrag()"
+                   onmouseleave="endOvDrag()">
+                <div class="ov-ch-h"></div>
+                <div class="ov-ch-v"></div>
+                <div class="ov-ch-dot" id="scar-dot"></div>
+                <span class="ov-ch-lbl ov-ch-lbl-h">Horizontal</span>
+                <span class="ov-ch-lbl ov-ch-lbl-v">Vertical</span>
+              </div>
+            </div>
+            <!-- Opacité + taille -->
+            <div class="ov-row">
+              <span class="ov-lbl">Opacité</span>
+              <div class="sl-wrap"><input class="sl" id="f_scar_opacity" type="range" min="0" max="100" value="100" oninput="onScarAlpha(this.value)"></div>
               <span class="sg-v" id="sv_scar_opacity">100%</span>
             </div>
-          </div>
-
-          <!-- FACEPAINTS -->
-          <div style="margin-top:20px">
-            <div class="sh">Facepaint / Masque</div>
-            <input class="fp-search" id="fp-search" type="text" placeholder="Rechercher…" oninput="renderFPGrid(this.value)">
-            <div id="fp-grid"></div>
-            <div class="ov-alpha">
-              <span class="sg-v" style="min-width:56px;color:var(--muted);font-size:11px">Opacité</span>
-              <div class="sl-wrap"><input class="sl" id="f_fp_opacity" type="range" min="0" max="100" value="100"
-                oninput="onFPAlpha(this.value)"></div>
-              <span class="sg-v" id="sv_fp_opacity">100%</span>
+            <div class="ov-row">
+              <span class="ov-lbl">Taille</span>
+              <div class="sl-wrap"><input class="sl" id="f_scar_scale" type="range" min="30" max="300" value="100" oninput="onScarScale(this.value)"></div>
+              <span class="sg-v" id="sv_scar_scale">1.0×</span>
             </div>
           </div>
-
         </div>
+
+        <!-- ── Panel TATOUAGES ── -->
+        <div id="ap-tatouages" class="ap-panel" style="max-width:380px">
+          <div class="sh">Tatouage / Facepaint</div>
+          <input class="fp-search" id="fp-search" type="text" placeholder="Rechercher…" oninput="renderFPGrid(this.value)">
+          <div id="fp-grid"></div>
+          <div class="ov-controls" id="fp-controls" style="display:none">
+            <div class="sh" style="margin-top:14px">Position</div>
+            <div class="ov-crosshair-wrap">
+              <div class="ov-crosshair" id="fp-crosshair"
+                   onmousedown="startOvDrag(event,'fp')"
+                   onmousemove="moveOvDrag(event,'fp')"
+                   onmouseup="endOvDrag()"
+                   onmouseleave="endOvDrag()">
+                <div class="ov-ch-h"></div>
+                <div class="ov-ch-v"></div>
+                <div class="ov-ch-dot" id="fp-dot"></div>
+                <span class="ov-ch-lbl ov-ch-lbl-h">Horizontal</span>
+                <span class="ov-ch-lbl ov-ch-lbl-v">Vertical</span>
+              </div>
+            </div>
+            <div class="ov-row">
+              <span class="ov-lbl">Opacité</span>
+              <div class="sl-wrap"><input class="sl" id="f_fp_opacity" type="range" min="0" max="100" value="100" oninput="onFPAlpha(this.value)"></div>
+              <span class="sg-v" id="sv_fp_opacity">100%</span>
+            </div>
+            <div class="ov-row">
+              <span class="ov-lbl">Taille</span>
+              <div class="sl-wrap"><input class="sl" id="f_fp_scale" type="range" min="30" max="300" value="100" oninput="onFPScale(this.value)"></div>
+              <span class="sg-v" id="sv_fp_scale">1.0×</span>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- PERSONNALITÉ -->
@@ -1478,7 +1611,8 @@ const S={
     age:25,height_cm:175,weight_kg:70,shoe_size:42,
     origin_country:'',birth_place:'',civil_status:'Celibataire',
     traits:[],hair_id:'',hair_color:{r:20,g:16,b:14},hair_scale:1.0,
-    scar_id:'',facepaint_id:'',scar_opacity:1.0,facepaint_opacity:1.0}
+    scar_id:'',facepaint_id:'',scar_opacity:1.0,facepaint_opacity:1.0,
+    scar_x:0,scar_y:0,scar_scale:1.0, fp_x:0,fp_y:0,fp_scale:1.0}
 };
 
 function B(fn,...a){try{if(window.gcc_js&&window.gcc_js[fn])window.gcc_js[fn](...a.map(x=>String(x)));}catch(_){}}
@@ -1649,11 +1783,23 @@ function renderHairGrid(){
   const g=document.getElementById('hgrid'); g.innerHTML='';
   const n=document.createElement('div');
   n.className='hc'+(S.data.hair_id===''?' active':''); n.dataset.id='';
-  n.innerHTML='<span class="hc-i">◯</span>Aucun'; n.onclick=()=>selHair(''); g.appendChild(n);
+  n.innerHTML='<span class="hc-i">◯</span><span style="position:relative;z-index:1">Aucun</span>';
+  n.onclick=()=>selHair(''); g.appendChild(n);
   cfg.hairChoices.forEach(h=>{
     const c=document.createElement('div');
-    c.className='hc'+(S.data.hair_id===h.id?' active':''); c.dataset.id=h.id;
-    c.innerHTML='<span class="hc-i">✦</span>'+h.name; c.onclick=()=>selHair(h.id); g.appendChild(c);
+    c.className='hc'+(S.data.hair_id===h.id?' active':'');
+    c.dataset.id=h.id;
+    const thumb=thumbCache['hair_'+h.id];
+    if(thumb){
+      c.style.backgroundImage='url('+thumb+')';
+      c.style.backgroundSize='cover';
+      c.style.backgroundPosition='center top';
+    }
+    c.innerHTML='<span class="hc-i" style="position:relative;z-index:1">'+(thumb?'':'✦')+'</span>'
+               +'<span style="position:relative;z-index:1;text-shadow:0 1px 4px rgba(0,0,0,0.8)">'+h.name+'</span>';
+    c.onclick=()=>selHair(h.id);
+    g.appendChild(c);
+    if(!thumb) requestThumb('hair',h.id);
   });
 }
 function renderCP(){
@@ -1717,10 +1863,18 @@ function populateForm(){
   // WLC: synchro overlays visage
   const soEl=document.getElementById('f_scar_opacity');
   if(soEl){soEl.value=Math.round((d.scar_opacity||1)*100);document.getElementById('sv_scar_opacity').textContent=Math.round((d.scar_opacity||1)*100)+'%';fill(soEl);}
+  const ssEl=document.getElementById('f_scar_scale');
+  if(ssEl){ssEl.value=Math.round((d.scar_scale||1)*100);document.getElementById('sv_scar_scale').textContent=(d.scar_scale||1).toFixed(1)+'×';fill(ssEl);}
   const foEl=document.getElementById('f_fp_opacity');
   if(foEl){foEl.value=Math.round((d.facepaint_opacity||1)*100);document.getElementById('sv_fp_opacity').textContent=Math.round((d.facepaint_opacity||1)*100)+'%';fill(foEl);}
-  renderScarGrid();
-  renderFPGrid(document.getElementById('fp-search')?.value||'');
+  const fsEl=document.getElementById('f_fp_scale');
+  if(fsEl){fsEl.value=Math.round((d.fp_scale||1)*100);document.getElementById('sv_fp_scale').textContent=(d.fp_scale||1).toFixed(1)+'×';fill(fsEl);}
+  const scarCtrl=document.getElementById('scar-controls');
+  if(scarCtrl) scarCtrl.style.display=d.scar_id?'block':'none';
+  const fpCtrl=document.getElementById('fp-controls');
+  if(fpCtrl) fpCtrl.style.display=d.facepaint_id?'block':'none';
+  renderScarGrid(); syncDot('scar');
+  renderFPGrid(document.getElementById('fp-search')?.value||''); syncDot('fp');
 }
 
 function onSave(){
@@ -1730,39 +1884,92 @@ function onSave(){
 function onClose(){if(S.forceSelection){notif("Sélection obligatoire avant de jouer");return;}B('close');}
 function onRandomize(){B('randomize');}
 
-/* ─── Overlays visage ─────────────────────────────────── */
+/* ─── Sous-navigation Apparence ─────────────────────── */
+function switchAp(ap){
+  document.querySelectorAll('.ap-nb').forEach(b=>b.classList.toggle('active',b.dataset.ap===ap));
+  document.querySelectorAll('.ap-panel').forEach(p=>p.classList.toggle('active',p.id==='ap-'+ap));
+  if(ap==='cicatrices') renderScarGrid();
+  if(ap==='tatouages')  renderFPGrid(document.getElementById('fp-search')?.value||'');
+  if(ap==='cheveux')    { renderHairGrid(); renderCP(); }
+  B('setCameraProfile', ap==='cheveux'?'appearance':'identity');
+}
+
+/* ─── Thumbnail cache & injection ───────────────────── */
+const thumbCache={};
+function GCC_SetThumb(type,id,dataUrl){
+  thumbCache[type+'_'+id]=dataUrl;
+  // Mettre à jour toutes les cells ayant ce data-id et data-type
+  document.querySelectorAll('[data-type="'+type+'"][data-oid="'+id+'"]').forEach(el=>{
+    let th=el.querySelector('.ov-thumb');
+    if(th) th.style.backgroundImage='url('+dataUrl+')';
+  });
+  // Hair grid : mettre à jour les cells
+  if(type==='hair'){
+    document.querySelectorAll('.hc[data-id="'+id+'"]').forEach(el=>{
+      el.style.backgroundImage='url('+dataUrl+')';
+      el.style.backgroundSize='cover';
+      el.style.backgroundPosition='center top';
+    });
+  }
+}
+function requestThumb(type,id){
+  if(thumbCache[type+'_'+id]) return;
+  B('requestThumb',type,id);
+}
+
+/* ─── Grille CICATRICES ──────────────────────────────── */
 function renderScarGrid(){
   const g=document.getElementById('scar-grid');
   if(!g) return;
   g.innerHTML='';
-  // Item "aucune"
+  // Aucune
   const n=document.createElement('div');
   n.className='ov-item none'+(S.data.scar_id===''?' active':'');
-  n.innerHTML='<span class="ov-none-ico">◯</span>Aucune';
+  n.innerHTML='<span class="ov-none-ico">◯</span><span class="ov-lbl-inner">Aucune</span>';
   n.onclick=()=>selScar('');
   g.appendChild(n);
-  // Items cicatrices
+  // 27 cicatrices
   for(let i=1;i<=27;i++){
     const id='scar_'+i;
     const c=document.createElement('div');
+    c.dataset.type='scar'; c.dataset.oid=id;
     c.className='ov-item'+(S.data.scar_id===id?' active':'');
-    c.innerHTML='<span class="ov-none-ico">✕</span>Cic. '+i;
+    const thumb=thumbCache['scar_'+id];
+    c.innerHTML='<div class="ov-thumb"'+(thumb?' style="background-image:url('+thumb+')"':'')+'></div>'
+               +'<span class="ov-lbl-inner">Cic. '+i+'</span>';
     c.onclick=()=>selScar(id);
     g.appendChild(c);
+    if(!thumb) requestThumb('scar',id);
   }
 }
 function selScar(id){
   S.data.scar_id=id;
   renderScarGrid();
-  B('previewScar', id, String(S.data.scar_opacity));
+  const ctrl=document.getElementById('scar-controls');
+  if(ctrl) ctrl.style.display=id?'block':'none';
+  sendScar();
+}
+function sendScar(){
+  B('previewScar',S.data.scar_id,
+    String(S.data.scar_opacity),
+    String(S.data.scar_x||0),
+    String(-(S.data.scar_y||0)),  // Y inversé (haut dans UI = positif, mais dans 3D on remonte)
+    String(S.data.scar_scale||1));
 }
 function onScarAlpha(v){
   S.data.scar_opacity=parseInt(v)/100;
   document.getElementById('sv_scar_opacity').textContent=v+'%';
   fill(document.getElementById('f_scar_opacity'));
-  B('previewScar', S.data.scar_id, String(S.data.scar_opacity));
+  sendScar();
+}
+function onScarScale(v){
+  S.data.scar_scale=parseInt(v)/100;
+  document.getElementById('sv_scar_scale').textContent=(S.data.scar_scale).toFixed(1)+'×';
+  fill(document.getElementById('f_scar_scale'));
+  sendScar();
 }
 
+/* ─── Grille TATOUAGES/FACEPAINTS ────────────────────── */
 function renderFPGrid(filter){
   const g=document.getElementById('fp-grid');
   if(!g) return;
@@ -1771,32 +1978,93 @@ function renderFPGrid(filter){
   // Aucun
   const n=document.createElement('div');
   n.className='ov-item none'+(S.data.facepaint_id===''?' active':'');
-  n.innerHTML='<span class="ov-none-ico">◯</span>Aucun';
+  n.innerHTML='<span class="ov-none-ico">◯</span><span class="ov-lbl-inner">Aucun</span>';
   n.onclick=()=>selFP('');
   g.appendChild(n);
-  // Items facepaints filtrés
+  // 162 facepaints
   for(let i=1;i<=162;i++){
     const num=String(i).padStart(3,'0');
     const id='fp_'+num;
     const lbl='Mask '+i;
-    if(f && !lbl.toLowerCase().includes(f) && !num.includes(f)) continue;
+    if(f && !lbl.toLowerCase().includes(f) && !num.includes(f) && !String(i).includes(f)) continue;
     const c=document.createElement('div');
+    c.dataset.type='fp'; c.dataset.oid=id;
     c.className='ov-item'+(S.data.facepaint_id===id?' active':'');
-    c.innerHTML='<span class="ov-none-ico">▦</span>'+lbl;
+    const thumb=thumbCache['fp_'+id];
+    c.innerHTML='<div class="ov-thumb"'+(thumb?' style="background-image:url('+thumb+')"':'')+'></div>'
+               +'<span class="ov-lbl-inner">'+lbl+'</span>';
     c.onclick=()=>selFP(id);
     g.appendChild(c);
+    if(!thumb) requestThumb('fp',id);
   }
 }
 function selFP(id){
   S.data.facepaint_id=id;
   renderFPGrid(document.getElementById('fp-search')?.value||'');
-  B('previewFacepaint', id, String(S.data.facepaint_opacity));
+  const ctrl=document.getElementById('fp-controls');
+  if(ctrl) ctrl.style.display=id?'block':'none';
+  sendFP();
+}
+function sendFP(){
+  B('previewFacepaint',S.data.facepaint_id,
+    String(S.data.facepaint_opacity),
+    String(S.data.fp_x||0),
+    String(-(S.data.fp_y||0)),
+    String(S.data.fp_scale||1));
 }
 function onFPAlpha(v){
   S.data.facepaint_opacity=parseInt(v)/100;
   document.getElementById('sv_fp_opacity').textContent=v+'%';
   fill(document.getElementById('f_fp_opacity'));
-  B('previewFacepaint', S.data.facepaint_id, String(S.data.facepaint_opacity));
+  sendFP();
+}
+function onFPScale(v){
+  S.data.fp_scale=parseInt(v)/100;
+  document.getElementById('sv_fp_scale').textContent=(S.data.fp_scale).toFixed(1)+'×';
+  fill(document.getElementById('f_fp_scale'));
+  sendFP();
+}
+
+/* ─── Crosshair drag ────────────────────────────────── */
+let _ovDragging=false, _ovType=null;
+function startOvDrag(e,type){
+  _ovDragging=true; _ovType=type;
+  moveOvDrag(e,type);
+  e.preventDefault();
+}
+function endOvDrag(){ _ovDragging=false; _ovType=null; }
+function moveOvDrag(e,type){
+  if(!_ovDragging && e.type==='mousemove') return;
+  const widget=document.getElementById((type||_ovType)+'-crosshair');
+  if(!widget) return;
+  const rect=widget.getBoundingClientRect();
+  const nx=Math.max(-1,Math.min(1,(e.clientX-rect.left-rect.width/2)/(rect.width/2)));
+  const ny=Math.max(-1,Math.min(1,(e.clientY-rect.top-rect.height/2)/(rect.height/2)));
+  const t=type||_ovType;
+  // Déplacer le dot visuellement
+  const dot=document.getElementById(t+'-dot');
+  if(dot){
+    dot.style.left=((nx+1)/2*100)+'%';
+    dot.style.top= ((ny+1)/2*100)+'%';
+  }
+  if(t==='scar'){
+    S.data.scar_x=parseFloat(nx.toFixed(3));
+    S.data.scar_y=parseFloat(ny.toFixed(3));
+    sendScar();
+  } else {
+    S.data.fp_x=parseFloat(nx.toFixed(3));
+    S.data.fp_y=parseFloat(ny.toFixed(3));
+    sendFP();
+  }
+}
+function syncDot(type){
+  const x=(type==='scar'?S.data.scar_x:S.data.fp_x)||0;
+  const y=(type==='scar'?S.data.scar_y:S.data.fp_y)||0;
+  const dot=document.getElementById(type+'-dot');
+  if(dot){
+    dot.style.left=((x+1)/2*100)+'%';
+    dot.style.top= ((y+1)/2*100)+'%';
+  }
 }
 
 function GCC_Bootstrap(data){
@@ -1919,6 +2187,12 @@ function loadSlotIntoEditor(slotId){
       facepaint_id:slotData.facepaint_id||'',
       scar_opacity:parseFloat(slotData.scar_opacity)||1.0,
       facepaint_opacity:parseFloat(slotData.facepaint_opacity)||1.0,
+      scar_x:parseFloat(slotData.scar_x)||0,
+      scar_y:parseFloat(slotData.scar_y)||0,
+      scar_scale:parseFloat(slotData.scar_scale)||1.0,
+      fp_x:parseFloat(slotData.fp_x)||0,
+      fp_y:parseFloat(slotData.fp_y)||0,
+      fp_scale:parseFloat(slotData.fp_scale)||1.0,
       slot_id: slotId
     };
   } else {
