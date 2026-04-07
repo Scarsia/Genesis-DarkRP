@@ -641,6 +641,35 @@ html,body {
 
 /* Hair grid */
 #hgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
+
+/* ── Overlays visage (cicatrices / facepaints) ── */
+#scar-grid, #fp-grid {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:6px;
+  max-height:220px; overflow-y:auto;
+}
+.ov-item {
+  padding:6px 4px; text-align:center;
+  background:rgba(255,255,255,0.03); border:1px solid var(--border);
+  border-radius:6px; cursor:pointer;
+  font-size:10px; font-weight:600; letter-spacing:0.08em;
+  color:var(--muted); text-transform:uppercase; line-height:1.3;
+  transition:all var(--dur-fast);
+}
+.ov-item:hover { background:rgba(255,255,255,0.07); color:var(--dim); border-color:rgba(255,255,255,0.15); transform:translateY(-1px); }
+.ov-item.active { background:rgba(198,150,67,0.12); border-color:var(--gold); color:var(--gold); }
+.ov-item.none   { border-style:dashed; }
+.ov-none-ico    { font-size:14px; display:block; margin-bottom:2px; opacity:0.35; }
+.ov-item.active .ov-none-ico { opacity:1; }
+.ov-alpha { display:flex; align-items:center; gap:10px; margin-top:6px; }
+.ov-alpha .sl-wrap { flex:1; }
+.ov-alpha .sg-v { min-width:36px; text-align:right; }
+.fp-search {
+  width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--border);
+  border-radius:5px; color:var(--text); font-family:inherit; font-size:12px;
+  padding:6px 10px; margin-bottom:8px; outline:none;
+  box-sizing:border-box;
+}
+.fp-search:focus { border-color:var(--accent); }
 .hc {
   padding:9px 5px; text-align:center;
   background:rgba(255,255,255,0.03); border:1px solid var(--border);
@@ -1256,6 +1285,7 @@ body.ui-busy #select-close {
       <nav id="nav">
         <button class="nb active" data-tab="identity"    onclick="switchTab('identity')">Identité</button>
         <button class="nb"        data-tab="appearance"  onclick="switchTab('appearance')">Apparence</button>
+        <button class="nb"        data-tab="visage"      onclick="switchTab('visage')">Visage</button>
         <button class="nb"        data-tab="personality" onclick="switchTab('personality')">Personnalité</button>
         <button class="nb"        data-tab="summary"     onclick="switchTab('summary')">Récapitulatif</button>
       </nav>
@@ -1381,6 +1411,38 @@ body.ui-busy #select-close {
         </div>
       </div>
 
+      <!-- VISAGE (cicatrices + facepaints) -->
+      <div id="tab-visage" class="tp">
+        <div class="col-l" style="max-width:400px">
+
+          <!-- CICATRICES -->
+          <div>
+            <div class="sh">Cicatrice</div>
+            <div id="scar-grid"></div>
+            <div class="ov-alpha">
+              <span class="sg-v" style="min-width:56px;color:var(--muted);font-size:11px">Opacité</span>
+              <div class="sl-wrap"><input class="sl" id="f_scar_opacity" type="range" min="0" max="100" value="100"
+                oninput="onScarAlpha(this.value)"></div>
+              <span class="sg-v" id="sv_scar_opacity">100%</span>
+            </div>
+          </div>
+
+          <!-- FACEPAINTS -->
+          <div style="margin-top:20px">
+            <div class="sh">Facepaint / Masque</div>
+            <input class="fp-search" id="fp-search" type="text" placeholder="Rechercher…" oninput="renderFPGrid(this.value)">
+            <div id="fp-grid"></div>
+            <div class="ov-alpha">
+              <span class="sg-v" style="min-width:56px;color:var(--muted);font-size:11px">Opacité</span>
+              <div class="sl-wrap"><input class="sl" id="f_fp_opacity" type="range" min="0" max="100" value="100"
+                oninput="onFPAlpha(this.value)"></div>
+              <span class="sg-v" id="sv_fp_opacity">100%</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
       <!-- PERSONNALITÉ -->
       <div id="tab-personality" class="tp">
         <div class="sh">Traits de personnalité</div>
@@ -1415,7 +1477,8 @@ const S={
   data:{first_name:'',last_name:'',nickname:'',gender:'Homme',birthdate:'',
     age:25,height_cm:175,weight_kg:70,shoe_size:42,
     origin_country:'',birth_place:'',civil_status:'Celibataire',
-    traits:[],hair_id:'',hair_color:{r:20,g:16,b:14},hair_scale:1.0}
+    traits:[],hair_id:'',hair_color:{r:20,g:16,b:14},hair_scale:1.0,
+    scar_id:'',facepaint_id:'',scar_opacity:1.0,facepaint_opacity:1.0}
 };
 
 function B(fn,...a){try{if(window.gcc_js&&window.gcc_js[fn])window.gcc_js[fn](...a.map(x=>String(x)));}catch(_){}}
@@ -1456,6 +1519,7 @@ function getTabMotionNodes(tabName){
   if(!tab) return [];
   if(tabName==='identity') return [...tab.querySelectorAll('.col-l > div, .col-r > div')];
   if(tabName==='appearance') return [...tab.querySelectorAll('.col-l > div')];
+  if(tabName==='visage') return [...tab.querySelectorAll('.col-l > div')];
   return [...tab.children];
 }
 function animateCurrentTab(initial=false){
@@ -1650,6 +1714,13 @@ function populateForm(){
   const hs=document.getElementById('f_hair_scale');
   if(hs){hs.value=Math.round((d.hair_scale||1)*100);document.getElementById('sv_hair_scale').textContent=(d.hair_scale||1).toFixed(2)+'×';fill(hs);}
   renderGenderToggle(); populateSels();
+  // WLC: synchro overlays visage
+  const soEl=document.getElementById('f_scar_opacity');
+  if(soEl){soEl.value=Math.round((d.scar_opacity||1)*100);document.getElementById('sv_scar_opacity').textContent=Math.round((d.scar_opacity||1)*100)+'%';fill(soEl);}
+  const foEl=document.getElementById('f_fp_opacity');
+  if(foEl){foEl.value=Math.round((d.facepaint_opacity||1)*100);document.getElementById('sv_fp_opacity').textContent=Math.round((d.facepaint_opacity||1)*100)+'%';fill(foEl);}
+  renderScarGrid();
+  renderFPGrid(document.getElementById('fp-search')?.value||'');
 }
 
 function onSave(){
@@ -1658,6 +1729,75 @@ function onSave(){
 }
 function onClose(){if(S.forceSelection){notif("Sélection obligatoire avant de jouer");return;}B('close');}
 function onRandomize(){B('randomize');}
+
+/* ─── Overlays visage ─────────────────────────────────── */
+function renderScarGrid(){
+  const g=document.getElementById('scar-grid');
+  if(!g) return;
+  g.innerHTML='';
+  // Item "aucune"
+  const n=document.createElement('div');
+  n.className='ov-item none'+(S.data.scar_id===''?' active':'');
+  n.innerHTML='<span class="ov-none-ico">◯</span>Aucune';
+  n.onclick=()=>selScar('');
+  g.appendChild(n);
+  // Items cicatrices
+  for(let i=1;i<=27;i++){
+    const id='scar_'+i;
+    const c=document.createElement('div');
+    c.className='ov-item'+(S.data.scar_id===id?' active':'');
+    c.innerHTML='<span class="ov-none-ico">✕</span>Cic. '+i;
+    c.onclick=()=>selScar(id);
+    g.appendChild(c);
+  }
+}
+function selScar(id){
+  S.data.scar_id=id;
+  renderScarGrid();
+  B('previewScar', id, String(S.data.scar_opacity));
+}
+function onScarAlpha(v){
+  S.data.scar_opacity=parseInt(v)/100;
+  document.getElementById('sv_scar_opacity').textContent=v+'%';
+  fill(document.getElementById('f_scar_opacity'));
+  B('previewScar', S.data.scar_id, String(S.data.scar_opacity));
+}
+
+function renderFPGrid(filter){
+  const g=document.getElementById('fp-grid');
+  if(!g) return;
+  g.innerHTML='';
+  const f=(filter||'').toLowerCase();
+  // Aucun
+  const n=document.createElement('div');
+  n.className='ov-item none'+(S.data.facepaint_id===''?' active':'');
+  n.innerHTML='<span class="ov-none-ico">◯</span>Aucun';
+  n.onclick=()=>selFP('');
+  g.appendChild(n);
+  // Items facepaints filtrés
+  for(let i=1;i<=162;i++){
+    const num=String(i).padStart(3,'0');
+    const id='fp_'+num;
+    const lbl='Mask '+i;
+    if(f && !lbl.toLowerCase().includes(f) && !num.includes(f)) continue;
+    const c=document.createElement('div');
+    c.className='ov-item'+(S.data.facepaint_id===id?' active':'');
+    c.innerHTML='<span class="ov-none-ico">▦</span>'+lbl;
+    c.onclick=()=>selFP(id);
+    g.appendChild(c);
+  }
+}
+function selFP(id){
+  S.data.facepaint_id=id;
+  renderFPGrid(document.getElementById('fp-search')?.value||'');
+  B('previewFacepaint', id, String(S.data.facepaint_opacity));
+}
+function onFPAlpha(v){
+  S.data.facepaint_opacity=parseInt(v)/100;
+  document.getElementById('sv_fp_opacity').textContent=v+'%';
+  fill(document.getElementById('f_fp_opacity'));
+  B('previewFacepaint', S.data.facepaint_id, String(S.data.facepaint_opacity));
+}
 
 function GCC_Bootstrap(data){
   if(data.hair_choices)         cfg.hairChoices       =data.hair_choices;
@@ -1670,17 +1810,6 @@ function GCC_Bootstrap(data){
   S.slots=data.slots||{}; S.currentSlot=parseInt(data.active_slot)||1;
   S.forceSelection=!!data.force_selection;
   S.hasAnyCharacter=!!data.has_any_character;
-  // WLC FIX: mise à jour du badge DB status
-  if(data.db_state){
-    const ok = data.db_state.ready && data.db_state.setup;
-    const lbl = document.getElementById('gcc-db-label');
-    const dot = document.getElementById('gcc-db-dot');
-    const badge = document.getElementById('gcc-db-badge');
-    if(lbl) lbl.textContent = (data.db_state.label||'SQLite') + (ok?' ✓':' ✗');
-    const col = ok ? '#4ade80' : '#f87171';
-    if(dot){ dot.style.background=col; dot.style.boxShadow='0 0 6px '+col; }
-    if(badge) badge.style.color=col;
-  }
   const d=data.current_data||{};
   S.data={
     first_name:d.first_name||'',last_name:d.last_name||'',nickname:d.nickname||'',
@@ -1693,6 +1822,8 @@ function GCC_Bootstrap(data){
   };
   renderSlots();
   renderSlotCards();
+  renderScarGrid();
+  renderFPGrid('');
   focusSlotView(S.currentSlot);
   const closeBtn=document.getElementById('select-close');
   if(closeBtn) closeBtn.style.display=S.forceSelection?'none':'';
@@ -1784,6 +1915,10 @@ function loadSlotIntoEditor(slotId){
       hair_id:slotData.hair_id||'',
       hair_color:slotData.hair_color||{r:20,g:16,b:14},
       hair_scale:parseFloat(slotData.hair_scale)||1.0,
+      scar_id:slotData.scar_id||'',
+      facepaint_id:slotData.facepaint_id||'',
+      scar_opacity:parseFloat(slotData.scar_opacity)||1.0,
+      facepaint_opacity:parseFloat(slotData.facepaint_opacity)||1.0,
       slot_id: slotId
     };
   } else {
@@ -1866,21 +2001,5 @@ window.addEventListener('load',()=>{
   setTimeout(()=>B('pageReady'),150);
 });
 </script>
-
-<!-- WLC FIX: badge statut base de données -->
-<div id="gcc-db-badge" style="
-  position:fixed; bottom:14px; right:18px; z-index:9999;
-  font-family:'Rajdhani',sans-serif; font-size:11px; font-weight:700;
-  letter-spacing:0.18em; text-transform:uppercase;
-  color:#4ade80; opacity:0.5; pointer-events:none;
-  display:flex; align-items:center; gap:5px;
-">
-  <span id="gcc-db-dot" style="
-    display:inline-block; width:6px; height:6px; border-radius:50%;
-    background:#4ade80; box-shadow:0 0 6px #4ade80; flex-shrink:0;
-  "></span>
-  <span id="gcc-db-label">SQLite</span>
-</div>
-
 </body>
 </html>
