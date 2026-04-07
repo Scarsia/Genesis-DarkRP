@@ -1772,7 +1772,7 @@ function renderSlots(){
     const mt=s.origin_country||(s.first_name?'Profil existant':'Nouveau personnage');
     const b=document.createElement('button');
     b.className='slot-btn'+(S.currentSlot===i?' active':'');
-    b.innerHTML=`<div class="sn">${nm}</div><div class="sm">${mt}</div>`;
+    b.innerHTML='<div class="sn">'+nm+'</div><div class="sm">'+mt+'</div>';
     b.onclick=()=>B('selectSlot',i);
     c.appendChild(b);
   }
@@ -1812,7 +1812,7 @@ function renderCP(){
     const sw=document.createElement('div');
     const active=cur&&Math.abs(cur.r-r)<6&&Math.abs(cur.g-g)<6&&Math.abs(cur.b-b)<6;
     sw.className='cs'+(active?' active':'');
-    sw.style.background=`rgb(${r},${g},${b})`; sw.title=p.name;
+    sw.style.background='rgb('+r+','+g+','+b+')'; sw.title=p.name;
     sw.onclick=()=>selCP(r,g,b,sw); c.appendChild(sw);
   });
 }
@@ -1827,25 +1827,24 @@ function renderTraits(){
 }
 function renderSum(){
   const d=S.data,nm=[d.first_name,d.last_name].filter(Boolean).join(' ')||'—';
-  document.getElementById('idcard').innerHTML=`
-    <div class="id-stripe"></div>
-    <div class="id-name">${nm.toUpperCase()}</div>
-    <div class="id-alias">${d.nickname?'"'+d.nickname+'"':'&nbsp;'}</div>
-    <div class="id-grid">
-      <div class="id-f"><div class="id-l">Genre</div><div class="id-v">${d.gender||'—'}</div></div>
-      <div class="id-f"><div class="id-l">Naissance</div><div class="id-v">${d.birthdate||'—'}</div></div>
-      <div class="id-f"><div class="id-l">Âge</div><div class="id-v">${d.age||'—'} ans</div></div>
-      <div class="id-f"><div class="id-l">Taille · Poids</div><div class="id-v">${d.height_cm||'—'} cm · ${d.weight_kg||'—'} kg</div></div>
-      <div class="id-f"><div class="id-l">Nationalité</div><div class="id-v">${d.origin_country||'—'}</div></div>
-      <div class="id-f"><div class="id-l">Ville natale</div><div class="id-v">${d.birth_place||'—'}</div></div>
-      <div class="id-f"><div class="id-l">État civil</div><div class="id-v">${d.civil_status||'—'}</div></div>
-    </div>
-    ${d.traits&&d.traits.length?`<div style="margin-top:10px"><div class="id-l" style="margin-bottom:5px">Personnalité</div>
-    <div class="id-traits">${d.traits.map(t=>`<span class="id-trait">${t}</span>`).join('')}</div></div>`:''}`;
+  document.getElementById('idcard').innerHTML=
+    '<div class="id-stripe"></div>'+
+    '<div class="id-name">'+nm.toUpperCase()+'</div>'+
+    '<div class="id-alias">'+(d.nickname?'"'+d.nickname+'"':'&nbsp;')+'</div>'+
+    '<div class="id-grid">'+
+      '<div class="id-f"><div class="id-l">Genre</div><div class="id-v">'+(d.gender||'—')+'</div></div>'+
+      '<div class="id-f"><div class="id-l">Naissance</div><div class="id-v">'+(d.birthdate||'—')+'</div></div>'+
+      '<div class="id-f"><div class="id-l">Âge</div><div class="id-v">'+(d.age||'—')+' ans</div></div>'+
+      '<div class="id-f"><div class="id-l">Taille · Poids</div><div class="id-v">'+(d.height_cm||'—')+' cm · '+(d.weight_kg||'—')+' kg</div></div>'+
+      '<div class="id-f"><div class="id-l">Nationalité</div><div class="id-v">'+(d.origin_country||'—')+'</div></div>'+
+      '<div class="id-f"><div class="id-l">Ville natale</div><div class="id-v">'+(d.birth_place||'—')+'</div></div>'+
+      '<div class="id-f"><div class="id-l">État civil</div><div class="id-v">'+(d.civil_status||'—')+'</div></div>'+
+    '</div>'+
+    (d.traits&&d.traits.length?'<div style="margin-top:10px"><div class="id-l" style="margin-bottom:5px">Personnalité</div><div class="id-traits">'+d.traits.map(function(t){return '<span class="id-trait">'+t+'</span>';}).join('')+'</div></div>':'');
 }
 function populateSels(){
   document.getElementById('f_civil_status').innerHTML=
-    cfg.civilStatusChoices.map(c=>`<option value="${c}"${c===S.data.civil_status?' selected':''}>${c}</option>`).join('');
+    cfg.civilStatusChoices.map(function(c){return '<option value="'+c+'"'+(c===S.data.civil_status?' selected':'')+'>'+c+'</option>';}).join('');
 }
 function populateForm(){
   const d=S.data;
@@ -1874,7 +1873,7 @@ function populateForm(){
   const fpCtrl=document.getElementById('fp-controls');
   if(fpCtrl) fpCtrl.style.display=d.facepaint_id?'block':'none';
   renderScarGrid(); syncDot('scar');
-  renderFPGrid(document.getElementById('fp-search')?.value||''); syncDot('fp');
+  renderFPGrid((document.getElementById('fp-search') && document.getElementById('fp-search').value)||''); syncDot('fp');
 }
 
 function onSave(){
@@ -1889,7 +1888,7 @@ function switchAp(ap){
   document.querySelectorAll('.ap-nb').forEach(b=>b.classList.toggle('active',b.dataset.ap===ap));
   document.querySelectorAll('.ap-panel').forEach(p=>p.classList.toggle('active',p.id==='ap-'+ap));
   if(ap==='cicatrices') renderScarGrid();
-  if(ap==='tatouages')  renderFPGrid(document.getElementById('fp-search')?.value||'');
+  if(ap==='tatouages')  renderFPGrid((document.getElementById('fp-search') && document.getElementById('fp-search').value)||'');
   if(ap==='cheveux')    { renderHairGrid(); renderCP(); }
   B('setCameraProfile', ap==='cheveux'?'appearance':'identity');
 }
@@ -2000,7 +1999,7 @@ function renderFPGrid(filter){
 }
 function selFP(id){
   S.data.facepaint_id=id;
-  renderFPGrid(document.getElementById('fp-search')?.value||'');
+  renderFPGrid((document.getElementById('fp-search') && document.getElementById('fp-search').value)||'');
   const ctrl=document.getElementById('fp-controls');
   if(ctrl) ctrl.style.display=id?'block':'none';
   sendFP();
@@ -2239,25 +2238,25 @@ function renderSlotCards(){
     const hasChar = slotHasCharacter(i);
     const safeFirst = s && s.first_name ? s.first_name : '';
     const safeLast = s && s.last_name ? s.last_name : '';
-    const name = hasChar ? `${safeFirst} ${safeLast}`.trim().toUpperCase() : 'Nouveau personnage';
+    const name = hasChar ? (safeFirst + ' ' + safeLast).trim().toUpperCase() : 'Nouveau personnage';
     const meta = hasChar
       ? [s && s.origin_country, s && s.age ? s.age+' ans' : null].filter(Boolean).join(' · ') || 'Profil existant'
       : 'Aucun personnage créé';
 
     const card = document.createElement('div');
     card.className = 'slot-card' + (hasChar ? ' has-char' : '');
-    card.innerHTML = `
-      <div class="sc-left">
-        <div class="sc-num">Profil 0${i}</div>
-        <div class="sc-name">${name}</div>
-        <div class="sc-meta">${meta}</div>
-      </div>
-      <button class="sc-btn ${hasChar ? 'play' : 'create'}"
-        onclick="event.stopPropagation(); ${hasChar ? `playSlot(${i})` : `createSlot(${i})`}">
-        ${hasChar ? 'Jouer' : 'Créer'}
-      </button>`;
-    card.onclick = () => hasChar ? playSlot(i) : createSlot(i);
-    card.onmouseenter = () => focusSlotView(i);
+    card.innerHTML =
+      '<div class="sc-left">'+
+        '<div class="sc-num">Profil 0'+i+'</div>'+
+        '<div class="sc-name">'+name+'</div>'+
+        '<div class="sc-meta">'+meta+'</div>'+
+      '</div>'+
+      '<button class="sc-btn '+(hasChar ? 'play' : 'create')+'"'+
+        ' onclick="event.stopPropagation(); '+(hasChar ? 'playSlot('+i+')' : 'createSlot('+i+')')+'">'+
+        (hasChar ? 'Jouer' : 'Créer')+
+      '</button>';
+    card.onclick = function(){ hasChar ? playSlot(i) : createSlot(i); };
+    card.onmouseenter = function(){ focusSlotView(i); };
     c.appendChild(card);
   }
 }
