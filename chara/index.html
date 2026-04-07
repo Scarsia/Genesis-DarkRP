@@ -1598,681 +1598,803 @@ body.ui-busy #select-close {
 <div id="notifs"></div>
 <div id="busy-indicator">Traitement...</div>
 
-<script>
-const cfg={
-  maxTraits:4, maxSlots:3,
-  genderChoices:['Homme','Femme','Non-binaire','Autre'],
-  civilStatusChoices:['Celibataire','En couple','Marie(e)','Divorce(e)','Veuf / Veuve'],
-  personalityTraits:[], hairChoices:[], hairColorPresets:[]
+<script>function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+var cfg = {
+  maxTraits: 4,
+  maxSlots: 3,
+  genderChoices: ['Homme', 'Femme', 'Non-binaire', 'Autre'],
+  civilStatusChoices: ['Celibataire', 'En couple', 'Marie(e)', 'Divorce(e)', 'Veuf / Veuve'],
+  personalityTraits: [],
+  hairChoices: [],
+  hairColorPresets: []
 };
-const S={
-  currentSlot:1, slots:{},
-  data:{first_name:'',last_name:'',nickname:'',gender:'Homme',birthdate:'',
-    age:25,height_cm:175,weight_kg:70,shoe_size:42,
-    origin_country:'',birth_place:'',civil_status:'Celibataire',
-    traits:[],hair_id:'',hair_color:{r:20,g:16,b:14},hair_scale:1.0,
-    scar_id:'',facepaint_id:'',scar_opacity:1.0,facepaint_opacity:1.0,
-    scar_x:0,scar_y:0,scar_scale:1.0, fp_x:0,fp_y:0,fp_scale:1.0}
+var S = {
+  currentSlot: 1,
+  slots: {},
+  data: {
+    first_name: '',
+    last_name: '',
+    nickname: '',
+    gender: 'Homme',
+    birthdate: '',
+    age: 25,
+    height_cm: 175,
+    weight_kg: 70,
+    shoe_size: 42,
+    origin_country: '',
+    birth_place: '',
+    civil_status: 'Celibataire',
+    traits: [],
+    hair_id: '',
+    hair_color: {
+      r: 20,
+      g: 16,
+      b: 14
+    },
+    hair_scale: 1.0,
+    scar_id: '',
+    facepaint_id: '',
+    scar_opacity: 1.0,
+    facepaint_opacity: 1.0,
+    scar_x: 0,
+    scar_y: 0,
+    scar_scale: 1.0,
+    fp_x: 0,
+    fp_y: 0,
+    fp_scale: 1.0
+  }
 };
-
-function B(fn,...a){try{if(window.gcc_js&&window.gcc_js[fn])window.gcc_js[fn](...a.map(x=>String(x)));}catch(_){}}
-
-let uiMotionBooted=false;
-let staticMotionPlayed=false;
-
-function animateNodeList(nodes,startDelay=0,step=80,side=false){
-  (nodes||[]).filter(Boolean).forEach((el)=>{
-    el.classList.add('motion-item','is-visible');
+function B(fn, ...a) {
+  try {
+    if (window.gcc_js && window.gcc_js[fn]) window.gcc_js[fn](...a.map(x => String(x)));
+  } catch (_) {}
+}
+var uiMotionBooted = false;
+var staticMotionPlayed = false;
+function animateNodeList(nodes, startDelay = 0, step = 80, side = false) {
+  (nodes || []).filter(Boolean).forEach(el => {
+    el.classList.add('motion-item', 'is-visible');
     el.classList.toggle('fx-side', !!side);
     el.style.removeProperty('opacity');
     el.style.removeProperty('transform');
     el.style.removeProperty('filter');
   });
 }
-function playStaticMotion(){
-  const nodes=[
-    document.querySelector('#header .brand-mark'),
-    document.querySelector('#header .logo-eyebrow'),
-    document.querySelector('#header .logo-title'),
-    document.querySelector('#header .logo-sub'),
-    document.querySelector('#sidebar .sec-lbl'),
-    document.querySelector('#sidebar .slots-track-wrap'),
-    document.querySelector('#sidebar .nav-lbl'),
-    ...document.querySelectorAll('#nav > *'),
-    ...document.querySelectorAll('#actions > *')
-  ].filter(Boolean);
-  animateNodeList(nodes,70,65,true);
-  staticMotionPlayed=true;
+function playStaticMotion() {
+  var nodes = [document.querySelector('#header .brand-mark'), document.querySelector('#header .logo-eyebrow'), document.querySelector('#header .logo-title'), document.querySelector('#header .logo-sub'), document.querySelector('#sidebar .sec-lbl'), document.querySelector('#sidebar .slots-track-wrap'), document.querySelector('#sidebar .nav-lbl'), ...document.querySelectorAll('#nav > *'), ...document.querySelectorAll('#actions > *')].filter(Boolean);
+  animateNodeList(nodes, 70, 65, true);
+  staticMotionPlayed = true;
 }
-function getCurrentTabName(){
-  const active=document.querySelector('.tp.active');
-  return active ? active.id.replace('tab-','') : 'identity';
+function getCurrentTabName() {
+  var active = document.querySelector('.tp.active');
+  return active ? active.id.replace('tab-', '') : 'identity';
 }
-function getTabMotionNodes(tabName){
-  const tab=document.getElementById('tab-'+tabName);
-  if(!tab) return [];
-  if(tabName==='identity') return [...tab.querySelectorAll('.col-l > div, .col-r > div')];
-  if(tabName==='appearance') return [...tab.querySelectorAll('.col-l > div')];
-  if(tabName==='visage') return [...tab.querySelectorAll('.col-l > div')];
+function getTabMotionNodes(tabName) {
+  var tab = document.getElementById('tab-' + tabName);
+  if (!tab) return [];
+  if (tabName === 'identity') return [...tab.querySelectorAll('.col-l > div, .col-r > div')];
+  if (tabName === 'appearance') return [...tab.querySelectorAll('.col-l > div')];
+  if (tabName === 'visage') return [...tab.querySelectorAll('.col-l > div')];
   return [...tab.children];
 }
-function animateCurrentTab(initial=false){
-  const nodes=getTabMotionNodes(getCurrentTabName());
+function animateCurrentTab(initial = false) {
+  var nodes = getTabMotionNodes(getCurrentTabName());
   animateNodeList(nodes, initial ? 240 : 35, initial ? 95 : 78, false);
 }
-function ensureTabVisible(tabName){
-  getTabMotionNodes(tabName).forEach(el=>{
-    el.classList.add('motion-item','is-visible');
+function ensureTabVisible(tabName) {
+  getTabMotionNodes(tabName).forEach(el => {
+    el.classList.add('motion-item', 'is-visible');
     el.style.removeProperty('opacity');
     el.style.removeProperty('transform');
     el.style.removeProperty('filter');
   });
 }
-function bootMotion(){
-  if(uiMotionBooted) return;
-  uiMotionBooted=true;
-  const app=document.getElementById('app');
+function bootMotion() {
+  if (uiMotionBooted) return;
+  uiMotionBooted = true;
+  var app = document.getElementById('app');
   app.classList.add('ready');
   playStaticMotion();
 }
 
 /* ── SLIDER FILL ─────────────────────────────────────────── */
-function fill(el){
-  const p=((parseFloat(el.value)-parseFloat(el.min))/(parseFloat(el.max)-parseFloat(el.min))*100).toFixed(1)+'%';
-  el.style.setProperty('--pct',p);
+function fill(el) {
+  var p = ((parseFloat(el.value) - parseFloat(el.min)) / (parseFloat(el.max) - parseFloat(el.min)) * 100).toFixed(1) + '%';
+  el.style.setProperty('--pct', p);
   // Sync shimmer wrapper
-  const wrap=el.parentNode;
-  if(wrap&&wrap.classList.contains('sl-wrap')) wrap.style.setProperty('--pct',p);
+  var wrap = el.parentNode;
+  if (wrap && wrap.classList.contains('sl-wrap')) wrap.style.setProperty('--pct', p);
 }
 
 /* ── SLOT CURSOR ─────────────────────────────────────────── */
-function updateSlotCursor(){
-  const list=document.getElementById('slot-list');
-  const track=document.getElementById('slot-track');
-  const cursor=document.getElementById('slot-cursor');
-  if(!list||!track||!cursor) return;
-  const active=list.querySelector('.slot-btn.active');
-  if(!active) return;
-  const listRect=list.getBoundingClientRect();
-  const btnRect=active.getBoundingClientRect();
-  track.style.height=list.offsetHeight+'px';
-  cursor.style.top=(btnRect.top-listRect.top)+'px';
-  cursor.style.height=btnRect.height+'px';
+function updateSlotCursor() {
+  var list = document.getElementById('slot-list');
+  var track = document.getElementById('slot-track');
+  var cursor = document.getElementById('slot-cursor');
+  if (!list || !track || !cursor) return;
+  var active = list.querySelector('.slot-btn.active');
+  if (!active) return;
+  var listRect = list.getBoundingClientRect();
+  var btnRect = active.getBoundingClientRect();
+  track.style.height = list.offsetHeight + 'px';
+  cursor.style.top = btnRect.top - listRect.top + 'px';
+  cursor.style.height = btnRect.height + 'px';
 }
 
 /* ── GENDER ──────────────────────────────────────────────── */
-function renderGenderToggle(){
-  const c=document.getElementById('gender-toggle'); c.innerHTML='';
-  cfg.genderChoices.slice(0,2).forEach(g=>{
-    const b=document.createElement('button');
-    b.className='toggle-opt'+(S.data.gender===g?' active':'');
-    b.innerHTML=(g==='Homme'?'♂ ':'♀ ')+g;
-    b.onclick=()=>{S.data.gender=g;sf('gender',g);renderGenderToggle();};
+function renderGenderToggle() {
+  var c = document.getElementById('gender-toggle');
+  c.innerHTML = '';
+  cfg.genderChoices.slice(0, 2).forEach(g => {
+    var b = document.createElement('button');
+    b.className = 'toggle-opt' + (S.data.gender === g ? ' active' : '');
+    b.innerHTML = (g === 'Homme' ? '♂ ' : '♀ ') + g;
+    b.onclick = () => {
+      S.data.gender = g;
+      sf('gender', g);
+      renderGenderToggle();
+    };
     c.appendChild(b);
   });
 }
-
-function sf(k,v){S.data[k]=v;}
-function ss(k,raw){
-  S.data[k]=parseInt(raw);
-  const d=document.getElementById('sv_'+k); if(d) d.textContent=parseInt(raw);
-  fill(document.getElementById('f_'+k));
+function sf(k, v) {
+  S.data[k] = v;
 }
-function onHS(raw){
-  const sc=parseFloat((parseInt(raw)/100).toFixed(2));
-  S.data.hair_scale=sc;
-  document.getElementById('sv_hair_scale').textContent=sc.toFixed(2)+'×';
+function ss(k, raw) {
+  S.data[k] = parseInt(raw);
+  var d = document.getElementById('sv_' + k);
+  if (d) d.textContent = parseInt(raw);
+  fill(document.getElementById('f_' + k));
+}
+function onHS(raw) {
+  var sc = parseFloat((parseInt(raw) / 100).toFixed(2));
+  S.data.hair_scale = sc;
+  document.getElementById('sv_hair_scale').textContent = sc.toFixed(2) + '×';
   fill(document.getElementById('f_hair_scale'));
-  B('previewHairScale',sc.toFixed(2));
+  B('previewHairScale', sc.toFixed(2));
 }
-
-function selHair(id){
-  S.data.hair_id=id;
-  document.querySelectorAll('.hc').forEach(c=>c.classList.toggle('active',c.dataset.id===id));
-  B('previewHair',id); B('setCameraProfile','appearance');
+function selHair(id) {
+  S.data.hair_id = id;
+  document.querySelectorAll('.hc').forEach(c => c.classList.toggle('active', c.dataset.id === id));
+  B('previewHair', id);
+  B('setCameraProfile', 'appearance');
 }
-function selCP(r,g,b,el){
-  S.data.hair_color={r,g,b};
-  document.querySelectorAll('.cs').forEach(s=>s.classList.remove('active'));
+function selCP(r, g, b, el) {
+  S.data.hair_color = {
+    r,
+    g,
+    b
+  };
+  document.querySelectorAll('.cs').forEach(s => s.classList.remove('active'));
   el.classList.add('active');
-  B('previewHairColor',r,g,b);
+  B('previewHairColor', r, g, b);
 }
-function togTrait(t){
-  const i=S.data.traits.indexOf(t);
-  if(i>=0) S.data.traits.splice(i,1);
-  else{if(S.data.traits.length>=cfg.maxTraits){notif('Maximum '+cfg.maxTraits+' traits');return;}S.data.traits.push(t);}
+function togTrait(t) {
+  var i = S.data.traits.indexOf(t);
+  if (i >= 0) S.data.traits.splice(i, 1);else {
+    if (S.data.traits.length >= cfg.maxTraits) {
+      notif('Maximum ' + cfg.maxTraits + ' traits');
+      return;
+    }
+    S.data.traits.push(t);
+  }
   renderTraits();
 }
-function switchTab(tab){
-  const next=document.getElementById('tab-'+tab);
-  if(!next) return;
-  document.querySelectorAll('.nb').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
-  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+function switchTab(tab) {
+  var next = document.getElementById('tab-' + tab);
+  if (!next) return;
+  document.querySelectorAll('.nb').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tp').forEach(p => p.classList.remove('active'));
   next.classList.add('active');
-  document.getElementById('form-area').scrollTop=0;
-  B('setCameraProfile',tab);
-  if(tab==='summary') renderSum();
+  document.getElementById('form-area').scrollTop = 0;
+  B('setCameraProfile', tab);
+  if (tab === 'summary') renderSum();
 }
-
-
-function triggerButtonFx(el){
-  if(!el) return;
-  const cls='is-pressed';
+function triggerButtonFx(el) {
+  if (!el) return;
+  var cls = 'is-pressed';
   el.classList.remove(cls);
   void el.offsetWidth;
   el.classList.add(cls);
-  setTimeout(()=>el.classList.remove(cls),360);
+  setTimeout(() => el.classList.remove(cls), 360);
 }
-
-function renderSlots(){
-  const c=document.getElementById('slot-list'); c.innerHTML='';
-  for(let i=1;i<=cfg.maxSlots;i++){
-    const s=S.slots[String(i)]||S.slots[i]||{};
-    const nm=(s.first_name&&s.first_name!=='')?(s.first_name+' '+(s.last_name||'')).toUpperCase():'Identité '+i;
-    const mt=s.origin_country||(s.first_name?'Profil existant':'Nouveau personnage');
-    const b=document.createElement('button');
-    b.className='slot-btn'+(S.currentSlot===i?' active':'');
-    b.innerHTML='<div class="sn">'+nm+'</div><div class="sm">'+mt+'</div>';
-    b.onclick=()=>B('selectSlot',i);
+function renderSlots() {
+  var c = document.getElementById('slot-list');
+  c.innerHTML = '';
+  var _loop = function _loop(i) {
+    var s = S.slots[String(i)] || S.slots[i] || {};
+    var nm = s.first_name && s.first_name !== '' ? (s.first_name + ' ' + (s.last_name || '')).toUpperCase() : 'Identité ' + i;
+    var mt = s.origin_country || (s.first_name ? 'Profil existant' : 'Nouveau personnage');
+    var b = document.createElement('button');
+    b.className = 'slot-btn' + (S.currentSlot === i ? ' active' : '');
+    b.innerHTML = '<div class="sn">' + nm + '</div><div class="sm">' + mt + '</div>';
+    b.onclick = () => B('selectSlot', i);
     c.appendChild(b);
+  };
+  for (var i = 1; i <= cfg.maxSlots; i++) {
+    _loop(i);
   }
-  if(uiMotionBooted) animateNodeList([...c.children], 180, 55, true);
+  if (uiMotionBooted) animateNodeList([...c.children], 180, 55, true);
   requestAnimationFrame(updateSlotCursor);
 }
-function renderHairGrid(){
-  const g=document.getElementById('hgrid'); g.innerHTML='';
-  const n=document.createElement('div');
-  n.className='hc'+(S.data.hair_id===''?' active':''); n.dataset.id='';
-  n.innerHTML='<span class="hc-i">◯</span><span style="position:relative;z-index:1">Aucun</span>';
-  n.onclick=()=>selHair(''); g.appendChild(n);
-  cfg.hairChoices.forEach(h=>{
-    const c=document.createElement('div');
-    c.className='hc'+(S.data.hair_id===h.id?' active':'');
-    c.dataset.id=h.id;
-    const thumb=thumbCache['hair_'+h.id];
-    if(thumb){
-      c.style.backgroundImage='url('+thumb+')';
-      c.style.backgroundSize='cover';
-      c.style.backgroundPosition='center top';
+function renderHairGrid() {
+  var g = document.getElementById('hgrid');
+  g.innerHTML = '';
+  var n = document.createElement('div');
+  n.className = 'hc' + (S.data.hair_id === '' ? ' active' : '');
+  n.dataset.id = '';
+  n.innerHTML = '<span class="hc-i">◯</span><span style="position:relative;z-index:1">Aucun</span>';
+  n.onclick = () => selHair('');
+  g.appendChild(n);
+  cfg.hairChoices.forEach(h => {
+    var c = document.createElement('div');
+    c.className = 'hc' + (S.data.hair_id === h.id ? ' active' : '');
+    c.dataset.id = h.id;
+    var thumb = thumbCache['hair_' + h.id];
+    if (thumb) {
+      c.style.backgroundImage = 'url(' + thumb + ')';
+      c.style.backgroundSize = 'cover';
+      c.style.backgroundPosition = 'center top';
     }
-    c.innerHTML='<span class="hc-i" style="position:relative;z-index:1">'+(thumb?'':'✦')+'</span>'
-               +'<span style="position:relative;z-index:1;text-shadow:0 1px 4px rgba(0,0,0,0.8)">'+h.name+'</span>';
-    c.onclick=()=>selHair(h.id);
+    c.innerHTML = '<span class="hc-i" style="position:relative;z-index:1">' + (thumb ? '' : '✦') + '</span>' + '<span style="position:relative;z-index:1;text-shadow:0 1px 4px rgba(0,0,0,0.8)">' + h.name + '</span>';
+    c.onclick = () => selHair(h.id);
     g.appendChild(c);
-    if(!thumb) requestThumb('hair',h.id);
+    if (!thumb) requestThumb('hair', h.id);
   });
 }
-function renderCP(){
-  const c=document.getElementById('cpreset'); c.innerHTML='';
-  const cur=S.data.hair_color;
-  cfg.hairColorPresets.forEach(p=>{
-    const r=p.color.r!==undefined?p.color.r:(p.color[1]||0);
-    const g=p.color.g!==undefined?p.color.g:(p.color[2]||0);
-    const b=p.color.b!==undefined?p.color.b:(p.color[3]||0);
-    const sw=document.createElement('div');
-    const active=cur&&Math.abs(cur.r-r)<6&&Math.abs(cur.g-g)<6&&Math.abs(cur.b-b)<6;
-    sw.className='cs'+(active?' active':'');
-    sw.style.background='rgb('+r+','+g+','+b+')'; sw.title=p.name;
-    sw.onclick=()=>selCP(r,g,b,sw); c.appendChild(sw);
+function renderCP() {
+  var c = document.getElementById('cpreset');
+  c.innerHTML = '';
+  var cur = S.data.hair_color;
+  cfg.hairColorPresets.forEach(p => {
+    var r = p.color.r !== undefined ? p.color.r : p.color[1] || 0;
+    var g = p.color.g !== undefined ? p.color.g : p.color[2] || 0;
+    var b = p.color.b !== undefined ? p.color.b : p.color[3] || 0;
+    var sw = document.createElement('div');
+    var active = cur && Math.abs(cur.r - r) < 6 && Math.abs(cur.g - g) < 6 && Math.abs(cur.b - b) < 6;
+    sw.className = 'cs' + (active ? ' active' : '');
+    sw.style.background = 'rgb(' + r + ',' + g + ',' + b + ')';
+    sw.title = p.name;
+    sw.onclick = () => selCP(r, g, b, sw);
+    c.appendChild(sw);
   });
 }
-function renderTraits(){
-  const g=document.getElementById('tgrid'); g.innerHTML='';
-  document.getElementById('trm').textContent=S.data.traits.length+'/'+cfg.maxTraits+' traits sélectionnés';
-  cfg.personalityTraits.forEach(t=>{
-    const c=document.createElement('button');
-    c.className='tc'+(S.data.traits.includes(t)?' active':'');
-    c.textContent=t; c.onclick=()=>togTrait(t); g.appendChild(c);
+function renderTraits() {
+  var g = document.getElementById('tgrid');
+  g.innerHTML = '';
+  document.getElementById('trm').textContent = S.data.traits.length + '/' + cfg.maxTraits + ' traits sélectionnés';
+  cfg.personalityTraits.forEach(t => {
+    var c = document.createElement('button');
+    c.className = 'tc' + (S.data.traits.includes(t) ? ' active' : '');
+    c.textContent = t;
+    c.onclick = () => togTrait(t);
+    g.appendChild(c);
   });
 }
-function renderSum(){
-  const d=S.data,nm=[d.first_name,d.last_name].filter(Boolean).join(' ')||'—';
-  document.getElementById('idcard').innerHTML=
-    '<div class="id-stripe"></div>'+
-    '<div class="id-name">'+nm.toUpperCase()+'</div>'+
-    '<div class="id-alias">'+(d.nickname?'"'+d.nickname+'"':'&nbsp;')+'</div>'+
-    '<div class="id-grid">'+
-      '<div class="id-f"><div class="id-l">Genre</div><div class="id-v">'+(d.gender||'—')+'</div></div>'+
-      '<div class="id-f"><div class="id-l">Naissance</div><div class="id-v">'+(d.birthdate||'—')+'</div></div>'+
-      '<div class="id-f"><div class="id-l">Âge</div><div class="id-v">'+(d.age||'—')+' ans</div></div>'+
-      '<div class="id-f"><div class="id-l">Taille · Poids</div><div class="id-v">'+(d.height_cm||'—')+' cm · '+(d.weight_kg||'—')+' kg</div></div>'+
-      '<div class="id-f"><div class="id-l">Nationalité</div><div class="id-v">'+(d.origin_country||'—')+'</div></div>'+
-      '<div class="id-f"><div class="id-l">Ville natale</div><div class="id-v">'+(d.birth_place||'—')+'</div></div>'+
-      '<div class="id-f"><div class="id-l">État civil</div><div class="id-v">'+(d.civil_status||'—')+'</div></div>'+
-    '</div>'+
-    (d.traits&&d.traits.length?'<div style="margin-top:10px"><div class="id-l" style="margin-bottom:5px">Personnalité</div><div class="id-traits">'+d.traits.map(function(t){return '<span class="id-trait">'+t+'</span>';}).join('')+'</div></div>':'');
+function renderSum() {
+  var d = S.data,
+    nm = [d.first_name, d.last_name].filter(Boolean).join(' ') || '—';
+  document.getElementById('idcard').innerHTML = '<div class="id-stripe"></div>' + '<div class="id-name">' + nm.toUpperCase() + '</div>' + '<div class="id-alias">' + (d.nickname ? '"' + d.nickname + '"' : '&nbsp;') + '</div>' + '<div class="id-grid">' + '<div class="id-f"><div class="id-l">Genre</div><div class="id-v">' + (d.gender || '—') + '</div></div>' + '<div class="id-f"><div class="id-l">Naissance</div><div class="id-v">' + (d.birthdate || '—') + '</div></div>' + '<div class="id-f"><div class="id-l">Âge</div><div class="id-v">' + (d.age || '—') + ' ans</div></div>' + '<div class="id-f"><div class="id-l">Taille · Poids</div><div class="id-v">' + (d.height_cm || '—') + ' cm · ' + (d.weight_kg || '—') + ' kg</div></div>' + '<div class="id-f"><div class="id-l">Nationalité</div><div class="id-v">' + (d.origin_country || '—') + '</div></div>' + '<div class="id-f"><div class="id-l">Ville natale</div><div class="id-v">' + (d.birth_place || '—') + '</div></div>' + '<div class="id-f"><div class="id-l">État civil</div><div class="id-v">' + (d.civil_status || '—') + '</div></div>' + '</div>' + (d.traits && d.traits.length ? '<div style="margin-top:10px"><div class="id-l" style="margin-bottom:5px">Personnalité</div><div class="id-traits">' + d.traits.map(function (t) {
+    return '<span class="id-trait">' + t + '</span>';
+  }).join('') + '</div></div>' : '');
 }
-function populateSels(){
-  document.getElementById('f_civil_status').innerHTML=
-    cfg.civilStatusChoices.map(function(c){return '<option value="'+c+'"'+(c===S.data.civil_status?' selected':'')+'>'+c+'</option>';}).join('');
+function populateSels() {
+  document.getElementById('f_civil_status').innerHTML = cfg.civilStatusChoices.map(function (c) {
+    return '<option value="' + c + '"' + (c === S.data.civil_status ? ' selected' : '') + '>' + c + '</option>';
+  }).join('');
 }
-function populateForm(){
-  const d=S.data;
-  ['first_name','last_name','nickname','birthdate','origin_country','birth_place']
-    .forEach(k=>{const e=document.getElementById('f_'+k);if(e)e.value=d[k]||'';});
-  ['age','height_cm','weight_kg','shoe_size'].forEach(k=>{
-    const e=document.getElementById('f_'+k);if(!e)return;
-    e.value=d[k]||0;
-    const dv=document.getElementById('sv_'+k);if(dv)dv.textContent=d[k]||0;
+function populateForm() {
+  var d = S.data;
+  ['first_name', 'last_name', 'nickname', 'birthdate', 'origin_country', 'birth_place'].forEach(k => {
+    var e = document.getElementById('f_' + k);
+    if (e) e.value = d[k] || '';
+  });
+  ['age', 'height_cm', 'weight_kg', 'shoe_size'].forEach(k => {
+    var e = document.getElementById('f_' + k);
+    if (!e) return;
+    e.value = d[k] || 0;
+    var dv = document.getElementById('sv_' + k);
+    if (dv) dv.textContent = d[k] || 0;
     fill(e);
   });
-  const hs=document.getElementById('f_hair_scale');
-  if(hs){hs.value=Math.round((d.hair_scale||1)*100);document.getElementById('sv_hair_scale').textContent=(d.hair_scale||1).toFixed(2)+'×';fill(hs);}
-  renderGenderToggle(); populateSels();
+  var hs = document.getElementById('f_hair_scale');
+  if (hs) {
+    hs.value = Math.round((d.hair_scale || 1) * 100);
+    document.getElementById('sv_hair_scale').textContent = (d.hair_scale || 1).toFixed(2) + '×';
+    fill(hs);
+  }
+  renderGenderToggle();
+  populateSels();
   // WLC: synchro overlays visage
-  const soEl=document.getElementById('f_scar_opacity');
-  if(soEl){soEl.value=Math.round((d.scar_opacity||1)*100);document.getElementById('sv_scar_opacity').textContent=Math.round((d.scar_opacity||1)*100)+'%';fill(soEl);}
-  const ssEl=document.getElementById('f_scar_scale');
-  if(ssEl){ssEl.value=Math.round((d.scar_scale||1)*100);document.getElementById('sv_scar_scale').textContent=(d.scar_scale||1).toFixed(1)+'×';fill(ssEl);}
-  const foEl=document.getElementById('f_fp_opacity');
-  if(foEl){foEl.value=Math.round((d.facepaint_opacity||1)*100);document.getElementById('sv_fp_opacity').textContent=Math.round((d.facepaint_opacity||1)*100)+'%';fill(foEl);}
-  const fsEl=document.getElementById('f_fp_scale');
-  if(fsEl){fsEl.value=Math.round((d.fp_scale||1)*100);document.getElementById('sv_fp_scale').textContent=(d.fp_scale||1).toFixed(1)+'×';fill(fsEl);}
-  const scarCtrl=document.getElementById('scar-controls');
-  if(scarCtrl) scarCtrl.style.display=d.scar_id?'block':'none';
-  const fpCtrl=document.getElementById('fp-controls');
-  if(fpCtrl) fpCtrl.style.display=d.facepaint_id?'block':'none';
-  renderScarGrid(); syncDot('scar');
-  renderFPGrid((document.getElementById('fp-search') && document.getElementById('fp-search').value)||''); syncDot('fp');
+  var soEl = document.getElementById('f_scar_opacity');
+  if (soEl) {
+    soEl.value = Math.round((d.scar_opacity || 1) * 100);
+    document.getElementById('sv_scar_opacity').textContent = Math.round((d.scar_opacity || 1) * 100) + '%';
+    fill(soEl);
+  }
+  var ssEl = document.getElementById('f_scar_scale');
+  if (ssEl) {
+    ssEl.value = Math.round((d.scar_scale || 1) * 100);
+    document.getElementById('sv_scar_scale').textContent = (d.scar_scale || 1).toFixed(1) + '×';
+    fill(ssEl);
+  }
+  var foEl = document.getElementById('f_fp_opacity');
+  if (foEl) {
+    foEl.value = Math.round((d.facepaint_opacity || 1) * 100);
+    document.getElementById('sv_fp_opacity').textContent = Math.round((d.facepaint_opacity || 1) * 100) + '%';
+    fill(foEl);
+  }
+  var fsEl = document.getElementById('f_fp_scale');
+  if (fsEl) {
+    fsEl.value = Math.round((d.fp_scale || 1) * 100);
+    document.getElementById('sv_fp_scale').textContent = (d.fp_scale || 1).toFixed(1) + '×';
+    fill(fsEl);
+  }
+  var scarCtrl = document.getElementById('scar-controls');
+  if (scarCtrl) scarCtrl.style.display = d.scar_id ? 'block' : 'none';
+  var fpCtrl = document.getElementById('fp-controls');
+  if (fpCtrl) fpCtrl.style.display = d.facepaint_id ? 'block' : 'none';
+  renderScarGrid();
+  syncDot('scar');
+  renderFPGrid(document.getElementById('fp-search') && document.getElementById('fp-search').value || '');
+  syncDot('fp');
 }
-
-function onSave(){
-  if(!S.data.first_name||!S.data.last_name){notif('Prénom et nom requis');switchTab('identity');return;}
-  B('saveCharacter',JSON.stringify({...S.data,slot_id:S.currentSlot}));
+function onSave() {
+  if (!S.data.first_name || !S.data.last_name) {
+    notif('Prénom et nom requis');
+    switchTab('identity');
+    return;
+  }
+  B('saveCharacter', JSON.stringify(_objectSpread(_objectSpread({}, S.data), {}, {
+    slot_id: S.currentSlot
+  })));
 }
-function onClose(){if(S.forceSelection){notif("Sélection obligatoire avant de jouer");return;}B('close');}
-function onRandomize(){B('randomize');}
+function onClose() {
+  if (S.forceSelection) {
+    notif("Sélection obligatoire avant de jouer");
+    return;
+  }
+  B('close');
+}
+function onRandomize() {
+  B('randomize');
+}
 
 /* ─── Sous-navigation Apparence ─────────────────────── */
-function switchAp(ap){
-  document.querySelectorAll('.ap-nb').forEach(b=>b.classList.toggle('active',b.dataset.ap===ap));
-  document.querySelectorAll('.ap-panel').forEach(p=>p.classList.toggle('active',p.id==='ap-'+ap));
-  if(ap==='cicatrices') renderScarGrid();
-  if(ap==='tatouages')  renderFPGrid((document.getElementById('fp-search') && document.getElementById('fp-search').value)||'');
-  if(ap==='cheveux')    { renderHairGrid(); renderCP(); }
-  B('setCameraProfile', ap==='cheveux'?'appearance':'identity');
+function switchAp(ap) {
+  document.querySelectorAll('.ap-nb').forEach(b => b.classList.toggle('active', b.dataset.ap === ap));
+  document.querySelectorAll('.ap-panel').forEach(p => p.classList.toggle('active', p.id === 'ap-' + ap));
+  if (ap === 'cicatrices') renderScarGrid();
+  if (ap === 'tatouages') renderFPGrid(document.getElementById('fp-search') && document.getElementById('fp-search').value || '');
+  if (ap === 'cheveux') {
+    renderHairGrid();
+    renderCP();
+  }
+  B('setCameraProfile', ap === 'cheveux' ? 'appearance' : 'identity');
 }
 
 /* ─── Thumbnail cache & injection ───────────────────── */
-const thumbCache={};
-function GCC_SetThumb(type,id,dataUrl){
-  thumbCache[type+'_'+id]=dataUrl;
+var thumbCache = {};
+function GCC_SetThumb(type, id, dataUrl) {
+  thumbCache[type + '_' + id] = dataUrl;
   // Mettre à jour toutes les cells ayant ce data-id et data-type
-  document.querySelectorAll('[data-type="'+type+'"][data-oid="'+id+'"]').forEach(el=>{
-    let th=el.querySelector('.ov-thumb');
-    if(th) th.style.backgroundImage='url('+dataUrl+')';
+  document.querySelectorAll('[data-type="' + type + '"][data-oid="' + id + '"]').forEach(el => {
+    var th = el.querySelector('.ov-thumb');
+    if (th) th.style.backgroundImage = 'url(' + dataUrl + ')';
   });
   // Hair grid : mettre à jour les cells
-  if(type==='hair'){
-    document.querySelectorAll('.hc[data-id="'+id+'"]').forEach(el=>{
-      el.style.backgroundImage='url('+dataUrl+')';
-      el.style.backgroundSize='cover';
-      el.style.backgroundPosition='center top';
+  if (type === 'hair') {
+    document.querySelectorAll('.hc[data-id="' + id + '"]').forEach(el => {
+      el.style.backgroundImage = 'url(' + dataUrl + ')';
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundPosition = 'center top';
     });
   }
 }
-function requestThumb(type,id){
-  if(thumbCache[type+'_'+id]) return;
-  B('requestThumb',type,id);
+function requestThumb(type, id) {
+  if (thumbCache[type + '_' + id]) return;
+  B('requestThumb', type, id);
 }
 
 /* ─── Grille CICATRICES ──────────────────────────────── */
-function renderScarGrid(){
-  const g=document.getElementById('scar-grid');
-  if(!g) return;
-  g.innerHTML='';
+function renderScarGrid() {
+  var g = document.getElementById('scar-grid');
+  if (!g) return;
+  g.innerHTML = '';
   // Aucune
-  const n=document.createElement('div');
-  n.className='ov-item none'+(S.data.scar_id===''?' active':'');
-  n.innerHTML='<span class="ov-none-ico">◯</span><span class="ov-lbl-inner">Aucune</span>';
-  n.onclick=()=>selScar('');
+  var n = document.createElement('div');
+  n.className = 'ov-item none' + (S.data.scar_id === '' ? ' active' : '');
+  n.innerHTML = '<span class="ov-none-ico">◯</span><span class="ov-lbl-inner">Aucune</span>';
+  n.onclick = () => selScar('');
   g.appendChild(n);
   // 27 cicatrices
-  for(let i=1;i<=27;i++){
-    const id='scar_'+i;
-    const c=document.createElement('div');
-    c.dataset.type='scar'; c.dataset.oid=id;
-    c.className='ov-item'+(S.data.scar_id===id?' active':'');
-    const thumb=thumbCache['scar_'+id];
-    c.innerHTML='<div class="ov-thumb"'+(thumb?' style="background-image:url('+thumb+')"':'')+'></div>'
-               +'<span class="ov-lbl-inner">Cic. '+i+'</span>';
-    c.onclick=()=>selScar(id);
+  var _loop2 = function _loop2() {
+    var id = 'scar_' + i;
+    var c = document.createElement('div');
+    c.dataset.type = 'scar';
+    c.dataset.oid = id;
+    c.className = 'ov-item' + (S.data.scar_id === id ? ' active' : '');
+    var thumb = thumbCache['scar_' + id];
+    c.innerHTML = '<div class="ov-thumb"' + (thumb ? ' style="background-image:url(' + thumb + ')"' : '') + '></div>' + '<span class="ov-lbl-inner">Cic. ' + i + '</span>';
+    c.onclick = () => selScar(id);
     g.appendChild(c);
-    if(!thumb) requestThumb('scar',id);
+    if (!thumb) requestThumb('scar', id);
+  };
+  for (var i = 1; i <= 27; i++) {
+    _loop2();
   }
 }
-function selScar(id){
-  S.data.scar_id=id;
+function selScar(id) {
+  S.data.scar_id = id;
   renderScarGrid();
-  const ctrl=document.getElementById('scar-controls');
-  if(ctrl) ctrl.style.display=id?'block':'none';
+  var ctrl = document.getElementById('scar-controls');
+  if (ctrl) ctrl.style.display = id ? 'block' : 'none';
   sendScar();
 }
-function sendScar(){
-  B('previewScar',S.data.scar_id,
-    String(S.data.scar_opacity),
-    String(S.data.scar_x||0),
-    String(-(S.data.scar_y||0)),  // Y inversé (haut dans UI = positif, mais dans 3D on remonte)
-    String(S.data.scar_scale||1));
+function sendScar() {
+  B('previewScar', S.data.scar_id, String(S.data.scar_opacity), String(S.data.scar_x || 0), String(-(S.data.scar_y || 0)),
+  // Y inversé (haut dans UI = positif, mais dans 3D on remonte)
+  String(S.data.scar_scale || 1));
 }
-function onScarAlpha(v){
-  S.data.scar_opacity=parseInt(v)/100;
-  document.getElementById('sv_scar_opacity').textContent=v+'%';
+function onScarAlpha(v) {
+  S.data.scar_opacity = parseInt(v) / 100;
+  document.getElementById('sv_scar_opacity').textContent = v + '%';
   fill(document.getElementById('f_scar_opacity'));
   sendScar();
 }
-function onScarScale(v){
-  S.data.scar_scale=parseInt(v)/100;
-  document.getElementById('sv_scar_scale').textContent=(S.data.scar_scale).toFixed(1)+'×';
+function onScarScale(v) {
+  S.data.scar_scale = parseInt(v) / 100;
+  document.getElementById('sv_scar_scale').textContent = S.data.scar_scale.toFixed(1) + '×';
   fill(document.getElementById('f_scar_scale'));
   sendScar();
 }
 
 /* ─── Grille TATOUAGES/FACEPAINTS ────────────────────── */
-function renderFPGrid(filter){
-  const g=document.getElementById('fp-grid');
-  if(!g) return;
-  g.innerHTML='';
-  const f=(filter||'').toLowerCase();
+function renderFPGrid(filter) {
+  var g = document.getElementById('fp-grid');
+  if (!g) return;
+  g.innerHTML = '';
+  var f = (filter || '').toLowerCase();
   // Aucun
-  const n=document.createElement('div');
-  n.className='ov-item none'+(S.data.facepaint_id===''?' active':'');
-  n.innerHTML='<span class="ov-none-ico">◯</span><span class="ov-lbl-inner">Aucun</span>';
-  n.onclick=()=>selFP('');
+  var n = document.createElement('div');
+  n.className = 'ov-item none' + (S.data.facepaint_id === '' ? ' active' : '');
+  n.innerHTML = '<span class="ov-none-ico">◯</span><span class="ov-lbl-inner">Aucun</span>';
+  n.onclick = () => selFP('');
   g.appendChild(n);
   // 162 facepaints
-  for(let i=1;i<=162;i++){
-    const num=String(i).padStart(3,'0');
-    const id='fp_'+num;
-    const lbl='Mask '+i;
-    if(f && !lbl.toLowerCase().includes(f) && !num.includes(f) && !String(i).includes(f)) continue;
-    const c=document.createElement('div');
-    c.dataset.type='fp'; c.dataset.oid=id;
-    c.className='ov-item'+(S.data.facepaint_id===id?' active':'');
-    const thumb=thumbCache['fp_'+id];
-    c.innerHTML='<div class="ov-thumb"'+(thumb?' style="background-image:url('+thumb+')"':'')+'></div>'
-               +'<span class="ov-lbl-inner">'+lbl+'</span>';
-    c.onclick=()=>selFP(id);
+  var _loop3 = function _loop3() {
+    var num = String(i).padStart(3, '0');
+    var id = 'fp_' + num;
+    var lbl = 'Mask ' + i;
+    if (f && !lbl.toLowerCase().includes(f) && !num.includes(f) && !String(i).includes(f)) return 1; // continue
+    var c = document.createElement('div');
+    c.dataset.type = 'fp';
+    c.dataset.oid = id;
+    c.className = 'ov-item' + (S.data.facepaint_id === id ? ' active' : '');
+    var thumb = thumbCache['fp_' + id];
+    c.innerHTML = '<div class="ov-thumb"' + (thumb ? ' style="background-image:url(' + thumb + ')"' : '') + '></div>' + '<span class="ov-lbl-inner">' + lbl + '</span>';
+    c.onclick = () => selFP(id);
     g.appendChild(c);
-    if(!thumb) requestThumb('fp',id);
+    if (!thumb) requestThumb('fp', id);
+  };
+  for (var i = 1; i <= 162; i++) {
+    if (_loop3()) continue;
   }
 }
-function selFP(id){
-  S.data.facepaint_id=id;
-  renderFPGrid((document.getElementById('fp-search') && document.getElementById('fp-search').value)||'');
-  const ctrl=document.getElementById('fp-controls');
-  if(ctrl) ctrl.style.display=id?'block':'none';
+function selFP(id) {
+  S.data.facepaint_id = id;
+  renderFPGrid(document.getElementById('fp-search') && document.getElementById('fp-search').value || '');
+  var ctrl = document.getElementById('fp-controls');
+  if (ctrl) ctrl.style.display = id ? 'block' : 'none';
   sendFP();
 }
-function sendFP(){
-  B('previewFacepaint',S.data.facepaint_id,
-    String(S.data.facepaint_opacity),
-    String(S.data.fp_x||0),
-    String(-(S.data.fp_y||0)),
-    String(S.data.fp_scale||1));
+function sendFP() {
+  B('previewFacepaint', S.data.facepaint_id, String(S.data.facepaint_opacity), String(S.data.fp_x || 0), String(-(S.data.fp_y || 0)), String(S.data.fp_scale || 1));
 }
-function onFPAlpha(v){
-  S.data.facepaint_opacity=parseInt(v)/100;
-  document.getElementById('sv_fp_opacity').textContent=v+'%';
+function onFPAlpha(v) {
+  S.data.facepaint_opacity = parseInt(v) / 100;
+  document.getElementById('sv_fp_opacity').textContent = v + '%';
   fill(document.getElementById('f_fp_opacity'));
   sendFP();
 }
-function onFPScale(v){
-  S.data.fp_scale=parseInt(v)/100;
-  document.getElementById('sv_fp_scale').textContent=(S.data.fp_scale).toFixed(1)+'×';
+function onFPScale(v) {
+  S.data.fp_scale = parseInt(v) / 100;
+  document.getElementById('sv_fp_scale').textContent = S.data.fp_scale.toFixed(1) + '×';
   fill(document.getElementById('f_fp_scale'));
   sendFP();
 }
 
 /* ─── Crosshair drag ────────────────────────────────── */
-let _ovDragging=false, _ovType=null;
-function startOvDrag(e,type){
-  _ovDragging=true; _ovType=type;
-  moveOvDrag(e,type);
+var _ovDragging = false,
+  _ovType = null;
+function startOvDrag(e, type) {
+  _ovDragging = true;
+  _ovType = type;
+  moveOvDrag(e, type);
   e.preventDefault();
 }
-function endOvDrag(){ _ovDragging=false; _ovType=null; }
-function moveOvDrag(e,type){
-  if(!_ovDragging && e.type==='mousemove') return;
-  const widget=document.getElementById((type||_ovType)+'-crosshair');
-  if(!widget) return;
-  const rect=widget.getBoundingClientRect();
-  const nx=Math.max(-1,Math.min(1,(e.clientX-rect.left-rect.width/2)/(rect.width/2)));
-  const ny=Math.max(-1,Math.min(1,(e.clientY-rect.top-rect.height/2)/(rect.height/2)));
-  const t=type||_ovType;
+function endOvDrag() {
+  _ovDragging = false;
+  _ovType = null;
+}
+function moveOvDrag(e, type) {
+  if (!_ovDragging && e.type === 'mousemove') return;
+  var widget = document.getElementById((type || _ovType) + '-crosshair');
+  if (!widget) return;
+  var rect = widget.getBoundingClientRect();
+  var nx = Math.max(-1, Math.min(1, (e.clientX - rect.left - rect.width / 2) / (rect.width / 2)));
+  var ny = Math.max(-1, Math.min(1, (e.clientY - rect.top - rect.height / 2) / (rect.height / 2)));
+  var t = type || _ovType;
   // Déplacer le dot visuellement
-  const dot=document.getElementById(t+'-dot');
-  if(dot){
-    dot.style.left=((nx+1)/2*100)+'%';
-    dot.style.top= ((ny+1)/2*100)+'%';
+  var dot = document.getElementById(t + '-dot');
+  if (dot) {
+    dot.style.left = (nx + 1) / 2 * 100 + '%';
+    dot.style.top = (ny + 1) / 2 * 100 + '%';
   }
-  if(t==='scar'){
-    S.data.scar_x=parseFloat(nx.toFixed(3));
-    S.data.scar_y=parseFloat(ny.toFixed(3));
+  if (t === 'scar') {
+    S.data.scar_x = parseFloat(nx.toFixed(3));
+    S.data.scar_y = parseFloat(ny.toFixed(3));
     sendScar();
   } else {
-    S.data.fp_x=parseFloat(nx.toFixed(3));
-    S.data.fp_y=parseFloat(ny.toFixed(3));
+    S.data.fp_x = parseFloat(nx.toFixed(3));
+    S.data.fp_y = parseFloat(ny.toFixed(3));
     sendFP();
   }
 }
-function syncDot(type){
-  const x=(type==='scar'?S.data.scar_x:S.data.fp_x)||0;
-  const y=(type==='scar'?S.data.scar_y:S.data.fp_y)||0;
-  const dot=document.getElementById(type+'-dot');
-  if(dot){
-    dot.style.left=((x+1)/2*100)+'%';
-    dot.style.top= ((y+1)/2*100)+'%';
+function syncDot(type) {
+  var x = (type === 'scar' ? S.data.scar_x : S.data.fp_x) || 0;
+  var y = (type === 'scar' ? S.data.scar_y : S.data.fp_y) || 0;
+  var dot = document.getElementById(type + '-dot');
+  if (dot) {
+    dot.style.left = (x + 1) / 2 * 100 + '%';
+    dot.style.top = (y + 1) / 2 * 100 + '%';
   }
 }
-
-function GCC_Bootstrap(data){
-  if(data.hair_choices)         cfg.hairChoices       =data.hair_choices;
-  if(data.hair_color_presets)   cfg.hairColorPresets  =data.hair_color_presets;
-  if(data.personality_traits)   cfg.personalityTraits =data.personality_traits;
-  if(data.gender_choices)       cfg.genderChoices     =data.gender_choices;
-  if(data.civil_status_choices) cfg.civilStatusChoices=data.civil_status_choices;
-  if(data.max_traits)           cfg.maxTraits         =data.max_traits;
-  if(data.max_slots)            cfg.maxSlots          =data.max_slots;
-  S.slots=data.slots||{}; S.currentSlot=parseInt(data.active_slot)||1;
-  S.forceSelection=!!data.force_selection;
-  S.hasAnyCharacter=!!data.has_any_character;
-  const d=data.current_data||{};
-  S.data={
-    first_name:d.first_name||'',last_name:d.last_name||'',nickname:d.nickname||'',
-    gender:d.gender||'Homme',birthdate:d.birthdate||'',
-    age:parseInt(d.age)||25,height_cm:parseInt(d.height_cm)||175,
-    weight_kg:parseInt(d.weight_kg)||70,shoe_size:parseInt(d.shoe_size)||42,
-    origin_country:d.origin_country||'',birth_place:d.birth_place||'',
-    civil_status:d.civil_status||'Celibataire',traits:Array.isArray(d.traits)?d.traits:[],
-    hair_id:d.hair_id||'',hair_color:d.hair_color||{r:20,g:16,b:14},hair_scale:parseFloat(d.hair_scale)||1.0
+function GCC_Bootstrap(data) {
+  if (data.hair_choices) cfg.hairChoices = data.hair_choices;
+  if (data.hair_color_presets) cfg.hairColorPresets = data.hair_color_presets;
+  if (data.personality_traits) cfg.personalityTraits = data.personality_traits;
+  if (data.gender_choices) cfg.genderChoices = data.gender_choices;
+  if (data.civil_status_choices) cfg.civilStatusChoices = data.civil_status_choices;
+  if (data.max_traits) cfg.maxTraits = data.max_traits;
+  if (data.max_slots) cfg.maxSlots = data.max_slots;
+  S.slots = data.slots || {};
+  S.currentSlot = parseInt(data.active_slot) || 1;
+  S.forceSelection = !!data.force_selection;
+  S.hasAnyCharacter = !!data.has_any_character;
+  var d = data.current_data || {};
+  S.data = {
+    first_name: d.first_name || '',
+    last_name: d.last_name || '',
+    nickname: d.nickname || '',
+    gender: d.gender || 'Homme',
+    birthdate: d.birthdate || '',
+    age: parseInt(d.age) || 25,
+    height_cm: parseInt(d.height_cm) || 175,
+    weight_kg: parseInt(d.weight_kg) || 70,
+    shoe_size: parseInt(d.shoe_size) || 42,
+    origin_country: d.origin_country || '',
+    birth_place: d.birth_place || '',
+    civil_status: d.civil_status || 'Celibataire',
+    traits: Array.isArray(d.traits) ? d.traits : [],
+    hair_id: d.hair_id || '',
+    hair_color: d.hair_color || {
+      r: 20,
+      g: 16,
+      b: 14
+    },
+    hair_scale: parseFloat(d.hair_scale) || 1.0
   };
   renderSlots();
   renderSlotCards();
   renderScarGrid();
   renderFPGrid('');
   focusSlotView(S.currentSlot);
-  const closeBtn=document.getElementById('select-close');
-  if(closeBtn) closeBtn.style.display=S.forceSelection?'none':'';
+  var closeBtn = document.getElementById('select-close');
+  if (closeBtn) closeBtn.style.display = S.forceSelection ? 'none' : '';
   ensureTabVisible(getCurrentTabName());
-  if(!uiMotionBooted) bootMotion();
+  if (!uiMotionBooted) bootMotion();
   // Montrer l'écran de sélection en premier
   showSelectScreen();
 }
-function GCC_ShowSaved(){const s=document.getElementById('stamp');s.classList.add('show');setTimeout(()=>s.classList.remove('show'),2600);}
-function GCC_SaveCompleted(payload){
+function GCC_ShowSaved() {
+  var s = document.getElementById('stamp');
+  s.classList.add('show');
+  setTimeout(() => s.classList.remove('show'), 2600);
+}
+function GCC_SaveCompleted(payload) {
   payload = payload || {};
-  if(payload.slots) S.slots = payload.slots;
-  if(payload.force_selection !== undefined) S.forceSelection = !!payload.force_selection;
-  if(payload.active_slot) S.currentSlot = parseInt(payload.active_slot)||S.currentSlot;
-  if(payload.slot_id) S.currentSlot = parseInt(payload.slot_id)||S.currentSlot;
+  if (payload.slots) S.slots = payload.slots;
+  if (payload.force_selection !== undefined) S.forceSelection = !!payload.force_selection;
+  if (payload.active_slot) S.currentSlot = parseInt(payload.active_slot) || S.currentSlot;
+  if (payload.slot_id) S.currentSlot = parseInt(payload.slot_id) || S.currentSlot;
   renderSlots();
   renderSlotCards();
   syncActiveSlotUI(S.currentSlot);
   focusSlotView(S.currentSlot);
-  setTimeout(()=>{
+  setTimeout(() => {
     showSelectScreen();
   }, 1200);
 }
-function GCC_UpdateData(d){if(!d)return;Object.assign(S.data,d);populateForm();renderHairGrid();renderCP();renderTraits();}
-function GCC_Notify(msg){notif(msg);}
-function notif(msg){const e=document.createElement('div');e.className='ntf';e.textContent=msg;document.getElementById('notifs').appendChild(e);setTimeout(()=>e.remove(),5200);}
-function GCC_SetBusy(flag,label){
-  const busy=!!flag;
+function GCC_UpdateData(d) {
+  if (!d) return;
+  Object.assign(S.data, d);
+  populateForm();
+  renderHairGrid();
+  renderCP();
+  renderTraits();
+}
+function GCC_Notify(msg) {
+  notif(msg);
+}
+function notif(msg) {
+  var e = document.createElement('div');
+  e.className = 'ntf';
+  e.textContent = msg;
+  document.getElementById('notifs').appendChild(e);
+  setTimeout(() => e.remove(), 5200);
+}
+function GCC_SetBusy(flag, label) {
+  var busy = !!flag;
   document.body.classList.toggle('ui-busy', busy);
-  const el=document.getElementById('busy-indicator');
-  if(!el) return;
-  if(label) el.setAttribute('data-label', label);
-  el.textContent = (label || el.getAttribute('data-label') || 'Traitement...');
+  var el = document.getElementById('busy-indicator');
+  if (!el) return;
+  if (label) el.setAttribute('data-label', label);
+  el.textContent = label || el.getAttribute('data-label') || 'Traitement...';
   el.classList.toggle('show', busy);
 }
-
-function focusSlotView(slotId){
-  S.currentSlot = parseInt(slotId)||1;
+function focusSlotView(slotId) {
+  S.currentSlot = parseInt(slotId) || 1;
   B('focusSlot', S.currentSlot);
 }
 
 /* ── SELECT SCREEN ──────────────────────────────────────────── */
-function showSelectScreen(){
+function showSelectScreen() {
   document.body.classList.remove('creator-mode');
   document.getElementById('screen-select').classList.remove('hidden');
   document.getElementById('main').classList.add('hidden');
   renderSlotCards();
 }
-
-function goToSelectScreen(){
+function goToSelectScreen() {
   showSelectScreen();
 }
-
-function slotHasCharacter(slotId){
-  const s = S.slots[String(slotId)] || S.slots[slotId] || null;
-  return !!(s && (
-    (s.first_name && String(s.first_name).trim() !== '') ||
-    (s.last_name && String(s.last_name).trim() !== '') ||
-    (s.nickname && String(s.nickname).trim() !== '') ||
-    s.created_at || s.updated_at || s.origin_country || s.birthdate || s.gender || s.hair_id
-  ));
+function slotHasCharacter(slotId) {
+  var s = S.slots[String(slotId)] || S.slots[slotId] || null;
+  return !!(s && (s.first_name && String(s.first_name).trim() !== '' || s.last_name && String(s.last_name).trim() !== '' || s.nickname && String(s.nickname).trim() !== '' || s.created_at || s.updated_at || s.origin_country || s.birthdate || s.gender || s.hair_id));
 }
-
-function syncActiveSlotUI(slotId){
+function syncActiveSlotUI(slotId) {
   S.currentSlot = slotId;
-  document.querySelectorAll('.slot-btn').forEach((b,i)=>{
-    b.classList.toggle('active', (i+1)===slotId);
+  document.querySelectorAll('.slot-btn').forEach((b, i) => {
+    b.classList.toggle('active', i + 1 === slotId);
   });
   requestAnimationFrame(updateSlotCursor);
 }
-
-function loadSlotIntoEditor(slotId){
-  const slotData = S.slots[String(slotId)] || S.slots[slotId] || null;
-  if(slotData){
+function loadSlotIntoEditor(slotId) {
+  var slotData = S.slots[String(slotId)] || S.slots[slotId] || null;
+  if (slotData) {
     S.data = {
-      first_name:slotData.first_name||'',
-      last_name:slotData.last_name||'',
-      nickname:slotData.nickname||'',
-      gender:slotData.gender||'Homme',
-      birthdate:slotData.birthdate||'',
-      age:parseInt(slotData.age)||25,
-      height_cm:parseInt(slotData.height_cm)||175,
-      weight_kg:parseInt(slotData.weight_kg)||70,
-      shoe_size:parseInt(slotData.shoe_size)||42,
-      origin_country:slotData.origin_country||'',
-      birth_place:slotData.birth_place||'',
-      civil_status:slotData.civil_status||'Celibataire',
-      traits:Array.isArray(slotData.traits)?slotData.traits:[],
-      hair_id:slotData.hair_id||'',
-      hair_color:slotData.hair_color||{r:20,g:16,b:14},
-      hair_scale:parseFloat(slotData.hair_scale)||1.0,
-      scar_id:slotData.scar_id||'',
-      facepaint_id:slotData.facepaint_id||'',
-      scar_opacity:parseFloat(slotData.scar_opacity)||1.0,
-      facepaint_opacity:parseFloat(slotData.facepaint_opacity)||1.0,
-      scar_x:parseFloat(slotData.scar_x)||0,
-      scar_y:parseFloat(slotData.scar_y)||0,
-      scar_scale:parseFloat(slotData.scar_scale)||1.0,
-      fp_x:parseFloat(slotData.fp_x)||0,
-      fp_y:parseFloat(slotData.fp_y)||0,
-      fp_scale:parseFloat(slotData.fp_scale)||1.0,
+      first_name: slotData.first_name || '',
+      last_name: slotData.last_name || '',
+      nickname: slotData.nickname || '',
+      gender: slotData.gender || 'Homme',
+      birthdate: slotData.birthdate || '',
+      age: parseInt(slotData.age) || 25,
+      height_cm: parseInt(slotData.height_cm) || 175,
+      weight_kg: parseInt(slotData.weight_kg) || 70,
+      shoe_size: parseInt(slotData.shoe_size) || 42,
+      origin_country: slotData.origin_country || '',
+      birth_place: slotData.birth_place || '',
+      civil_status: slotData.civil_status || 'Celibataire',
+      traits: Array.isArray(slotData.traits) ? slotData.traits : [],
+      hair_id: slotData.hair_id || '',
+      hair_color: slotData.hair_color || {
+        r: 20,
+        g: 16,
+        b: 14
+      },
+      hair_scale: parseFloat(slotData.hair_scale) || 1.0,
+      scar_id: slotData.scar_id || '',
+      facepaint_id: slotData.facepaint_id || '',
+      scar_opacity: parseFloat(slotData.scar_opacity) || 1.0,
+      facepaint_opacity: parseFloat(slotData.facepaint_opacity) || 1.0,
+      scar_x: parseFloat(slotData.scar_x) || 0,
+      scar_y: parseFloat(slotData.scar_y) || 0,
+      scar_scale: parseFloat(slotData.scar_scale) || 1.0,
+      fp_x: parseFloat(slotData.fp_x) || 0,
+      fp_y: parseFloat(slotData.fp_y) || 0,
+      fp_scale: parseFloat(slotData.fp_scale) || 1.0,
       slot_id: slotId
     };
   } else {
     S.data = {
-      first_name:'',last_name:'',nickname:'',gender:'Homme',birthdate:'',
-      age:25,height_cm:175,weight_kg:70,shoe_size:42,
-      origin_country:'',birth_place:'',civil_status:'Celibataire',
-      traits:[],hair_id:'',hair_color:{r:20,g:16,b:14},hair_scale:1.0,
+      first_name: '',
+      last_name: '',
+      nickname: '',
+      gender: 'Homme',
+      birthdate: '',
+      age: 25,
+      height_cm: 175,
+      weight_kg: 70,
+      shoe_size: 42,
+      origin_country: '',
+      birth_place: '',
+      civil_status: 'Celibataire',
+      traits: [],
+      hair_id: '',
+      hair_color: {
+        r: 20,
+        g: 16,
+        b: 14
+      },
+      hair_scale: 1.0,
       slot_id: slotId
     };
   }
-
   populateForm();
   renderHairGrid();
   renderCP();
   renderTraits();
   switchTab('identity');
 }
-
-function openCreatorForSlot(slotId){
+function openCreatorForSlot(slotId) {
   syncActiveSlotUI(slotId);
   document.body.classList.add('creator-mode');
   document.getElementById('screen-select').classList.add('hidden');
   document.getElementById('main').classList.remove('hidden');
   loadSlotIntoEditor(slotId);
 }
-
-function createSlot(slotId){
+function createSlot(slotId) {
   openCreatorForSlot(slotId);
   B('setSlot', slotId);
 }
-
-function playSlot(slotId){
+function playSlot(slotId) {
   syncActiveSlotUI(slotId);
   B('selectSlot', slotId);
 }
-
-function renderSlotCards(){
-  const c = document.getElementById('slot-cards');
-  if(!c) return;
+function renderSlotCards() {
+  var c = document.getElementById('slot-cards');
+  if (!c) return;
   c.innerHTML = '';
-  for(let i=1; i<=cfg.maxSlots; i++){
-    const s = S.slots[String(i)] || S.slots[i] || null;
-    const hasChar = slotHasCharacter(i);
-    const safeFirst = s && s.first_name ? s.first_name : '';
-    const safeLast = s && s.last_name ? s.last_name : '';
-    const name = hasChar ? (safeFirst + ' ' + safeLast).trim().toUpperCase() : 'Nouveau personnage';
-    const meta = hasChar
-      ? [s && s.origin_country, s && s.age ? s.age+' ans' : null].filter(Boolean).join(' · ') || 'Profil existant'
-      : 'Aucun personnage créé';
-
-    const card = document.createElement('div');
+  var _loop4 = function _loop4(i) {
+    var s = S.slots[String(i)] || S.slots[i] || null;
+    var hasChar = slotHasCharacter(i);
+    var safeFirst = s && s.first_name ? s.first_name : '';
+    var safeLast = s && s.last_name ? s.last_name : '';
+    var name = hasChar ? (safeFirst + ' ' + safeLast).trim().toUpperCase() : 'Nouveau personnage';
+    var meta = hasChar ? [s && s.origin_country, s && s.age ? s.age + ' ans' : null].filter(Boolean).join(' · ') || 'Profil existant' : 'Aucun personnage créé';
+    var card = document.createElement('div');
     card.className = 'slot-card' + (hasChar ? ' has-char' : '');
-    card.innerHTML =
-      '<div class="sc-left">'+
-        '<div class="sc-num">Profil 0'+i+'</div>'+
-        '<div class="sc-name">'+name+'</div>'+
-        '<div class="sc-meta">'+meta+'</div>'+
-      '</div>'+
-      '<button class="sc-btn '+(hasChar ? 'play' : 'create')+'"'+
-        ' onclick="event.stopPropagation(); '+(hasChar ? 'playSlot('+i+')' : 'createSlot('+i+')')+'">'+
-        (hasChar ? 'Jouer' : 'Créer')+
-      '</button>';
-    card.onclick = function(){ hasChar ? playSlot(i) : createSlot(i); };
-    card.onmouseenter = function(){ focusSlotView(i); };
+    card.innerHTML = '<div class="sc-left">' + '<div class="sc-num">Profil 0' + i + '</div>' + '<div class="sc-name">' + name + '</div>' + '<div class="sc-meta">' + meta + '</div>' + '</div>' + '<button class="sc-btn ' + (hasChar ? 'play' : 'create') + '"' + ' onclick="event.stopPropagation(); ' + (hasChar ? 'playSlot(' + i + ')' : 'createSlot(' + i + ')') + '">' + (hasChar ? 'Jouer' : 'Créer') + '</button>';
+    card.onclick = function () {
+      hasChar ? playSlot(i) : createSlot(i);
+    };
+    card.onmouseenter = function () {
+      focusSlotView(i);
+    };
     c.appendChild(card);
+  };
+  for (var i = 1; i <= cfg.maxSlots; i++) {
+    _loop4(i);
   }
 }
-
-window.addEventListener('load',()=>{
+window.addEventListener('load', () => {
   document.body.classList.remove('creator-mode');
-  document.querySelectorAll('.sl').forEach(s=>{fill(s);s.addEventListener('input',()=>fill(s));});
-  document.addEventListener('click',e=>{
-    const btn=e.target.closest('button');
-    if(btn) triggerButtonFx(btn);
+  document.querySelectorAll('.sl').forEach(s => {
+    fill(s);
+    s.addEventListener('input', () => fill(s));
+  });
+  document.addEventListener('click', e => {
+    var btn = e.target.closest('button');
+    if (btn) triggerButtonFx(btn);
   });
   renderGenderToggle();
   ensureTabVisible(getCurrentTabName());
   bootMotion();
-  setTimeout(()=>B('pageReady'),150);
-});
-</script>
+  setTimeout(() => B('pageReady'), 150);
+});</script>
 </body>
 </html>
