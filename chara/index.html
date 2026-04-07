@@ -1598,11 +1598,57 @@ body.ui-busy #select-close {
 <div id="notifs"></div>
 <div id="busy-indicator">Traitement...</div>
 
-<script>function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
-function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
-function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+<script>
+function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
+function _nonIterableSpread(){throw new TypeError("Invalid attempt to spread non-iterable instance.");}
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _iterableToArray(r){if(Array.isArray(r))return r;var a=[];if(r){for(var i=0;i<r.length;i++)a.push(r[i]);}return a;}
+function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function _typeof(o){return typeof o;}, _typeof(o); }
+function ownKeys(e, r) {
+  var t = Object.keys(e);
+  if (Object.getOwnPropertySymbols) {
+    var o = Object.getOwnPropertySymbols(e);
+    r && (o = o.filter(function (r) {
+      return Object.getOwnPropertyDescriptor(e, r).enumerable;
+    })), t.push.apply(t, o);
+  }
+  return t;
+}
+function _objectSpread(e) {
+  for (var r = 1; r < arguments.length; r++) {
+    var t = null != arguments[r] ? arguments[r] : {};
+    r % 2 ? ownKeys(Object(t), !0).forEach(function (r) {
+      _defineProperty(e, r, t[r]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) {
+      Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r));
+    });
+  }
+  return e;
+}
+function _defineProperty(e, r, t) {
+  return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
+    value: t,
+    enumerable: !0,
+    configurable: !0,
+    writable: !0
+  }) : e[r] = t, e;
+}
+function _toPropertyKey(t) {
+  var i = _toPrimitive(t, "string");
+  return "symbol" == _typeof(i) ? i : i + "";
+}
+function _toPrimitive(t, r) {
+  if ("object" != _typeof(t) || !t) return t;
+  var e = (t.valueOf ? t.valueOf() : String(t));
+  if (void 0 !== e) {
+    var i = e.call(t, r || "default");
+    if ("object" != _typeof(i)) return i;
+    throw new TypeError("@@toPrimitive must return a primitive value.");
+  }
+  return ("string" === r ? String : Number)(t);
+}
 var cfg = {
   maxTraits: 4,
   maxSlots: 3,
@@ -1648,15 +1694,24 @@ var S = {
     fp_scale: 1.0
   }
 };
-function B(fn, ...a) {
+function B(fn) {
   try {
-    if (window.gcc_js && window.gcc_js[fn]) window.gcc_js[fn](...a.map(x => String(x)));
+    var _window$gcc_js;
+    for (var _len = arguments.length, a = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      a[_key - 1] = arguments[_key];
+    }
+    if (window.gcc_js && window.gcc_js[fn]) (_window$gcc_js = window.gcc_js)[fn].apply(_window$gcc_js, _toConsumableArray(a.map(function (x) {
+      return String(x);
+    })));
   } catch (_) {}
 }
 var uiMotionBooted = false;
 var staticMotionPlayed = false;
-function animateNodeList(nodes, startDelay = 0, step = 80, side = false) {
-  (nodes || []).filter(Boolean).forEach(el => {
+function animateNodeList(nodes) {
+  var startDelay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var step = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 80;
+  var side = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  (nodes || []).filter(Boolean).forEach(function (el) {
     el.classList.add('motion-item', 'is-visible');
     el.classList.toggle('fx-side', !!side);
     el.style.removeProperty('opacity');
@@ -1665,7 +1720,7 @@ function animateNodeList(nodes, startDelay = 0, step = 80, side = false) {
   });
 }
 function playStaticMotion() {
-  var nodes = [document.querySelector('#header .brand-mark'), document.querySelector('#header .logo-eyebrow'), document.querySelector('#header .logo-title'), document.querySelector('#header .logo-sub'), document.querySelector('#sidebar .sec-lbl'), document.querySelector('#sidebar .slots-track-wrap'), document.querySelector('#sidebar .nav-lbl'), ...document.querySelectorAll('#nav > *'), ...document.querySelectorAll('#actions > *')].filter(Boolean);
+  var nodes = [document.querySelector('#header .brand-mark'), document.querySelector('#header .logo-eyebrow'), document.querySelector('#header .logo-title'), document.querySelector('#header .logo-sub'), document.querySelector('#sidebar .sec-lbl'), document.querySelector('#sidebar .slots-track-wrap'), document.querySelector('#sidebar .nav-lbl')].concat(_toConsumableArray(document.querySelectorAll('#nav > *')), _toConsumableArray(document.querySelectorAll('#actions > *'))).filter(Boolean);
   animateNodeList(nodes, 70, 65, true);
   staticMotionPlayed = true;
 }
@@ -1676,17 +1731,18 @@ function getCurrentTabName() {
 function getTabMotionNodes(tabName) {
   var tab = document.getElementById('tab-' + tabName);
   if (!tab) return [];
-  if (tabName === 'identity') return [...tab.querySelectorAll('.col-l > div, .col-r > div')];
-  if (tabName === 'appearance') return [...tab.querySelectorAll('.col-l > div')];
-  if (tabName === 'visage') return [...tab.querySelectorAll('.col-l > div')];
-  return [...tab.children];
+  if (tabName === 'identity') return _toConsumableArray(tab.querySelectorAll('.col-l > div, .col-r > div'));
+  if (tabName === 'appearance') return _toConsumableArray(tab.querySelectorAll('.col-l > div'));
+  if (tabName === 'visage') return _toConsumableArray(tab.querySelectorAll('.col-l > div'));
+  return _toConsumableArray(tab.children);
 }
-function animateCurrentTab(initial = false) {
+function animateCurrentTab() {
+  var initial = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
   var nodes = getTabMotionNodes(getCurrentTabName());
   animateNodeList(nodes, initial ? 240 : 35, initial ? 95 : 78, false);
 }
 function ensureTabVisible(tabName) {
-  getTabMotionNodes(tabName).forEach(el => {
+  getTabMotionNodes(tabName).forEach(function (el) {
     el.classList.add('motion-item', 'is-visible');
     el.style.removeProperty('opacity');
     el.style.removeProperty('transform');
@@ -1729,11 +1785,11 @@ function updateSlotCursor() {
 function renderGenderToggle() {
   var c = document.getElementById('gender-toggle');
   c.innerHTML = '';
-  cfg.genderChoices.slice(0, 2).forEach(g => {
+  cfg.genderChoices.slice(0, 2).forEach(function (g) {
     var b = document.createElement('button');
     b.className = 'toggle-opt' + (S.data.gender === g ? ' active' : '');
     b.innerHTML = (g === 'Homme' ? '♂ ' : '♀ ') + g;
-    b.onclick = () => {
+    b.onclick = function () {
       S.data.gender = g;
       sf('gender', g);
       renderGenderToggle();
@@ -1759,17 +1815,21 @@ function onHS(raw) {
 }
 function selHair(id) {
   S.data.hair_id = id;
-  document.querySelectorAll('.hc').forEach(c => c.classList.toggle('active', c.dataset.id === id));
+  document.querySelectorAll('.hc').forEach(function (c) {
+    return c.classList.toggle('active', c.dataset.id === id);
+  });
   B('previewHair', id);
   B('setCameraProfile', 'appearance');
 }
 function selCP(r, g, b, el) {
   S.data.hair_color = {
-    r,
-    g,
-    b
+    r: r,
+    g: g,
+    b: b
   };
-  document.querySelectorAll('.cs').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.cs').forEach(function (s) {
+    return s.classList.remove('active');
+  });
   el.classList.add('active');
   B('previewHairColor', r, g, b);
 }
@@ -1787,8 +1847,12 @@ function togTrait(t) {
 function switchTab(tab) {
   var next = document.getElementById('tab-' + tab);
   if (!next) return;
-  document.querySelectorAll('.nb').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  document.querySelectorAll('.tp').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(function (b) {
+    return b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  document.querySelectorAll('.tp').forEach(function (p) {
+    return p.classList.remove('active');
+  });
   next.classList.add('active');
   document.getElementById('form-area').scrollTop = 0;
   B('setCameraProfile', tab);
@@ -1800,7 +1864,9 @@ function triggerButtonFx(el) {
   el.classList.remove(cls);
   void el.offsetWidth;
   el.classList.add(cls);
-  setTimeout(() => el.classList.remove(cls), 360);
+  setTimeout(function () {
+    return el.classList.remove(cls);
+  }, 360);
 }
 function renderSlots() {
   var c = document.getElementById('slot-list');
@@ -1812,13 +1878,15 @@ function renderSlots() {
     var b = document.createElement('button');
     b.className = 'slot-btn' + (S.currentSlot === i ? ' active' : '');
     b.innerHTML = '<div class="sn">' + nm + '</div><div class="sm">' + mt + '</div>';
-    b.onclick = () => B('selectSlot', i);
+    b.onclick = function () {
+      return B('selectSlot', i);
+    };
     c.appendChild(b);
   };
   for (var i = 1; i <= cfg.maxSlots; i++) {
     _loop(i);
   }
-  if (uiMotionBooted) animateNodeList([...c.children], 180, 55, true);
+  if (uiMotionBooted) animateNodeList(_toConsumableArray(c.children), 180, 55, true);
   requestAnimationFrame(updateSlotCursor);
 }
 function renderHairGrid() {
@@ -1828,9 +1896,11 @@ function renderHairGrid() {
   n.className = 'hc' + (S.data.hair_id === '' ? ' active' : '');
   n.dataset.id = '';
   n.innerHTML = '<span class="hc-i">◯</span><span style="position:relative;z-index:1">Aucun</span>';
-  n.onclick = () => selHair('');
+  n.onclick = function () {
+    return selHair('');
+  };
   g.appendChild(n);
-  cfg.hairChoices.forEach(h => {
+  cfg.hairChoices.forEach(function (h) {
     var c = document.createElement('div');
     c.className = 'hc' + (S.data.hair_id === h.id ? ' active' : '');
     c.dataset.id = h.id;
@@ -1841,7 +1911,9 @@ function renderHairGrid() {
       c.style.backgroundPosition = 'center top';
     }
     c.innerHTML = '<span class="hc-i" style="position:relative;z-index:1">' + (thumb ? '' : '✦') + '</span>' + '<span style="position:relative;z-index:1;text-shadow:0 1px 4px rgba(0,0,0,0.8)">' + h.name + '</span>';
-    c.onclick = () => selHair(h.id);
+    c.onclick = function () {
+      return selHair(h.id);
+    };
     g.appendChild(c);
     if (!thumb) requestThumb('hair', h.id);
   });
@@ -1850,7 +1922,7 @@ function renderCP() {
   var c = document.getElementById('cpreset');
   c.innerHTML = '';
   var cur = S.data.hair_color;
-  cfg.hairColorPresets.forEach(p => {
+  cfg.hairColorPresets.forEach(function (p) {
     var r = p.color.r !== undefined ? p.color.r : p.color[1] || 0;
     var g = p.color.g !== undefined ? p.color.g : p.color[2] || 0;
     var b = p.color.b !== undefined ? p.color.b : p.color[3] || 0;
@@ -1859,7 +1931,9 @@ function renderCP() {
     sw.className = 'cs' + (active ? ' active' : '');
     sw.style.background = 'rgb(' + r + ',' + g + ',' + b + ')';
     sw.title = p.name;
-    sw.onclick = () => selCP(r, g, b, sw);
+    sw.onclick = function () {
+      return selCP(r, g, b, sw);
+    };
     c.appendChild(sw);
   });
 }
@@ -1867,11 +1941,13 @@ function renderTraits() {
   var g = document.getElementById('tgrid');
   g.innerHTML = '';
   document.getElementById('trm').textContent = S.data.traits.length + '/' + cfg.maxTraits + ' traits sélectionnés';
-  cfg.personalityTraits.forEach(t => {
+  cfg.personalityTraits.forEach(function (t) {
     var c = document.createElement('button');
     c.className = 'tc' + (S.data.traits.includes(t) ? ' active' : '');
     c.textContent = t;
-    c.onclick = () => togTrait(t);
+    c.onclick = function () {
+      return togTrait(t);
+    };
     g.appendChild(c);
   });
 }
@@ -1889,11 +1965,11 @@ function populateSels() {
 }
 function populateForm() {
   var d = S.data;
-  ['first_name', 'last_name', 'nickname', 'birthdate', 'origin_country', 'birth_place'].forEach(k => {
+  ['first_name', 'last_name', 'nickname', 'birthdate', 'origin_country', 'birth_place'].forEach(function (k) {
     var e = document.getElementById('f_' + k);
     if (e) e.value = d[k] || '';
   });
-  ['age', 'height_cm', 'weight_kg', 'shoe_size'].forEach(k => {
+  ['age', 'height_cm', 'weight_kg', 'shoe_size'].forEach(function (k) {
     var e = document.getElementById('f_' + k);
     if (!e) return;
     e.value = d[k] || 0;
@@ -1966,8 +2042,12 @@ function onRandomize() {
 
 /* ─── Sous-navigation Apparence ─────────────────────── */
 function switchAp(ap) {
-  document.querySelectorAll('.ap-nb').forEach(b => b.classList.toggle('active', b.dataset.ap === ap));
-  document.querySelectorAll('.ap-panel').forEach(p => p.classList.toggle('active', p.id === 'ap-' + ap));
+  document.querySelectorAll('.ap-nb').forEach(function (b) {
+    return b.classList.toggle('active', b.dataset.ap === ap);
+  });
+  document.querySelectorAll('.ap-panel').forEach(function (p) {
+    return p.classList.toggle('active', p.id === 'ap-' + ap);
+  });
   if (ap === 'cicatrices') renderScarGrid();
   if (ap === 'tatouages') renderFPGrid(document.getElementById('fp-search') && document.getElementById('fp-search').value || '');
   if (ap === 'cheveux') {
@@ -1982,13 +2062,13 @@ var thumbCache = {};
 function GCC_SetThumb(type, id, dataUrl) {
   thumbCache[type + '_' + id] = dataUrl;
   // Mettre à jour toutes les cells ayant ce data-id et data-type
-  document.querySelectorAll('[data-type="' + type + '"][data-oid="' + id + '"]').forEach(el => {
+  document.querySelectorAll('[data-type="' + type + '"][data-oid="' + id + '"]').forEach(function (el) {
     var th = el.querySelector('.ov-thumb');
     if (th) th.style.backgroundImage = 'url(' + dataUrl + ')';
   });
   // Hair grid : mettre à jour les cells
   if (type === 'hair') {
-    document.querySelectorAll('.hc[data-id="' + id + '"]').forEach(el => {
+    document.querySelectorAll('.hc[data-id="' + id + '"]').forEach(function (el) {
       el.style.backgroundImage = 'url(' + dataUrl + ')';
       el.style.backgroundSize = 'cover';
       el.style.backgroundPosition = 'center top';
@@ -2009,7 +2089,9 @@ function renderScarGrid() {
   var n = document.createElement('div');
   n.className = 'ov-item none' + (S.data.scar_id === '' ? ' active' : '');
   n.innerHTML = '<span class="ov-none-ico">◯</span><span class="ov-lbl-inner">Aucune</span>';
-  n.onclick = () => selScar('');
+  n.onclick = function () {
+    return selScar('');
+  };
   g.appendChild(n);
   // 27 cicatrices
   var _loop2 = function _loop2() {
@@ -2020,7 +2102,9 @@ function renderScarGrid() {
     c.className = 'ov-item' + (S.data.scar_id === id ? ' active' : '');
     var thumb = thumbCache['scar_' + id];
     c.innerHTML = '<div class="ov-thumb"' + (thumb ? ' style="background-image:url(' + thumb + ')"' : '') + '></div>' + '<span class="ov-lbl-inner">Cic. ' + i + '</span>';
-    c.onclick = () => selScar(id);
+    c.onclick = function () {
+      return selScar(id);
+    };
     g.appendChild(c);
     if (!thumb) requestThumb('scar', id);
   };
@@ -2063,7 +2147,9 @@ function renderFPGrid(filter) {
   var n = document.createElement('div');
   n.className = 'ov-item none' + (S.data.facepaint_id === '' ? ' active' : '');
   n.innerHTML = '<span class="ov-none-ico">◯</span><span class="ov-lbl-inner">Aucun</span>';
-  n.onclick = () => selFP('');
+  n.onclick = function () {
+    return selFP('');
+  };
   g.appendChild(n);
   // 162 facepaints
   var _loop3 = function _loop3() {
@@ -2077,7 +2163,9 @@ function renderFPGrid(filter) {
     c.className = 'ov-item' + (S.data.facepaint_id === id ? ' active' : '');
     var thumb = thumbCache['fp_' + id];
     c.innerHTML = '<div class="ov-thumb"' + (thumb ? ' style="background-image:url(' + thumb + ')"' : '') + '></div>' + '<span class="ov-lbl-inner">' + lbl + '</span>';
-    c.onclick = () => selFP(id);
+    c.onclick = function () {
+      return selFP(id);
+    };
     g.appendChild(c);
     if (!thumb) requestThumb('fp', id);
   };
@@ -2204,7 +2292,9 @@ function GCC_Bootstrap(data) {
 function GCC_ShowSaved() {
   var s = document.getElementById('stamp');
   s.classList.add('show');
-  setTimeout(() => s.classList.remove('show'), 2600);
+  setTimeout(function () {
+    return s.classList.remove('show');
+  }, 2600);
 }
 function GCC_SaveCompleted(payload) {
   payload = payload || {};
@@ -2216,7 +2306,7 @@ function GCC_SaveCompleted(payload) {
   renderSlotCards();
   syncActiveSlotUI(S.currentSlot);
   focusSlotView(S.currentSlot);
-  setTimeout(() => {
+  setTimeout(function () {
     showSelectScreen();
   }, 1200);
 }
@@ -2236,7 +2326,9 @@ function notif(msg) {
   e.className = 'ntf';
   e.textContent = msg;
   document.getElementById('notifs').appendChild(e);
-  setTimeout(() => e.remove(), 5200);
+  setTimeout(function () {
+    return e.remove();
+  }, 5200);
 }
 function GCC_SetBusy(flag, label) {
   var busy = !!flag;
@@ -2268,7 +2360,7 @@ function slotHasCharacter(slotId) {
 }
 function syncActiveSlotUI(slotId) {
   S.currentSlot = slotId;
-  document.querySelectorAll('.slot-btn').forEach((b, i) => {
+  document.querySelectorAll('.slot-btn').forEach(function (b, i) {
     b.classList.toggle('active', i + 1 === slotId);
   });
   requestAnimationFrame(updateSlotCursor);
@@ -2381,20 +2473,25 @@ function renderSlotCards() {
     _loop4(i);
   }
 }
-window.addEventListener('load', () => {
+window.addEventListener('load', function () {
   document.body.classList.remove('creator-mode');
-  document.querySelectorAll('.sl').forEach(s => {
+  document.querySelectorAll('.sl').forEach(function (s) {
     fill(s);
-    s.addEventListener('input', () => fill(s));
+    s.addEventListener('input', function () {
+      return fill(s);
+    });
   });
-  document.addEventListener('click', e => {
+  document.addEventListener('click', function (e) {
     var btn = e.target.closest('button');
     if (btn) triggerButtonFx(btn);
   });
   renderGenderToggle();
   ensureTabVisible(getCurrentTabName());
   bootMotion();
-  setTimeout(() => B('pageReady'), 150);
-});</script>
+  setTimeout(function () {
+    return B('pageReady');
+  }, 150);
+});
+</script>
 </body>
 </html>
