@@ -91,6 +91,9 @@ html,body {
   width:min(1160px, calc(100% - 72px)); height:100%;
   display:flex; flex-direction:column; align-items:flex-start;
   padding:56px 0 42px 74px;
+  /* WLC: décalage à gauche pour laisser le personnage visible à droite */
+  margin-left:0;
+  margin-right:auto;
   opacity:1;
   transform:none;
   filter:none;
@@ -268,7 +271,7 @@ html,body {
 
 /* ── MAIN ROW : sidebar + form ────────────────────────────── */
 #main {
-  width:100%; max-width:860px;
+  width:100%; max-width:700px;
   display:grid; grid-template-columns:210px minmax(0, 1fr);
   gap:52px; flex:1; min-height:0; align-items:flex-start;
   position:relative;
@@ -1055,8 +1058,72 @@ body.creator-mode #main {
   opacity:1; visibility:visible; pointer-events:auto; transform:none;
 }
 
-/* Header écran de choix */
-#select-header {
+/* ── ORBIT SLIDER ─────────────────────────────────────────── */
+#orbit-wrap {
+  position:fixed;
+  bottom:32px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.3s ease;
+  z-index:20;
+}
+body.creator-mode #orbit-wrap {
+  opacity:1;
+  pointer-events:auto;
+}
+#orbit-wrap svg.orbit-arc {
+  position:absolute;
+  top:-28px;
+  left:50%;
+  transform:translateX(-50%);
+  pointer-events:none;
+  opacity:0.45;
+}
+#orbit-label {
+  font-size:10px;
+  color:rgba(255,255,255,0.35);
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  user-select:none;
+}
+#orbit-slider {
+  -webkit-appearance:none;
+  width:220px;
+  height:3px;
+  border-radius:2px;
+  background:rgba(255,255,255,0.12);
+  outline:none;
+  cursor:ew-resize;
+}
+#orbit-slider::-webkit-slider-thumb {
+  -webkit-appearance:none;
+  width:14px; height:14px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 0 8px rgba(255,255,255,0.4);
+  cursor:ew-resize;
+}
+#orbit-reset {
+  background:none;
+  border:1px solid rgba(255,255,255,0.18);
+  color:rgba(255,255,255,0.5);
+  border-radius:4px;
+  padding:3px 8px;
+  font-size:10px;
+  cursor:pointer;
+  letter-spacing:0.06em;
+  transition:border-color 0.2s, color 0.2s;
+}
+#orbit-reset:hover {
+  border-color:rgba(255,255,255,0.45);
+  color:rgba(255,255,255,0.85);
+}
   min-height:172px;
   margin-bottom:54px;
   flex-shrink:0;
@@ -1594,6 +1661,20 @@ body.ui-busy #select-close {
   </div><!-- /main -->
 </div>
 
+<!-- WLC: Orbit slider -->
+<div id="orbit-wrap">
+  <svg class="orbit-arc" width="260" height="32" viewBox="0 0 260 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 28 Q130 2 250 28" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+    <polyline points="6,22 10,28 16,24" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" fill="none"/>
+    <polyline points="254,22 250,28 244,24" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" fill="none"/>
+  </svg>
+  <span id="orbit-label">Orbiter</span>
+  <input id="orbit-slider" type="range" min="-180" max="180" value="0"
+    oninput="onOrbitSlider(this.value)"
+    ondblclick="resetOrbit()">
+  <button id="orbit-reset" onclick="resetOrbit()">↺</button>
+</div>
+
 <div id="stamp">SAUVEGARDÉ</div>
 <div id="notifs"></div>
 <div id="busy-indicator">Traitement...</div>
@@ -1978,6 +2059,14 @@ function populateForm() {
   renderFPGrid(document.getElementById('fp-search') && document.getElementById('fp-search').value || '');
   syncDot('fp');
 }
+function onOrbitSlider(v) {
+  B('setPreviewYaw', String(v));
+}
+function resetOrbit() {
+  var sl = document.getElementById('orbit-slider');
+  if (sl) sl.value = 0;
+  B('setPreviewYaw', '0');
+}
 function onSave() {
   if (!S.data.first_name || !S.data.last_name) {
     notif('Prénom et nom requis');
@@ -2234,17 +2323,7 @@ function GCC_Bootstrap(data) {
       g: 16,
       b: 14
     },
-    hair_scale: parseFloat(d.hair_scale) || 1.0,
-    scar_id: d.scar_id || '',
-    facepaint_id: d.facepaint_id || '',
-    scar_opacity: parseFloat(d.scar_opacity) || 1.0,
-    facepaint_opacity: parseFloat(d.facepaint_opacity) || 1.0,
-    scar_x: parseFloat(d.scar_x) || 0,
-    scar_y: parseFloat(d.scar_y) || 0,
-    scar_scale: parseFloat(d.scar_scale) || 1.0,
-    fp_x: parseFloat(d.fp_x) || 0,
-    fp_y: parseFloat(d.fp_y) || 0,
-    fp_scale: parseFloat(d.fp_scale) || 1.0
+    hair_scale: parseFloat(d.hair_scale) || 1.0
   };
   renderSlots();
   renderSlotCards();
@@ -2392,16 +2471,6 @@ function loadSlotIntoEditor(slotId) {
         b: 14
       },
       hair_scale: 1.0,
-      scar_id: '',
-      facepaint_id: '',
-      scar_opacity: 1.0,
-      facepaint_opacity: 1.0,
-      scar_x: 0,
-      scar_y: 0,
-      scar_scale: 1.0,
-      fp_x: 0,
-      fp_y: 0,
-      fp_scale: 1.0,
       slot_id: slotId
     };
   }
