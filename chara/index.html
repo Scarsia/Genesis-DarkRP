@@ -2234,7 +2234,17 @@ function GCC_Bootstrap(data) {
       g: 16,
       b: 14
     },
-    hair_scale: parseFloat(d.hair_scale) || 1.0
+    hair_scale: parseFloat(d.hair_scale) || 1.0,
+    scar_id: d.scar_id || '',
+    facepaint_id: d.facepaint_id || '',
+    scar_opacity: parseFloat(d.scar_opacity) || 1.0,
+    facepaint_opacity: parseFloat(d.facepaint_opacity) || 1.0,
+    scar_x: parseFloat(d.scar_x) || 0,
+    scar_y: parseFloat(d.scar_y) || 0,
+    scar_scale: parseFloat(d.scar_scale) || 1.0,
+    fp_x: parseFloat(d.fp_x) || 0,
+    fp_y: parseFloat(d.fp_y) || 0,
+    fp_scale: parseFloat(d.fp_scale) || 1.0
   };
   renderSlots();
   renderSlotCards();
@@ -2382,6 +2392,16 @@ function loadSlotIntoEditor(slotId) {
         b: 14
       },
       hair_scale: 1.0,
+      scar_id: '',
+      facepaint_id: '',
+      scar_opacity: 1.0,
+      facepaint_opacity: 1.0,
+      scar_x: 0,
+      scar_y: 0,
+      scar_scale: 1.0,
+      fp_x: 0,
+      fp_y: 0,
+      fp_scale: 1.0,
       slot_id: slotId
     };
   }
