@@ -332,7 +332,7 @@ input{font-family:inherit;}
     </div>
     <div class="hdr-right">
       <div class="hdr-greet">Bienvenue,</div>
-      <div class="hdr-name" id="player-name">Jean Dupont</div>
+      <div class="hdr-name" id="player-name"></div>
     </div>
   </div>
 
@@ -443,7 +443,7 @@ input{font-family:inherit;}
           <div class="info-panel">
             <div class="info-top">
               <div class="info-greet">BIENVENUE,</div>
-              <div class="info-name" id="info-player-name">Jean Dupont</div>
+              <div class="info-name" id="info-player-name"></div>
               <div class="info-iban" id="info-iban">GN-8821-4201</div>
             </div>
             <div>
@@ -552,7 +552,7 @@ var S = {
   selectedKey: null,
   viewMode: 'cards',
   activeGroupID: null,
-  playerName: 'Jean Dupont',
+  playerName: '',
   isAdmin: false,
   transferSourceKey: null,
   activeFilter: 'all',
@@ -562,61 +562,6 @@ var S = {
 /* ============================================================
    MOCK DATA  (remplacé par GN_SetSnapshot en prod)
    ============================================================ */
-var MOCK = {
-  personal_cards_count: 2,
-  max_personal_cards: 3,
-  cards_personal: [
-    { card_uid:1, card_id:1, scope:'personal', iban:'GN-8821-4201', label:'Carte Genesis',
-      card_number:'3055 4821 0042 1337', balance:8200, metadata:{} },
-    { card_uid:2, card_id:2, scope:'personal', iban:'GN-9922-0011', label:'Epargne',
-      card_number:'4012 9922 0011 5566', balance:2150, metadata:{} }
-  ],
-  cards_group: [
-    { card_uid:'group:1', group_id:1, scope:'group', group_name:'Los Santos Corp',
-      iban:'GN-1234-5678', card_number:'5099 1234 5678 9012', balance:45000,
-      metadata:{ is_verified:true, is_group_owner:true, can_manage_members:true,
-                 can_invite:true, can_create_subgroups:true,
-                 members:[{name:'Jean Dupont',role:'Patron',steamid:'76561198000000001'}] } }
-  ],
-  cards_subgroups: [
-    { card_uid:'sub:1', group_id:1, subgroup_id:1, scope:'subgroup',
-      subgroup_name:'Département RH', group_name:'Los Santos Corp',
-      iban:'GN-5566-7788', balance:8000,
-      metadata:{ subgroup_ibans:[
-        {iban:'GN-1111-2222',beneficiary_name:'Alice Dupuis'},
-        {iban:'GN-3333-4444',beneficiary_name:'Bob Martin'}
-      ]} }
-  ],
-  transactions: [
-    { id:1,date:'14',month:'AVR',txn_type:'transfer_in', description:'Virement reçu',
-      amount:1500, balance_after:8200, created_at:1713100800,
-      metadata:{ sender_name:'Pierre Martin', source_name:'Pierre Martin' } },
-    { id:2,date:'13',month:'AVR',txn_type:'transfer_out', description:'Los Santos Corp LLC.',
-      amount:-5000, balance_after:6700, created_at:1713014400,
-      metadata:{ beneficiary_name:'Los Santos Corp', target_name:'Los Santos Corp LLC.',
-                 source_group_name:'Los Santos Corp', source_group_verified:true } },
-    { id:3,date:'12',month:'AVR',txn_type:'deposit', description:'Dépôt',
-      amount:3000, balance_after:11700, created_at:1712928000, metadata:{} },
-    { id:4,date:'10',month:'AVR',txn_type:'withdraw', description:'Retrait ATM',
-      amount:-800, balance_after:8700, created_at:1712755200, metadata:{} },
-    { id:5,date:'08',month:'AVR',txn_type:'transfer_in', description:'Pierre Martin',
-      amount:250, balance_after:9500, created_at:1712582400,
-      metadata:{ sender_name:'Pierre Martin' } },
-    { id:6,date:'05',month:'AVR',txn_type:'transfer_out', description:'Loyer mensuel',
-      amount:-1200, balance_after:9250, created_at:1712326400,
-      metadata:{ beneficiary_name:'Agence Immo', comment:'Loyer' } }
-  ],
-  invoices_received: [
-    { id:1, status:'pending',   creator_iban:'GN-1234-5678', target_iban:'GN-8821-4201', amount:5000, description:'Commande matériel', created_at:1713100800 },
-    { id:2, status:'paid',      creator_iban:'GN-9900-1122', target_iban:'GN-8821-4201', amount:1200, description:'Prestation service', created_at:1712500000 }
-  ],
-  invoices_sent: [
-    { id:3, status:'pending',   creator_iban:'GN-1234-5678', target_iban:'GN-3344-8812', amount:3500, description:'Loyer local commercial', created_at:1713050000 },
-    { id:4, status:'cancelled', creator_iban:'GN-1234-5678', target_iban:'GN-5511-2200', amount:800,  description:'Facture annulée', created_at:1712400000 }
-  ],
-  atm_session: { granted_personal_cards:[] }
-};
-
 /* ============================================================
    UTILS
    ============================================================ */
@@ -1849,14 +1794,16 @@ window.GN_HandleResult=function(payload){
 window.GN_OpenPinPrompt=function(payload){ openPinPrompt(payload||{}); };
 
 /* ============================================================
-   INIT
+   INIT — état vide, attente de GN_SetSnapshot() depuis Lua
    ============================================================ */
 (function(){
-  S.snap=MOCK;
-  S.playerName='Jean Dupont';
+  S.snap=null;
+  S.playerName='';
   S.viewMode='cards';
   S.selectedKey=null;
-  renderAll();
+  // Dashboard caché, init screen caché — on attend le bridge Lua
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('init-screen').classList.remove('open');
 })();
 </script>
 </body>
