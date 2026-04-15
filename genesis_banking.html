@@ -340,12 +340,12 @@ input{font-family:inherit;}
     <!-- SIDEBAR -->
     <div class="sidebar">
       <div class="glass" style="padding:16px;">
-        <div class="lxs" id="bal-label">PATRIMOINE PERSONNEL</div>
-        <div class="bal-lg" id="sidebar-total">$0</div>
+        <div class="lxs" id="bal-label"></div>
+        <div class="bal-lg" id="sidebar-total"></div>
         <div class="stats-row">
-          <div class="stat-item"><div class="stat-val" id="stat-cards">0/3</div><div class="stat-label">Cartes</div></div>
-          <div class="stat-item"><div class="stat-val" id="stat-groups">0</div><div class="stat-label">Groupes</div></div>
-          <div class="stat-item"><div class="stat-val" id="stat-sub">0</div><div class="stat-label">Sous-groupes</div></div>
+          <div class="stat-item"><div class="stat-val" id="stat-cards"></div><div class="stat-label">Cartes</div></div>
+          <div class="stat-item"><div class="stat-val" id="stat-groups"></div><div class="stat-label">Groupes</div></div>
+          <div class="stat-item"><div class="stat-val" id="stat-sub"></div><div class="stat-label">Sous-groupes</div></div>
         </div>
       </div>
 
@@ -414,25 +414,23 @@ input{font-family:inherit;}
               <div class="cc-inner">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                   <div>
-                    <div class="cc-type-lbl" id="cc-type">PERSONNEL</div>
+                    <div class="cc-type-lbl" id="cc-type"></div>
                     <div style="display:flex;align-items:center;margin-top:10px;">
                       <div class="cc-chip"></div>
                       <div class="cc-nfc">)))</div>
                     </div>
                   </div>
-                  <div class="cc-brand-area" id="cc-brand-area">
-                    <span class="cc-brand-text cc-vis">VISA</span>
-                  </div>
+                  <div class="cc-brand-area" id="cc-brand-area"></div>
                 </div>
                 <div>
-                  <div class="cc-number" id="cc-number">3007 4821 0042 1337</div>
-                  <div class="cc-iban-lbl" id="cc-iban-lbl">GN-8821-4201</div>
+                  <div class="cc-number" id="cc-number"></div>
+                  <div class="cc-iban-lbl" id="cc-iban-lbl"></div>
                   <div class="cc-bottom" style="margin-top:8px;">
                     <div>
-                      <div class="cc-name-lbl" id="cc-name-lbl">CARTE GENESIS</div>
+                      <div class="cc-name-lbl" id="cc-name-lbl"></div>
                       <div class="cc-verified-badge" id="cc-verified" style="display:none;">✔ VÉRIFIÉ</div>
                     </div>
-                    <div class="cc-expiry">04/28</div>
+                    <div class="cc-expiry"></div>
                   </div>
                 </div>
               </div>
@@ -444,11 +442,11 @@ input{font-family:inherit;}
             <div class="info-top">
               <div class="info-greet">BIENVENUE,</div>
               <div class="info-name" id="info-player-name"></div>
-              <div class="info-iban" id="info-iban">GN-8821-4201</div>
+              <div class="info-iban" id="info-iban"></div>
             </div>
             <div>
               <div class="info-bal-lbl">SOLDE DISPONIBLE</div>
-              <div class="info-bal" id="info-bal">$8 200.00</div>
+              <div class="info-bal" id="info-bal"></div>
               <div class="cfg-pills" id="cfg-pills"></div>
             </div>
           </div>
@@ -493,22 +491,22 @@ input{font-family:inherit;}
           <div class="pin-cc-inner">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;">
               <div>
-                <div class="pin-cc-type" id="pin-cc-type">PERSONNEL</div>
+                <div class="pin-cc-type" id="pin-cc-type"></div>
                 <div style="display:flex;align-items:center;margin-top:7px;">
                   <div class="pin-cc-chip"></div>
                   <span style="font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:-2px;font-weight:300;margin-left:6px;">)))</span>
                 </div>
               </div>
-              <div id="pin-cc-brand" class="pin-cc-brand">VISA</div>
+              <div id="pin-cc-brand" class="pin-cc-brand"></div>
             </div>
             <div>
-              <div class="pin-cc-number" id="pin-cc-number">•••• •••• •••• ••••</div>
+              <div class="pin-cc-number" id="pin-cc-number"></div>
               <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:4px;">
                 <div>
-                  <div class="pin-cc-name" id="pin-cc-name">CARTE GENESIS</div>
+                  <div class="pin-cc-name" id="pin-cc-name"></div>
                   <div class="pin-cc-group-badge" id="pin-cc-badge" style="display:none;">✔ ENTREPRISE VÉRIFIÉE</div>
                 </div>
-                <span style="font-size:7px;color:rgba(255,255,255,0.35);">04/28</span>
+                <span style="font-size:7px;color:rgba(255,255,255,0.35);"></span>
               </div>
             </div>
           </div>
@@ -567,6 +565,61 @@ var S = {
    ============================================================ */
 function fmt(v){ return '$' + Math.round(Math.abs(v)).toLocaleString('fr-FR'); }
 function fmtDate(ts){ if(!ts) return ''; var d=new Date(ts*1000); return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+
+var MONTHS=['JAN','FÉV','MAR','AVR','MAI','JUN','JUL','AOÛ','SEP','OCT','NOV','DÉC'];
+
+// Normalise un IBAN brut (ex: "VMQSGU") → "GN-VMQS-GU"
+function fmtIban(raw){
+  if(!raw) return '';
+  raw=String(raw).trim().toUpperCase();
+  // Déjà formaté (contient un tiret)
+  if(raw.indexOf('-')>=0) return raw;
+  // 6 lettres brutes → GN-XXXX-XX
+  if(raw.length===6) return 'GN-'+raw.substring(0,4)+'-'+raw.substring(4);
+  return raw;
+}
+
+// Normalise une transaction serveur (created_at → date/month, metadata string → object)
+function normTx(tx){
+  if(!tx) return tx;
+  // Parser metadata si c'est une string JSON
+  if(typeof tx.metadata === 'string' && tx.metadata !== ''){
+    try{ tx.metadata = JSON.parse(tx.metadata); }catch(e){ tx.metadata = {}; }
+  }
+  if(!tx.metadata || typeof tx.metadata !== 'object') tx.metadata = {};
+  // Générer date/month depuis created_at si absents
+  if(!tx.date && tx.created_at){
+    var d = new Date((tx.created_at)*1000);
+    tx.date  = String(d.getDate());
+    tx.month = MONTHS[d.getMonth()]||'';
+  }
+  tx.date  = tx.date  || '—';
+  tx.month = tx.month || '';
+  // Normaliser les IBANs counterparty
+  if(tx.counterparty_iban) tx.counterparty_iban = fmtIban(tx.counterparty_iban);
+  return tx;
+}
+
+// Normalise une carte (iban brut, metadata string)
+function normCard(c){
+  if(!c) return c;
+  if(c.iban) c.iban = fmtIban(c.iban);
+  if(typeof c.metadata === 'string' && c.metadata !== ''){
+    try{ c.metadata = JSON.parse(c.metadata); }catch(e){ c.metadata = {}; }
+  }
+  if(!c.metadata || typeof c.metadata !== 'object') c.metadata = {};
+  return c;
+}
+
+// Normalise tout le snapshot à la réception
+function normSnap(snap){
+  if(!snap) return snap;
+  (snap.cards_personal||[]).forEach(normCard);
+  (snap.cards_group||[]).forEach(normCard);
+  (snap.cards_subgroups||[]).forEach(normCard);
+  (snap.transactions||[]).forEach(normTx);
+  return snap;
+}
 
 function getCardTier(num){
   var clean = String(num||'').replace(/\s/g,'');
@@ -641,7 +694,7 @@ function renderSidebar(){
   var total=shown.reduce(function(s,c){return s+(c.balance||0);},0);
 
   var labels={cards:'PATRIMOINE PERSONNEL',groups:'TRÉSORERIE DES GROUPES',subgroups:'FONDS DÉPARTEMENTS',invoices:'FACTURES'};
-  document.getElementById('bal-label').textContent=labels[S.viewMode]||'PATRIMOINE';
+  document.getElementById('bal-label').textContent=labels[S.viewMode]||'';
   document.getElementById('sidebar-total').textContent=fmt(total);
   document.getElementById('stat-cards').textContent=(snap.personal_cards_count||0)+'/'+(snap.max_personal_cards||3);
   document.getElementById('stat-groups').textContent=(snap.cards_group||[]).length;
@@ -671,7 +724,7 @@ function renderSidebar(){
     var tier=getCardTier(c.card_number||'');
     var tierLabel=tier.toUpperCase();
     var scopeLabel=scope==='group'?(isVerif?'ENTREPRISE':'GROUPE'):scope==='subgroup'?'DÉPARTEMENT':'PERSONNEL';
-    var name=scope==='group'?c.group_name:scope==='subgroup'?c.subgroup_name:(c.label||'Carte');
+    var name=scope==='group'?c.group_name:scope==='subgroup'?c.subgroup_name:(c.label||'');
     var subIbans=meta.subgroup_ibans||[];
     var balOrCount=scope==='subgroup'
       ? subIbans.length+' salarié'+(subIbans.length>1?'s':'')
@@ -709,9 +762,9 @@ function renderCreditCard(card){
   document.getElementById('cc-iban-lbl').textContent=card.iban||'';
 
   var nameEl=document.getElementById('cc-name-lbl');
-  if(scope==='group') nameEl.textContent=(card.group_name||'GROUPE').toUpperCase();
-  else if(scope==='subgroup') nameEl.textContent=(card.subgroup_name||'DÉPARTEMENT').toUpperCase();
-  else nameEl.textContent=(card.label||'CARTE').toUpperCase();
+  if(scope==='group') nameEl.textContent=(card.group_name||'').toUpperCase();
+  else if(scope==='subgroup') nameEl.textContent=(card.subgroup_name||'').toUpperCase();
+  else nameEl.textContent=(card.label||'').toUpperCase();
 
   var vBadge=document.getElementById('cc-verified');
   vBadge.style.display=meta.is_verified?'block':'none';
@@ -900,7 +953,7 @@ function renderInvoices(area){
     var groupCards=snap.cards_group||[];
     var groupOpts=groupCards.length
       ? groupCards.map(function(g,i){
-          return '<option value="'+i+'">'+String(g.group_name||'Groupe #'+(g.group_id||i))+'</option>';
+          return '<option value="'+i+'">'+String(g.group_name||'')+'</option>';
         }).join('')
       : '<option value="">Aucun groupe disponible</option>';
 
@@ -957,7 +1010,7 @@ function openTxModal(idx){
   var arrowIn='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#22b960;width:22px;height:22px;"><line x1="19" y1="5" x2="5" y2="19"/><polyline points="19 12 19 5 12 5"/></svg>';
   var arrowOut='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#8892a8;width:22px;height:22px;"><line x1="5" y1="5" x2="19" y2="19"/><polyline points="5 12 5 5 12 5"/></svg>';
   var details=[
-    {k:'Date',v:tx.date+' '+tx.month+' 2026'},
+    {k:'Date',v:fmtDate(tx.created_at)||(tx.date+' '+tx.month)},
     {k:'Type',v:tx.txn_type||'—'},
     {k:pos?'De':'Vers', v:pos?(meta.sender_name||meta.source_group_name||'—'):(meta.beneficiary_name||meta.target_name||'—')},
     {k:'Référence',v:'#TX-'+String(tx.id||idx).padStart(6,'0')},
@@ -1051,7 +1104,7 @@ function doTransfer(){
     var isSel=k===S.transferSourceKey;
     return '<div class="csel-row'+(isSel?' on':'')+'" onclick="S.transferSourceKey=\''+k+'\';document.querySelectorAll(\'.csel-row\').forEach(function(el){el.classList.remove(\'on\');});this.classList.add(\'on\')">'
       +'<div><div style="font-size:10px;font-weight:500;color:#c0c4d4;">'+c.iban+'</div>'
-      +'<div style="font-size:9px;color:#2e3848;">'+(c.label||c.group_name||'Carte')+'</div></div>'
+      +'<div style="font-size:9px;color:#2e3848;">'+(c.label||c.group_name||'')+'</div></div>'
       +'<div style="font-size:10px;color:#8892a8;">'+fmt(c.balance||0)+'</div>'
     +'</div>';
   }).join('');
@@ -1060,9 +1113,9 @@ function doTransfer(){
     +'<div class="mlabel" style="margin-bottom:6px;">COMPTE SOURCE</div>'
     +'<div class="csel-list">'+cardRows+'</div>'
     +mField('IBAN destinataire','tr-iban','text','GN-XXXX-XXXX',true)
-    +mField('Nom du bénéficiaire','tr-benef','text','Jean Dupont')
+    +mField('Nom du bénéficiaire','tr-benef','text','')
     +mField('Montant','tr-amount','number','0')
-    +mField('Motif / Référence','tr-comment','text','Loyer, remboursement...')
+    +mField('Motif / Référence','tr-comment','text','')
     +mBtn('Envoyer le virement','confirmTransfer()'), true);
 }
 function confirmTransfer(){
@@ -1116,7 +1169,7 @@ function confirmUpgrade(tier){
 
 function doTempLimit(){
   openModal(mTitle('PLAFOND TEMPORAIRE (+30min)')
-    +mField('Montant du bonus','limit-bonus','number','50000')
+    +mField('Montant du bonus','limit-bonus','number','0')
     +mBtn('Activer','confirmTempLimit()'));
 }
 function confirmTempLimit(){
@@ -1141,7 +1194,7 @@ function confirmChangePin(){
 
 function doRename(){
   var card=getSelectedCard();
-  var cur=card?String(card.label||card.group_name||'Carte'):'';
+  var cur=card?String(card.label||card.group_name||''):'';
   openModal(mTitle('RENOMMER LA CARTE')
     +mField('Nouveau nom','rename-label','text',cur)
     +mBtn('Confirmer','confirmRename()'));
@@ -1174,8 +1227,8 @@ function doManageMembers(){
   var rows=members.length
     ? members.map(function(m,i){
         return '<div class="member-row">'
-          +'<div><div style="font-size:12px;color:#c0c4d4;">'+(m.name||m.nick||'Membre')+'</div>'
-          +'<div style="font-size:9.5px;color:#3a4255;">'+(m.role||'Employé')+' · '+(m.steamid||'')+'</div></div>'
+          +'<div><div style="font-size:12px;color:#c0c4d4;">'+(m.name||m.nick||'')+'</div>'
+          +'<div style="font-size:9.5px;color:#3a4255;">'+(m.role||'')+' · '+(m.steamid||'')+'</div></div>'
           +'<button class="kick-btn" onclick="doKickMember('+i+')">Expulser</button>'
         +'</div>';
       }).join('')
@@ -1195,7 +1248,7 @@ function doKickMember(idx){
 
 function doInvite(){
   openModal(mTitle('INVITER UN MEMBRE')
-    +mField('SteamID64, nom ou IBAN','invite-target','text','76561198...')
+    +mField('SteamID64, nom ou IBAN','invite-target','text','')
     +mBtn('Envoyer l\'invitation','confirmInvite()'));
 }
 function confirmInvite(){
@@ -1208,7 +1261,7 @@ function confirmInvite(){
 
 function doCreateSubgroup(){
   openModal(mTitle('CRÉER UN SOUS-GROUPE')
-    +mField('Nom du sous-groupe','sg-name','text','Département RH')
+    +mField('Nom du sous-groupe','sg-name','text','')
     +mBtn('Créer','confirmCreateSubgroup()'));
 }
 function confirmCreateSubgroup(){
@@ -1235,7 +1288,7 @@ function confirmLeave(){
 function doAddEmployee(){
   openModal(mTitle('AJOUTER UN SALARIÉ')
     +mField('IBAN du salarié','emp-iban','text','GN-XXXX-XXXX',true)
-    +mField('Nom affiché','emp-name','text','Alice Dupuis')
+    +mField('Nom affiché','emp-name','text','')
     +mBtn('Ajouter','confirmAddEmployee()'));
 }
 function confirmAddEmployee(){
@@ -1254,7 +1307,7 @@ function doManageEmployees(){
   var rows=emps.length
     ? emps.map(function(e,i){
         return '<div class="member-row">'
-          +'<div><div style="font-size:12px;color:#c0c4d4;">'+(e.beneficiary_name||'Salarié')+'</div>'
+          +'<div><div style="font-size:12px;color:#c0c4d4;">'+(e.beneficiary_name||'')+'</div>'
           +'<div style="font-size:9.5px;color:#3a4255;font-family:\'Courier New\',monospace;">'+(e.iban||'')+'</div></div>'
           +'<button class="kick-btn" onclick="doKickEmployee('+i+')">Retirer</button>'
         +'</div>';
@@ -1301,7 +1354,7 @@ function confirmAddCard(){
 
 function doCreateGroup(){
   openModal(mTitle('CRÉER / OUVRIR MON ENTREPRISE')
-    +mField('Nom de l\'entreprise (min. 3 caract.)','grp-name','text','Los Santos Corp')
+    +mField('Nom de l\'entreprise (min. 3 caract.)','grp-name','text','')
     +mField('Code PIN (optionnel — 4 chiffres)','grp-pin','password','')
     +'<div style="font-size:9.5px;color:#2a3040;margin-top:-6px;margin-bottom:12px;">Laissez vide pour accès libre.</div>'
     +mBtn('Créer','confirmCreateGroup()'));
@@ -1627,8 +1680,8 @@ function renderPinCard(){
     isGroup?(isVerif?'ENTREPRISE':'GROUPE'):scope==='subgroup'?'DÉPARTEMENT':'PERSONNEL';
   document.getElementById('pin-cc-number').textContent=card.card_number||'•••• •••• •••• ••••';
 
-  var name=isGroup?(card.group_name||'GROUPE'):
-    scope==='subgroup'?(card.subgroup_name||'DÉPARTEMENT'):(card.label||'CARTE GENESIS');
+  var name=isGroup?(card.group_name||''):
+    scope==='subgroup'?(card.subgroup_name||''):(card.label||'');
   document.getElementById('pin-cc-name').textContent=String(name).toUpperCase();
 
   var badge=document.getElementById('pin-cc-badge');
@@ -1712,7 +1765,7 @@ window.GN_SetSnapshot=function(data){
     if(BLOCK_ERRORS.indexOf(err)>=0){ showBlockScreen(err); return; }
     return;
   }
-  S.snap=(data&&data.data)||data;
+  S.snap=normSnap((data&&data.data)||data);
   S.viewMode='cards'; S.selectedKey=null;
   renderAll();
 };
