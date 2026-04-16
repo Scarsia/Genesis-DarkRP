@@ -311,6 +311,33 @@ button { cursor:pointer; }
 .notif-txt{font-size:11.5px;color:#c8ccd8;padding-left:12px;}
 @keyframes notifIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:none;}}
 
+/* ===== CARD SETTINGS PANEL ===== */
+.cs-section{margin-bottom:22px;}
+.cs-section-title{font-size:9px;font-weight:600;letter-spacing:.22em;color:#5a6880;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.cs-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);margin-bottom:5px;}
+.cs-row.locked{opacity:.45;cursor:not-allowed;}
+.cs-row-label{font-size:9.5px;color:#6a7890;letter-spacing:.05em;display:flex;align-items:center;gap:6px;}
+.cs-row-label svg{opacity:.4;}
+.cs-row-value{font-size:11px;font-weight:500;color:#c0c4d4;text-align:right;font-family:inherit;}
+.cs-row-value.mono{font-family:'Courier New',monospace;font-size:10px;}
+.cs-row-value.locked-val{color:#5a6880;}
+.cs-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:8.5px;font-weight:600;letter-spacing:.08em;}
+.cs-badge.ok{background:rgba(34,185,96,0.1);color:#22b960;border:1px solid rgba(34,185,96,0.2);}
+.cs-badge.warn{background:rgba(212,168,48,0.1);color:#d4a030;border:1px solid rgba(212,168,48,0.2);}
+.cs-badge.muted{background:rgba(100,110,130,0.1);color:#6a7890;border:1px solid rgba(100,110,130,0.15);}
+
+.cs-activity{display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;}
+.cs-act-row{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:7px;background:rgba(255,255,255,0.02);}
+.cs-act-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.cs-act-dot.login{background:#22b960;}
+.cs-act-dot.pin{background:#d4a030;}
+.cs-act-dot.tx{background:#5a6880;}
+.cs-act-dot.alert{background:#d03030;}
+.cs-act-info{flex:1;}
+.cs-act-label{font-size:10.5px;color:#c0c4d4;}
+.cs-act-date{font-size:9px;color:#5a6880;margin-top:1px;}
+.cs-act-badge{font-size:9px;color:#4a5870;}
+
 #init-screen{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#030305;z-index:50;align-items:center;justify-content:center;flex-direction:column;}
 #init-screen.open{display:flex;}
 #stars-canvas{position:absolute;top:0;right:0;bottom:0;left:0;}
@@ -707,6 +734,7 @@ function renderHero(card){
     btns.push({l:'Plafonds (+30min)', fn:doTempLimit});
     btns.push({l:'Modifier PIN',      fn:doChangePin});
     btns.push({l:'Renommer',          fn:doRename});
+    btns.push({l:'Paramètres',        fn:doCardSettings});
   } else if(scope==='group'){
     btns.push({l:'Modifier PIN',       fn:doChangePin});
     btns.push({l:'Renommer',           fn:doRename});
@@ -715,9 +743,11 @@ function renderHero(card){
     if(meta.can_invite)         btns.push({l:'Inviter',           fn:doInvite});
     if(meta.can_create_subgroups) btns.push({l:'Créer un sous-groupe', fn:doCreateSubgroup});
     if(meta.is_group_member&&!meta.is_group_owner) btns.push({l:'Quitter', fn:doLeaveGroup, danger:true});
+    btns.push({l:'Paramètres', fn:doCardSettings});
   } else if(scope==='subgroup'){
     btns.push({l:'Ajouter un salarié',  fn:doAddEmployee});
     btns.push({l:'Gérer les salariés',  fn:doManageEmployees});
+    btns.push({l:'Paramètres',          fn:doCardSettings});
     btns.push({l:'Quitter',             fn:doLeaveGroup, danger:true});
   }
   var html='';
@@ -1115,7 +1145,121 @@ function doTheme(){
   }
 }
 
-function doCreateInvoice(){
+function makeGenesisEmail(name){
+  return String(name||'').toLowerCase()
+    .replace(/\s+/g,'.')
+    .replace(/[^a-z0-9.]/g,'')
+    + '@genesis.com';
+}
+
+function doCardSettings(){
+  var card=getSelectedCard(); if(!card) return;
+  var meta=getMeta(card); var scope=card.scope||'personal';
+  var playerName=S.playerName||'Joueur';
+  var email=makeGenesisEmail(playerName);
+  var tier=getCardTier(card.card_number||'');
+  var tierLabel=tier==='mastercard'?'Mastercard':tier==='amex'?'American Express':'Visa';
+  var scopeLabel=scope==='group'?(meta.is_verified?'Entreprise vérifiée':'Groupe'):scope==='subgroup'?'Département':'Carte personnelle';
+
+  /* Icones inline SVG */
+  var iLock='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>';
+  var iUser='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+  var iMail='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>';
+  var iCard='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
+  var iHash='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>';
+  var iClock='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+
+  /* Historique d'activité à partir des transactions */
+  var txs=(S.snap?S.snap.transactions||[]:[]);
+  var cardIban=String(card.iban||'').toLowerCase();
+  var events=[];
+  var now=Math.floor(Date.now()/1000);
+
+  /* Événement connexion actuelle */
+  events.push({dot:'login',label:'Connexion ATM',sub:'Session en cours',ts:now,badge:'ok'});
+
+  /* Filtrer les transactions de cette carte pour extraire les événements pertinents */
+  for(var i=0;i<txs.length&&events.length<8;i++){
+    var tx=txs[i]; var type=String(tx.txn_type||'').toLowerCase();
+    var txIban=String(tx.iban||'').toLowerCase();
+    if(cardIban&&txIban&&txIban!==cardIban) continue;
+    var ts=tx.created_at||0;
+    if(type.indexOf('pin')!==-1||type==='pin_change'){
+      events.push({dot:'pin',label:'Modification du PIN',sub:'Code d\'accès modifié',ts:ts,badge:'warn'});
+    } else if(type==='card_create'||type.indexOf('creation')!==-1){
+      events.push({dot:'login',label:'Création de la carte',sub:String(tx.description||''),ts:ts,badge:'ok'});
+    } else if(type==='deposit'||type==='withdraw'||type.indexOf('transfer')!==-1){
+      var amt=(tx.amount||0); var prefix=amt>=0?'+ ':'-  ';
+      events.push({dot:'tx',label:type==='deposit'?'Dépôt':type==='withdraw'?'Retrait':'Virement',sub:prefix+fmt(amt),ts:ts,badge:'muted'});
+    } else {
+      events.push({dot:'tx',label:String(tx.description||type),sub:'',ts:ts,badge:'muted'});
+    }
+  }
+
+  /* Construire le HTML de l'activité */
+  var actHtml='';
+  if(!events.length){ actHtml='<div style="font-size:10px;color:#5a6880;padding:8px;">Aucune activité enregistrée.</div>'; }
+  else {
+    for(var e=0;e<events.length;e++){
+      var ev=events[e];
+      var dateStr=ev.ts>0?fmtDate(ev.ts):'';
+      var badgeHtml='';
+      if(ev.badge==='ok') badgeHtml='<span class="cs-badge ok">✓</span>';
+      else if(ev.badge==='warn') badgeHtml='<span class="cs-badge warn">⚠</span>';
+      else badgeHtml='<span class="cs-badge muted">—</span>';
+      actHtml+='<div class="cs-act-row">'
+        +'<div class="cs-act-dot '+ev.dot+'"></div>'
+        +'<div class="cs-act-info"><div class="cs-act-label">'+ev.label+'</div>'
+        +(ev.sub?'<div class="cs-act-date">'+ev.sub+'</div>':'')
+        +(dateStr?'<div class="cs-act-date">'+dateStr+'</div>':'')
+        +'</div>'+badgeHtml+'</div>';
+    }
+  }
+
+  var html=''
+    +'<div class="mtitle" style="font-size:11px;margin-bottom:18px;">PARAMÈTRES · '+(card.label||card.group_name||card.iban||'CARTE')+'</div>'
+    +'<div class="cs-section">'
+      +'<div class="cs-section-title">'+iUser+' &nbsp;Titulaire</div>'
+      +'<div class="cs-row locked" title="Champ non modifiable">'
+        +'<span class="cs-row-label">'+iLock+' Nom complet</span>'
+        +'<span class="cs-row-value locked-val">'+playerName+'</span>'
+      +'</div>'
+      +'<div class="cs-row locked" title="Champ non modifiable">'
+        +'<span class="cs-row-label">'+iMail+' Adresse e-mail</span>'
+        +'<span class="cs-row-value locked-val mono">'+email+'</span>'
+      +'</div>'
+      +'<div class="cs-row locked" title="Champ non modifiable">'
+        +'<span class="cs-row-label">'+iHash+' Portée</span>'
+        +'<span class="cs-row-value locked-val">'+scopeLabel+'</span>'
+      +'</div>'
+    +'</div>'
+    +'<div class="cs-section">'
+      +'<div class="cs-section-title">'+iCard+' &nbsp;Carte</div>'
+      +'<div class="cs-row locked">'
+        +'<span class="cs-row-label">'+iLock+' Numéro</span>'
+        +'<span class="cs-row-value locked-val mono">'+(card.card_number||'—')+'</span>'
+      +'</div>'
+      +'<div class="cs-row locked">'
+        +'<span class="cs-row-label">'+iLock+' Type</span>'
+        +'<span class="cs-row-value locked-val">'+tierLabel+'</span>'
+      +'</div>'
+      +'<div class="cs-row locked">'
+        +'<span class="cs-row-label">'+iHash+' IBAN</span>'
+        +'<span class="cs-row-value locked-val mono">'+(card.iban||'—')+'</span>'
+      +'</div>'
+      +(scope==='personal'?
+        '<div class="cs-row locked">'
+          +'<span class="cs-row-label">'+iLock+' Alias carte</span>'
+          +'<span class="cs-row-value">'+(card.label||'—')+'</span>'
+        +'</div>':'')
+    +'</div>'
+    +'<div class="cs-section">'
+      +'<div class="cs-section-title">'+iClock+' &nbsp;Historique d\'activité</div>'
+      +'<div class="cs-activity">'+actHtml+'</div>'
+    +'</div>';
+
+  openModal(html, true);
+}
   var iban=String(document.getElementById('inv-iban').value||'').trim(); var amt=Math.floor(Number(document.getElementById('inv-amount').value||0)); var desc=String(document.getElementById('inv-desc').value||'').trim(); var grp=document.getElementById('inv-group');
   var gid=null;
   if(grp && S.snap && S.snap.cards_group && S.snap.cards_group[Number(grp.value)]) {
@@ -1216,7 +1360,14 @@ function renderPinNumpad(){
     document.getElementById('pin-numpad').innerHTML = html;
 }
 function pinKey(k){
-  if(k==='Annuler'){closePinPrompt();return;} if(k==='Effacer'){PIN_STATE.pin=PIN_STATE.pin.slice(0,-1);renderPinDots();return;}
+  if(k==='Annuler'){
+    /* Annuler = fermeture complète de l'ATM, pas juste masquer l'overlay */
+    document.getElementById('pin-overlay').classList.remove('open');
+    PIN_STATE.pin=''; PIN_STATE.cards=[];
+    bridgeSend('close',{});
+    return;
+  }
+  if(k==='Effacer'){PIN_STATE.pin=PIN_STATE.pin.slice(0,-1);renderPinDots();return;}
   if(PIN_STATE.pin.length<4) PIN_STATE.pin+=k; renderPinDots();
   if(PIN_STATE.pin.length===4){ var c=PIN_STATE.cards[PIN_STATE.idx]; bridgeSend('atm_pin_auth',{card_uid:c.card_uid||c.group_id||0,pin:PIN_STATE.pin}); closePinPrompt(); }
 }
