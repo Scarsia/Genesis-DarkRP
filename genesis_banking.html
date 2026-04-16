@@ -7,31 +7,32 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
-/* SCROLLBAR INVISIBLE/THEMÉE (Fini les barres blanches Chromium) */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+/* SCROLLBAR INVISIBLE (FINI LE BLANC) */
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.15); }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
 
 html,body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  margin:0;
-  padding:0;
-  background: #050505;
-}
-#dashboard{
-  width:100%;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  padding:12px 18px 10px;
-  overflow:hidden;
-  box-sizing:border-box;
+  width:100%; height:100%; overflow:hidden;
+  margin:0; padding:0; background:#050505;
+  color:#e8eaf0; font-family:'Segoe UI',system-ui,sans-serif;
+  display: flex; align-items: center; justify-content: center; /* Centrage absolu */
 }
 
-body{color:#e8eaf0;font-family:'Segoe UI',system-ui,sans-serif;position:relative;}
+/* WRAPPER D'ÉCHELLE (LE SECRET DU CENTRAGE PARFAIT) */
+#scale-wrapper {
+  width: 1000px;
+  height: 680px;
+  position: relative;
+  transform-origin: center center;
+}
+
+#dashboard{
+  width:100%; height:100%;
+  display:flex; flex-direction:column;
+  padding:12px 18px 10px; overflow:hidden;
+}
 
 /* Ambient glows */
 .glow{position:fixed;border-radius:50%;pointer-events:none;z-index:0;}
@@ -42,13 +43,7 @@ body{color:#e8eaf0;font-family:'Segoe UI',system-ui,sans-serif;position:relative
 .glass{background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:0.5px solid rgba(255,255,255,0.08);border-radius:16px;}
 .glass-sm{background:rgba(255,255,255,0.025);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:0.5px solid rgba(255,255,255,0.06);border-radius:10px;}
 
-/* Suppression totale des bordures par défaut sur les boutons */
-button, input, select {
-  font-family:inherit;
-  outline:none;
-  border:none;
-  -webkit-appearance:none;
-}
+button, input, select { font-family:inherit; outline:none; border:none; -webkit-appearance:none; }
 button { cursor:pointer; }
 
 /* Header */
@@ -74,7 +69,7 @@ button { cursor:pointer; }
 .tb:hover{color:#7a8498;}
 .tb.on{background:rgba(255,255,255,0.08);color:#e0e4ef;border-color:rgba(255,255,255,0.1);}
 
-.card-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;min-height:0;}
+.card-list{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:6px;min-height:0;}
 .card-row{background:rgba(255,255,255,0.025);border:0.5px solid rgba(255,255,255,0.05);border-radius:9px;padding:8px 10px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;flex-shrink:0;}
 .card-row:hover{background:rgba(255,255,255,0.045);border-color:rgba(255,255,255,0.09);}
 .card-row.sel{background:rgba(255,255,255,0.05);border-color:rgba(184,188,200,0.2);}
@@ -89,12 +84,12 @@ button { cursor:pointer; }
 .cr-bal.sel-bal{color:#d0d4e0;}
 .empty-msg{padding:14px 8px;text-align:center;font-size:10px;color:#1e2430;}
 
-/* Mini card buttons - RÉPARÉS ET RECADRÉS */
+/* Mini card buttons - RÉPARÉS ET LISIBLES */
 .mini-card-btns{display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
 .mini-card-btn{
   width:100%;
   height:auto; 
-  min-height:54px; /* Permet au texte de respirer */
+  min-height:54px; 
   border-radius:9px;
   position:relative;
   overflow:hidden;
@@ -108,19 +103,18 @@ button { cursor:pointer; }
 .mcb-new{background:linear-gradient(135deg,#0d1a38 0%,#162450 60%,#0a1228 100%);}
 .mcb-add{background:linear-gradient(135deg,#1a1a20 0%,#282830 60%,#111116 100%);}
 .mcb-grp{background:linear-gradient(135deg,#1a1400 0%,#2a2200 60%,#100e00 100%);}
-/* NOUVEAU BOUTON : ÉJECTER LA CARTE */
 .mcb-eject{background:linear-gradient(135deg,#3a1010 0%,#501616 60%,#280a0a 100%);}
 
-.mcb-inner{position:absolute;inset:0;padding:0 12px;display:flex;align-items:center;gap:9px;}
+.mcb-inner{position:absolute;inset:0;padding:0 14px;display:flex;align-items:center;gap:12px;}
 .mcb-chip{width:14px;height:10px;border-radius:2px;flex-shrink:0;}
 .mcb-chip-blu{background:linear-gradient(135deg,#d4a830,#b88e28);}
 .mcb-chip-gry{background:linear-gradient(135deg,#6a6a80,#4a4a60);}
 .mcb-chip-gld{background:linear-gradient(135deg,#c8a020,#a07818);}
 .mcb-chip-red{background:linear-gradient(135deg,#e53935,#9b0000);}
 
-.mcb-text{flex:1; text-align:left;}
-.mcb-label{font-size:9.5px;font-weight:600;color:rgba(255,255,255,0.8);letter-spacing:.04em;line-height:1.2;}
-.mcb-sub{font-size:7.5px;color:rgba(255,255,255,0.3);margin-top:2px;line-height:1.1;}
+.mcb-text{flex:1; text-align:left; display:flex; flex-direction:column; justify-content:center; min-width:0;}
+.mcb-label{font-size:10px;font-weight:600;color:#fff;letter-spacing:.04em;line-height:1.2;}
+.mcb-sub{font-size:8px;color:#a0a5b5;margin-top:2px;line-height:1.1;} /* GRIS PLUS CLAIR ET LISIBLE */
 
 .mcb-icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .mcb-icon-blu{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.4);}
@@ -223,10 +217,10 @@ button { cursor:pointer; }
 .inv-cancel{background:rgba(100,100,120,0.1);color:#5a6478;border:0.5px solid rgba(100,100,120,0.15);}
 .inv-create-form{padding:4px 0;}
 
-/* =========== MODALS (SUPPRESSION DES GROSSES OMBRES) =========== */
-.moverlay{display:none;position:fixed;inset:0;z-index:100;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,0.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+/* =========== MODALS =========== */
+.moverlay{display:none;position:absolute;inset:0;z-index:100;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,0.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
 .moverlay.open{display:flex;}
-.mbox{position:relative;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;padding:24px;background:rgba(12,12,16,0.96);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.08);border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.5);}
+.mbox{position:relative;width:100%;max-width:460px;max-height:90%;overflow-y:auto;padding:24px;background:rgba(12,12,16,0.96);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.08);border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.5);}
 .mbox.wide{max-width:540px;}
 .mclose{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:7px;background:transparent;color:#3a4255;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .18s;z-index:1;}
 .mclose:hover{background:rgba(255,255,255,0.05);color:#fff;}
@@ -265,7 +259,7 @@ button { cursor:pointer; }
 .theme-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
 .theme-option{padding:9px 11px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);color:#8892a8;font-size:11px;text-align:left;}
 
-#block-screen{display:none;position:fixed;inset:0;z-index:500;background:#010101;align-items:center;justify-content:center;flex-direction:column;}
+#block-screen{display:none;position:absolute;inset:0;z-index:500;background:#010101;align-items:center;justify-content:center;flex-direction:column;}
 #block-screen.open{display:flex;}
 .block-icon{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:28px;}
 .block-icon.frozen{background:rgba(30,80,200,0.12);border:1px solid rgba(30,80,200,0.25);}
@@ -275,7 +269,7 @@ button { cursor:pointer; }
 .block-msg{font-size:12px;color:#3a4255;text-align:center;max-width:320px;line-height:1.7;margin-bottom:32px;}
 .block-code{font-size:9px;letter-spacing:.2em;color:#1e2430;font-family:'Courier New',monospace;}
 
-#pin-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);align-items:center;justify-content:center;}
+#pin-overlay{display:none;position:absolute;inset:0;z-index:300;background:rgba(0,0,0,0.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);align-items:center;justify-content:center;}
 #pin-overlay.open{display:flex;}
 .pin-box{background:#0a0a0e;border:1px solid rgba(255,255,255,0.09);border-radius:22px;padding:28px 24px 24px;width:400px;position:relative;}
 .pin-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:7px;background:transparent;color:#2e3848;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .18s;}
@@ -315,7 +309,7 @@ button { cursor:pointer; }
 .pin-key.cancel{color:#803838;}
 .pin-key.cancel:hover{color:#e06060;background:rgba(180,50,50,0.06);}
 
-#notif-stack{position:fixed;top:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:300px;}
+#notif-stack{position:absolute;top:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:300px;}
 .notif{border-radius:10px;padding:12px 16px;background:rgba(14,14,18,0.96);border:1px solid rgba(255,255,255,0.07);position:relative;overflow:hidden;animation:notifIn .25s ease;}
 .notif.success .notif-bar{background:#22b960;}
 .notif.error .notif-bar{background:#d03030;}
@@ -324,7 +318,7 @@ button { cursor:pointer; }
 .notif-txt{font-size:11.5px;color:#c8ccd8;padding-left:12px;}
 @keyframes notifIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:none;}}
 
-#init-screen{display:none;position:fixed;inset:0;background:#030305;z-index:50;align-items:center;justify-content:center;flex-direction:column;}
+#init-screen{display:none;position:absolute;inset:0;background:#030305;z-index:50;align-items:center;justify-content:center;flex-direction:column;}
 #init-screen.open{display:flex;}
 #stars-canvas{position:absolute;inset:0;}
 .init-title{font-size:36px;font-weight:100;letter-spacing:.5em;color:#fff;position:relative;z-index:1;margin-bottom:60px;}
@@ -334,219 +328,220 @@ button { cursor:pointer; }
 </style>
 </head>
 <body>
-<div id="notif-stack"></div>
+<div id="scale-wrapper">
+  
+  <div id="notif-stack"></div>
+  <div class="glow g1"></div>
+  <div class="glow g2"></div>
+  <div class="glow g3"></div>
 
-<div class="glow g1"></div>
-<div class="glow g2"></div>
-<div class="glow g3"></div>
-
-<div id="init-screen">
-  <canvas id="stars-canvas"></canvas>
-  <div class="init-title" id="init-label">G &nbsp; E &nbsp; N &nbsp; E &nbsp; S &nbsp; I &nbsp; S &nbsp; &nbsp; B &nbsp; A &nbsp; N &nbsp; K &nbsp; I &nbsp; N &nbsp; G</div>
-  <button class="init-btn" id="init-btn">INITIALISER MON COMPTE</button>
-  <div class="init-progress" id="init-progress" style="display:none;"></div>
-</div>
-
-<div id="dashboard" style="display:none;">
-  <div class="hdr">
-    <div>
-      <div class="hdr-title">BANKING DASHBOARD</div>
-      <div class="hdr-sub">Gérez vos finances avec Genesis Network</div>
-    </div>
-    <div class="hdr-right">
-      <div class="hdr-greet">Bienvenue,</div>
-      <div class="hdr-name" id="player-name"></div>
-    </div>
+  <div id="init-screen">
+    <canvas id="stars-canvas"></canvas>
+    <div class="init-title" id="init-label">G &nbsp; E &nbsp; N &nbsp; E &nbsp; S &nbsp; I &nbsp; S &nbsp; &nbsp; B &nbsp; A &nbsp; N &nbsp; K &nbsp; I &nbsp; N &nbsp; G</div>
+    <button class="init-btn" id="init-btn">INITIALISER MON COMPTE</button>
+    <div class="init-progress" id="init-progress" style="display:none;"></div>
   </div>
 
-  <div class="layout">
-    <div class="sidebar">
-      <div class="glass" style="padding:13px;flex-shrink:0;">
-        <div class="lxs" id="bal-label"></div>
-        <div class="bal-lg" id="sidebar-total"></div>
-        <div class="stats-row">
-          <div class="stat-item"><div class="stat-val" id="stat-cards"></div><div class="stat-label">Cartes</div></div>
-          <div class="stat-item"><div class="stat-val" id="stat-groups"></div><div class="stat-label">Groupes</div></div>
-          <div class="stat-item"><div class="stat-val" id="stat-sub"></div><div class="stat-label">Sous-groupes</div></div>
+  <div id="dashboard" style="display:none;">
+    <div class="hdr">
+      <div>
+        <div class="hdr-title">BANKING DASHBOARD</div>
+        <div class="hdr-sub">Gérez vos finances avec Genesis Network</div>
+      </div>
+      <div class="hdr-right">
+        <div class="hdr-greet">Bienvenue,</div>
+        <div class="hdr-name" id="player-name"></div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="sidebar">
+        <div class="glass" style="padding:13px;flex-shrink:0;">
+          <div class="lxs" id="bal-label"></div>
+          <div class="bal-lg" id="sidebar-total"></div>
+          <div class="stats-row">
+            <div class="stat-item"><div class="stat-val" id="stat-cards"></div><div class="stat-label">Cartes</div></div>
+            <div class="stat-item"><div class="stat-val" id="stat-groups"></div><div class="stat-label">Groupes</div></div>
+            <div class="stat-item"><div class="stat-val" id="stat-sub"></div><div class="stat-label">Sous-groupes</div></div>
+          </div>
+        </div>
+
+        <div class="tabs" id="tab-bar">
+          <button class="tb on" data-mode="cards">Mes Cartes</button>
+          <button class="tb" data-mode="groups">Groupes</button>
+          <button class="tb" data-mode="subgroups">Sous-Groupes</button>
+          <button class="tb" data-mode="invoices">Factures</button>
+        </div>
+
+        <div class="card-list" id="card-list"></div>
+
+        <div class="mini-card-btns">
+          <button class="mini-card-btn mcb-new" id="btn-new-account" onclick="doNewAccount()">
+            <div class="mcb-stripe mcb-stripe-blu"></div>
+            <div class="mcb-inner">
+              <div class="mcb-chip mcb-chip-blu"></div>
+              <div class="mcb-text">
+                <div class="mcb-label">Nouveau compte</div>
+                <div class="mcb-sub">Ouvrir un compte personnel</div>
+              </div>
+              <div class="mcb-icon mcb-icon-blu"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            </div>
+          </button>
+          <button class="mini-card-btn mcb-add" onclick="doAddCard()">
+            <div class="mcb-stripe mcb-stripe-gry"></div>
+            <div class="mcb-inner">
+              <div class="mcb-chip mcb-chip-gry"></div>
+              <div class="mcb-text">
+                <div class="mcb-label">Ajouter une carte</div>
+                <div class="mcb-sub">Gestionnaire de cartes</div>
+              </div>
+              <div class="mcb-icon mcb-icon-blu"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+            </div>
+          </button>
+          <button class="mini-card-btn mcb-grp" onclick="doCreateGroup()">
+            <div class="mcb-stripe mcb-stripe-gld"></div>
+            <div class="mcb-inner">
+              <div class="mcb-chip mcb-chip-gld"></div>
+              <div class="mcb-text">
+                <div class="mcb-label">Mon entreprise</div>
+                <div class="mcb-sub">Créer / ouvrir un groupe</div>
+              </div>
+              <div class="mcb-icon mcb-icon-gld"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>
+            </div>
+          </button>
+          <button class="mini-card-btn mcb-eject" onclick="bridgeSend('close', {})">
+            <div class="mcb-stripe mcb-stripe-red"></div>
+            <div class="mcb-inner">
+              <div class="mcb-chip mcb-chip-red"></div>
+              <div class="mcb-text">
+                <div class="mcb-label" style="color:#ff8a8a;">Retirer la carte</div>
+                <div class="mcb-sub" style="color:#d32f2f;">Quitter le distributeur</div>
+              </div>
+              <div class="mcb-icon mcb-icon-red"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></div>
+            </div>
+          </button>
         </div>
       </div>
 
-      <div class="tabs" id="tab-bar">
-        <button class="tb on" data-mode="cards">Mes Cartes</button>
-        <button class="tb" data-mode="groups">Groupes</button>
-        <button class="tb" data-mode="subgroups">Sous-Groupes</button>
-        <button class="tb" data-mode="invoices">Factures</button>
-      </div>
-
-      <div class="card-list" id="card-list"></div>
-
-      <div class="mini-card-btns">
-        <button class="mini-card-btn mcb-new" id="btn-new-account" onclick="doNewAccount()">
-          <div class="mcb-stripe mcb-stripe-blu"></div>
-          <div class="mcb-inner">
-            <div class="mcb-chip mcb-chip-blu"></div>
-            <div class="mcb-text">
-              <div class="mcb-label">Nouveau compte</div>
-              <div class="mcb-sub">Ouvrir un compte personnel</div>
-            </div>
-            <div class="mcb-icon mcb-icon-blu">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            </div>
-          </div>
-        </button>
-        <button class="mini-card-btn mcb-add" onclick="doAddCard()">
-          <div class="mcb-stripe mcb-stripe-gry"></div>
-          <div class="mcb-inner">
-            <div class="mcb-chip mcb-chip-gry"></div>
-            <div class="mcb-text">
-              <div class="mcb-label">Ajouter une carte</div>
-              <div class="mcb-sub">Gestionnaire de cartes</div>
-            </div>
-            <div class="mcb-icon mcb-icon-blu">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            </div>
-          </div>
-        </button>
-        <button class="mini-card-btn mcb-grp" onclick="doCreateGroup()">
-          <div class="mcb-stripe mcb-stripe-gld"></div>
-          <div class="mcb-inner">
-            <div class="mcb-chip mcb-chip-gld"></div>
-            <div class="mcb-text">
-              <div class="mcb-label">Mon entreprise</div>
-              <div class="mcb-sub">Créer / ouvrir un groupe</div>
-            </div>
-            <div class="mcb-icon mcb-icon-gld">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-            </div>
-          </div>
-        </button>
-        <button class="mini-card-btn mcb-eject" onclick="bridgeSend('close', {})">
-          <div class="mcb-stripe mcb-stripe-red"></div>
-          <div class="mcb-inner">
-            <div class="mcb-chip mcb-chip-red"></div>
-            <div class="mcb-text">
-              <div class="mcb-label" style="color:#ff8a8a;">Retirer la carte</div>
-              <div class="mcb-sub" style="color:#d32f2f;">Quitter le distributeur</div>
-            </div>
-            <div class="mcb-icon mcb-icon-red">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-            </div>
-          </div>
-        </button>
-      </div>
-    </div>
-
-    <div class="main">
-      <div class="glass hero">
-        <div class="hero-grid">
-          <div>
-            <div class="cc cc-visa" id="cc-wrap">
-              <div class="cc-inner">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-                  <div>
-                    <div class="cc-type-lbl" id="cc-type"></div>
-                    <div style="display:flex;align-items:center;margin-top:10px;">
-                      <div class="cc-chip"></div>
-                      <div class="cc-nfc">)))</div>
-                    </div>
-                  </div>
-                  <div class="cc-brand-area" id="cc-brand-area"></div>
-                </div>
-                <div>
-                  <div class="cc-number" id="cc-number"></div>
-                  <div class="cc-iban-lbl" id="cc-iban-lbl"></div>
-                  <div class="cc-bottom" style="margin-top:8px;">
+      <div class="main">
+        <div class="glass hero">
+          <div class="hero-grid">
+            <div>
+              <div class="cc cc-visa" id="cc-wrap">
+                <div class="cc-inner">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                     <div>
-                      <div class="cc-name-lbl" id="cc-name-lbl"></div>
-                      <div class="cc-verified-badge" id="cc-verified" style="display:none;">✔ VÉRIFIÉ</div>
+                      <div class="cc-type-lbl" id="cc-type"></div>
+                      <div style="display:flex;align-items:center;margin-top:10px;">
+                        <div class="cc-chip"></div><div class="cc-nfc">)))</div>
+                      </div>
                     </div>
-                    <div class="cc-expiry"></div>
+                    <div class="cc-brand-area" id="cc-brand-area"></div>
+                  </div>
+                  <div>
+                    <div class="cc-number" id="cc-number"></div>
+                    <div class="cc-iban-lbl" id="cc-iban-lbl"></div>
+                    <div class="cc-bottom" style="margin-top:8px;">
+                      <div><div class="cc-name-lbl" id="cc-name-lbl"></div><div class="cc-verified-badge" id="cc-verified" style="display:none;">✔ VÉRIFIÉ</div></div>
+                      <div class="cc-expiry"></div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="info-panel">
-            <div class="info-top">
-              <div class="info-greet">BIENVENUE,</div>
-              <div class="info-name" id="info-player-name"></div>
-              <div class="info-iban" id="info-iban"></div>
-            </div>
-            <div>
-              <div class="info-bal-lbl">SOLDE DISPONIBLE</div>
-              <div class="info-bal" id="info-bal"></div>
-              <div class="cfg-pills" id="cfg-pills"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="glass-sm" style="flex-shrink:0;">
-        <div class="quick" id="quick-actions"></div>
-      </div>
-
-      <div class="glass" id="content-area"></div>
-    </div>
-  </div>
-</div>
-
-<div id="block-screen">
-  <div class="block-icon" id="block-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
-  <div class="block-title" id="block-title">ACCÈS REFUSÉ</div>
-  <div class="block-msg" id="block-msg">Votre compte a été gelé par les autorités.</div>
-  <div class="block-code" id="block-code">CODE: ACCOUNT_FROZEN</div>
-</div>
-
-<div id="pin-overlay">
-  <div class="pin-box">
-    <button class="pin-close" onclick="closePinPrompt()">✕</button>
-    <div class="pin-title">VÉRIFICATION PIN</div>
-    <div class="pin-sub">Sélectionnez la carte et entrez le code</div>
-    <div class="pin-carousel">
-      <button class="pin-arrow left" onclick="pinNav(-1)">‹</button>
-      <div class="pin-card-wrap">
-        <div class="pin-cc pin-cc-visa" id="pin-cc">
-          <div class="pin-cc-inner">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div class="info-panel">
+              <div class="info-top">
+                <div class="info-greet">BIENVENUE,</div>
+                <div class="info-name" id="info-player-name"></div>
+                <div class="info-iban" id="info-iban"></div>
+              </div>
               <div>
-                <div class="pin-cc-type" id="pin-cc-type"></div>
-                <div style="display:flex;align-items:center;margin-top:7px;"><div class="pin-cc-chip"></div><span style="font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:-2px;font-weight:300;margin-left:6px;">)))</span></div>
-              </div>
-              <div id="pin-cc-brand" class="pin-cc-brand"></div>
-            </div>
-            <div>
-              <div class="pin-cc-number" id="pin-cc-number"></div>
-              <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:4px;">
-                <div><div class="pin-cc-name" id="pin-cc-name"></div><div class="pin-cc-group-badge" id="pin-cc-badge" style="display:none;">✔ ENTREPRISE VÉRIFIÉE</div></div>
-                <span style="font-size:7px;color:rgba(255,255,255,0.35);"></span>
+                <div class="info-bal-lbl">SOLDE DISPONIBLE</div>
+                <div class="info-bal" id="info-bal"></div>
+                <div class="cfg-pills" id="cfg-pills"></div>
               </div>
             </div>
           </div>
         </div>
+
+        <div class="glass-sm" style="flex-shrink:0;">
+          <div class="quick" id="quick-actions"></div>
+        </div>
+
+        <div class="glass" id="content-area"></div>
       </div>
-      <button class="pin-arrow right" onclick="pinNav(1)">›</button>
     </div>
-    <div class="pin-dots" id="pin-dots"><div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div><div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div></div>
-    <div class="pin-numpad" id="pin-numpad"></div>
   </div>
-</div>
 
-<div class="moverlay" id="modal" onclick="if(event.target===this)closeModal()">
-  <div class="mbox" id="modal-box">
-    <button class="mclose" onclick="closeModal()">✕</button>
-    <div id="modal-body"></div>
+  <div id="block-screen">
+    <div class="block-icon" id="block-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+    <div class="block-title" id="block-title">ACCÈS REFUSÉ</div>
+    <div class="block-msg" id="block-msg">Votre compte a été gelé par les autorités.</div>
+    <div class="block-code" id="block-code">CODE: ACCOUNT_FROZEN</div>
   </div>
-</div>
 
-<div class="moverlay" id="tx-modal" onclick="if(event.target===this)closeTxModal()">
-  <div class="mbox">
-    <button class="mclose" onclick="closeTxModal()">✕</button>
-    <div id="tx-modal-body"></div>
+  <div id="pin-overlay">
+    <div class="pin-box">
+      <button class="pin-close" onclick="closePinPrompt()">✕</button>
+      <div class="pin-title">VÉRIFICATION PIN</div>
+      <div class="pin-sub">Sélectionnez la carte et entrez le code</div>
+      <div class="pin-carousel">
+        <button class="pin-arrow left" onclick="pinNav(-1)">‹</button>
+        <div class="pin-card-wrap">
+          <div class="pin-cc pin-cc-visa" id="pin-cc">
+            <div class="pin-cc-inner">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div>
+                  <div class="pin-cc-type" id="pin-cc-type"></div>
+                  <div style="display:flex;align-items:center;margin-top:7px;"><div class="pin-cc-chip"></div><span style="font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:-2px;font-weight:300;margin-left:6px;">)))</span></div>
+                </div>
+                <div id="pin-cc-brand" class="pin-cc-brand"></div>
+              </div>
+              <div>
+                <div class="pin-cc-number" id="pin-cc-number"></div>
+                <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:4px;">
+                  <div><div class="pin-cc-name" id="pin-cc-name"></div><div class="pin-cc-group-badge" id="pin-cc-badge" style="display:none;">✔ ENTREPRISE VÉRIFIÉE</div></div>
+                  <span style="font-size:7px;color:rgba(255,255,255,0.35);"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="pin-arrow right" onclick="pinNav(1)">›</button>
+      </div>
+      <div class="pin-dots" id="pin-dots"><div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div><div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div></div>
+      <div class="pin-numpad" id="pin-numpad"></div>
+    </div>
   </div>
-</div>
 
-<script>
+  <div class="moverlay" id="modal" onclick="if(event.target===this)closeModal()">
+    <div class="mbox" id="modal-box">
+      <button class="mclose" onclick="closeModal()">✕</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <div class="moverlay" id="tx-modal" onclick="if(event.target===this)closeTxModal()">
+    <div class="mbox">
+      <button class="mclose" onclick="closeTxModal()">✕</button>
+      <div id="tx-modal-body"></div>
+    </div>
+  </div>
+
+</div> <script>
+/* ============================================================
+   SCRIPT AUTO-SCALE PARFAIT POUR TOUS LES ÉCRANS
+   ============================================================ */
+function autoScaleUI() {
+    var wrapper = document.getElementById('scale-wrapper');
+    // On calcule combien de fois 1000x680 rentre dans la vraie fenêtre Lua
+    var scale = Math.min(window.innerWidth / 1000, window.innerHeight / 680);
+    wrapper.style.transform = 'scale(' + scale + ')';
+}
+window.addEventListener('resize', autoScaleUI);
+setInterval(autoScaleUI, 100);
+
 var S = { snap: null, selectedKey: null, viewMode: 'cards', activeGroupID: null, playerName: '', isAdmin: false, transferSourceKey: null, activeFilter: 'all', invSubMode: 'received' };
 
 function fmt(v){ return '$' + Math.round(Math.abs(v)).toLocaleString('fr-FR'); }
@@ -748,11 +743,11 @@ function mField(label,id,type,ph,mono){ return '<div class="mfield"><div class="
 function mBtn(label, onclick, danger){ return '<button class="mbtn'+(danger?' danger':'')+'" onclick="'+onclick+'">'+label+'</button>'; }
 
 /* ============================================================
-   RETRAIT NOUVELLE FAÇON (Style distributeur avec billets)
+   LES ACTIONS DU DISTRIBUTEUR (Retraits / Dépôts)
    ============================================================ */
 function doWithdraw(){
-  var card=getSelectedCard();
-  var balance=card?card.balance:0;
+  var c = getSelectedCard();
+  var balance = c ? c.balance : 0;
   var html = mTitle('RETRAIT D\'ESPÈCES')
     +'<div style="font-size:11px;color:#3a4255;margin-bottom:14px;">Solde disponible: <span style="color:#9aa0b0;">'+fmt(balance)+'</span></div>'
     +'<div class="mfield"><div class="mlabel">Montant du retrait</div>'
@@ -782,7 +777,7 @@ function confirmWithdraw(){
   bridgeSend('withdraw',{amount:amt,selection:selPay(getSelectedCard())}); closeModal();
 }
 
-function doDeposit(){ openModal(mTitle('EFFECTUER UN DÉPÔT')+'<div style="font-size:11px;color:#3a4255;margin-bottom:14px;">Carte: <span style="color:#9aa0b0;font-family:\'Courier New\',monospace;">'+(getSelectedCard()?.iban||'')+'</span></div>'+mField('Montant','dep-amount','number','0')+mBtn('Confirmer le dépôt','confirmDeposit()')); }
+function doDeposit(){ var c=getSelectedCard(); openModal(mTitle('EFFECTUER UN DÉPÔT')+'<div style="font-size:11px;color:#3a4255;margin-bottom:14px;">Carte: <span style="color:#9aa0b0;font-family:\'Courier New\',monospace;">'+(c?c.iban:'')+'</span></div>'+mField('Montant','dep-amount','number','0')+mBtn('Confirmer le dépôt','confirmDeposit()')); }
 function confirmDeposit(){ var amt=Number(document.getElementById('dep-amount').value||0); if(amt<=0){notify('Montant invalide.','error');return;} bridgeSend('deposit',{amount:amt,selection:selPay(getSelectedCard())}); closeModal(); }
 
 function doTransfer(){
@@ -797,19 +792,20 @@ function confirmTransfer(){
   bridgeSend('transfer',{iban:iban,amount:amt,beneficiary_name:benef,comment:comment,selection:selPay(src||getSelectedCard())}); closeModal();
 }
 
-function doBatchTransfer(){ var card=getSelectedCard(); openModal(mTitle('VIREMENT GROUPÉ')+'<div style="font-size:11px;color:#3a4255;margin-bottom:14px;">Virement aux salariés.</div>'+mField('Montant par bénéficiaire','batch-amount','number','0')+mBtn('Envoyer','confirmBatchTransfer()')); }
-function confirmBatchTransfer(){ var amt=Number(document.getElementById('batch-amount').value||0); if(amt<=0)return; bridgeSend('batch_transfer',{group_id:getSelectedCard().group_id,subgroup_id:getSelectedCard().subgroup_id,amount:amt,comment:'Virement groupe'}); closeModal(); }
+function doBatchTransfer(){ var c = getSelectedCard(); openModal(mTitle('VIREMENT GROUPÉ')+'<div style="font-size:11px;color:#3a4255;margin-bottom:14px;">Virement aux salariés.</div>'+mField('Montant par bénéficiaire','batch-amount','number','0')+mBtn('Envoyer','confirmBatchTransfer()')); }
+function confirmBatchTransfer(){ var amt=Number(document.getElementById('batch-amount').value||0); if(amt<=0)return; var c = getSelectedCard(); bridgeSend('batch_transfer',{group_id:c?c.group_id:0,subgroup_id:c?c.subgroup_id:0,amount:amt,comment:'Virement groupe'}); closeModal(); }
 function doUpgrade(tier){ openModal(mTitle('UPGRADE CARTE')+'<div style="font-size:12px;color:#5a6478;margin-bottom:18px;">Upgrader vers <strong style="color:#c0c4d4;">'+tier.toUpperCase()+'</strong>.</div>'+mBtn('Confirmer l\'upgrade','bridgeSend("card_config",{card_action:"upgrade",tier:"'+tier+'",selection:selPay(getSelectedCard())});closeModal()')); }
 function doTempLimit(){ openModal(mTitle('PLAFOND TEMPORAIRE (+30min)')+mField('Montant du bonus','limit-bonus','number','0')+mBtn('Activer','bridgeSend("card_config",{card_action:"temp_limit",bonus:Number(document.getElementById("limit-bonus").value||0),selection:selPay(getSelectedCard())});closeModal()')); }
 function doChangePin(){ openModal(mTitle('MODIFIER LE CODE PIN')+mField('Nouveau PIN','new-pin','password','••••')+mBtn('Confirmer','var p=document.getElementById("new-pin").value; if(/^\\d{4}$/.test(p)){bridgeSend("pin_change",{pin:p,selection:selPay(getSelectedCard())});closeModal();}else{notify("PIN invalide","error");}')); }
 function doRename(){ var c=getSelectedCard(); openModal(mTitle('RENOMMER LA CARTE')+mField('Nouveau nom','rename-label','text',c?c.label:'')+mBtn('Confirmer','bridgeSend("card_config",{card_action:"rename",label:document.getElementById("rename-label").value,selection:selPay(getSelectedCard())});closeModal()')); }
 function doGroupInfo(){ var c=getSelectedCard(); if(c)openModal(mTitle('INFOS ENTREPRISE')+'<div class="mrow"><span class="k">Groupe</span><span class="v">'+(c.group_name||'—')+'</span></div><div class="mrow"><span class="k">IBAN</span><span class="v">'+(c.iban||'—')+'</span></div><div class="mrow"><span class="k">Solde</span><span class="v">'+fmt(c.balance||0)+'</span></div>'); }
-function doManageMembers(){ var m=(getMeta(getSelectedCard()).members||[]); openModal(mTitle('MEMBRES DU GROUPE')+'<div style="max-height:220px;overflow-y:auto;">'+(m.length?m.map(function(x,i){return '<div class="member-row"><div><div style="font-size:12px;color:#c0c4d4;">'+(x.name||'')+'</div><div style="font-size:9.5px;color:#3a4255;">'+(x.steamid||'')+'</div></div><button class="kick-btn" onclick="bridgeSend(\'group_action\',{action:\'kick_member\',group_id:getSelectedCard().group_id,target:\''+(x.steamid||'')+'\'});closeModal()">Expulser</button></div>';}).join(''):'<div class="tx-empty">Aucun membre</div>')+'</div>'); }
-function doInvite(){ openModal(mTitle('INVITER UN MEMBRE')+mField('SteamID/Nom','invite-target','text','')+mBtn('Envoyer l\'invitation','bridgeSend("group_action",{action:"invite_member",group_id:getSelectedCard().group_id,target:document.getElementById("invite-target").value});closeModal()')); }
-function doCreateSubgroup(){ openModal(mTitle('CRÉER UN SOUS-GROUPE')+mField('Nom','sg-name','text','')+mBtn('Créer','bridgeSend("group_action",{action:"create_subgroup",group_id:getSelectedCard().group_id,name:document.getElementById("sg-name").value});closeModal()')); }
-function doLeaveGroup(){ openModal(mTitle('QUITTER CE GROUPE')+mBtn('Oui, quitter','bridgeSend("group_action",{action:"leave_group",group_id:getSelectedCard().group_id});closeModal()',true)); }
-function doAddEmployee(){ openModal(mTitle('AJOUTER UN SALARIÉ')+mField('IBAN','emp-iban','text','GN-')+mField('Nom','emp-name','text','')+mBtn('Ajouter','bridgeSend("group_action",{action:"subgroup_add_iban",group_id:getSelectedCard().group_id,subgroup_id:getSelectedCard().subgroup_id,iban:document.getElementById("emp-iban").value,beneficiary_name:document.getElementById("emp-name").value});closeModal()')); }
-function doManageEmployees(){ var e=(getMeta(getSelectedCard()).subgroup_ibans||[]); openModal(mTitle('SALARIÉS')+'<div style="max-height:220px;overflow-y:auto;">'+(e.length?e.map(function(x){return '<div class="member-row"><div><div style="font-size:12px;color:#c0c4d4;">'+(x.beneficiary_name||'')+'</div></div><button class="kick-btn" onclick="bridgeSend(\'group_action\',{action:\'subgroup_remove_iban\',group_id:getSelectedCard().group_id,subgroup_id:getSelectedCard().subgroup_id,iban:\''+x.iban+'\'});closeModal()">Retirer</button></div>';}).join(''):'<div class="tx-empty">Aucun salarié</div>')+'</div>'); }
+function doManageMembers(){ var c = getSelectedCard(); var m=(c?getMeta(c).members||[]:[]); openModal(mTitle('MEMBRES DU GROUPE')+'<div style="max-height:220px;overflow-y:auto;">'+(m.length?m.map(function(x){return '<div class="member-row"><div><div style="font-size:12px;color:#c0c4d4;">'+(x.name||'')+'</div><div style="font-size:9.5px;color:#3a4255;">'+(x.steamid||'')+'</div></div><button class="kick-btn" onclick="bridgeSend(\'group_action\',{action:\'kick_member\',group_id:getSelectedCard().group_id,target:\''+(x.steamid||'')+'\'});closeModal()">Expulser</button></div>';}).join(''):'<div class="tx-empty">Aucun membre</div>')+'</div>'); }
+function doInvite(){ openModal(mTitle('INVITER UN MEMBRE')+mField('SteamID/Nom','invite-target','text','')+mBtn('Envoyer l\'invitation','var c=getSelectedCard(); bridgeSend("group_action",{action:"invite_member",group_id:c?c.group_id:0,target:document.getElementById("invite-target").value});closeModal()')); }
+function doCreateSubgroup(){ openModal(mTitle('CRÉER UN SOUS-GROUPE')+mField('Nom','sg-name','text','')+mBtn('Créer','var c=getSelectedCard(); bridgeSend("group_action",{action:"create_subgroup",group_id:c?c.group_id:0,name:document.getElementById("sg-name").value});closeModal()')); }
+function doLeaveGroup(){ openModal(mTitle('QUITTER CE GROUPE')+mBtn('Oui, quitter','var c=getSelectedCard(); bridgeSend("group_action",{action:"leave_group",group_id:c?c.group_id:0});closeModal()',true)); }
+function doAddEmployee(){ openModal(mTitle('AJOUTER UN SALARIÉ')+mField('IBAN','emp-iban','text','GN-')+mField('Nom','emp-name','text','')+mBtn('Ajouter','var c=getSelectedCard(); bridgeSend("group_action",{action:"subgroup_add_iban",group_id:c?c.group_id:0,subgroup_id:c?c.subgroup_id:0,iban:document.getElementById("emp-iban").value,beneficiary_name:document.getElementById("emp-name").value});closeModal()')); }
+function doManageEmployees(){ var c=getSelectedCard(); var e=(c?getMeta(c).subgroup_ibans||[]:[]); openModal(mTitle('SALARIÉS')+'<div style="max-height:220px;overflow-y:auto;">'+(e.length?e.map(function(x){return '<div class="member-row"><div><div style="font-size:12px;color:#c0c4d4;">'+(x.beneficiary_name||'')+'</div></div><button class="kick-btn" onclick="bridgeSend(\'group_action\',{action:\'subgroup_remove_iban\',group_id:getSelectedCard().group_id,subgroup_id:getSelectedCard().subgroup_id,iban:\''+x.iban+'\'});closeModal()">Retirer</button></div>';}).join(''):'<div class="tx-empty">Aucun salarié</div>')+'</div>'); }
+
 function doNewAccount(){ bridgeSend('card_create',{label:'Compte Principal',pin:1234}); }
 function doAddCard(){ bridgeSend('atm_open',{force_pin:true,refresh:true}); }
 function doCreateGroup(){ openModal(mTitle('CRÉER ENTREPRISE')+mField('Nom','grp-name','text','')+mField('PIN (Optionnel)','grp-pin','password','')+mBtn('Créer','bridgeSend("group_action",{action:"create_multi_group",requested_name:document.getElementById("grp-name").value,group_pin:document.getElementById("grp-pin").value});closeModal()')); }
@@ -817,17 +813,21 @@ function doTheme(){ openModal(mTitle('THÈMES')+'<div class="theme-grid">'+['Gen
 
 function doCreateInvoice(){
   var iban=String(document.getElementById('inv-iban').value||'').trim(); var amt=Math.floor(Number(document.getElementById('inv-amount').value||0)); var desc=String(document.getElementById('inv-desc').value||'').trim(); var grp=document.getElementById('inv-group');
-  var gid=grp?S.snap.cards_group[Number(grp.value)]?.group_id:null;
+  var gid=null;
+  if(grp && S.snap && S.snap.cards_group && S.snap.cards_group[Number(grp.value)]) {
+      gid = S.snap.cards_group[Number(grp.value)].group_id;
+  }
   if(iban&&amt>0&&desc){ bridgeSend('invoice_create',{target_iban:iban,amount:amt,description:desc,group_id:gid}); document.getElementById('inv-iban').value=''; document.getElementById('inv-amount').value=''; document.getElementById('inv-desc').value=''; }
 }
 function doInvoiceAction(idx,mode){
-  var inv=(mode==='received'?S.snap.invoices_received:S.snap.invoices_sent)[idx]; if(!inv||inv.status!=='pending')return;
+  var list = (mode==='received' ? (S.snap?S.snap.invoices_received:[]) : (S.snap?S.snap.invoices_sent:[]));
+  var inv=list[idx]; if(!inv||inv.status!=='pending')return;
   if(mode==='received') openModal(mTitle('FACTURE REÇUE')+'<div class="mamount-box"><div class="mamount neg">- '+fmt(inv.amount)+'</div></div>'+mBtn('Payer','bridgeSend("invoice_action",{action:"pay",invoice_id:'+inv.id+'});closeModal()')+'<br>'+mBtn('Refuser','bridgeSend("invoice_action",{action:"refuse",invoice_id:'+inv.id+'});closeModal()',true));
   else openModal(mTitle('ANNULER LA FACTURE')+mBtn('Confirmer l\'annulation','bridgeSend("invoice_action",{action:"cancel",invoice_id:'+inv.id+'});closeModal()',true));
 }
 
 function setFilter(f){ S.activeFilter=f; renderQuickActions(getSelectedCard()); renderContent(); }
-document.getElementById('tab-bar').addEventListener('click',function(e){ var btn=e.target.closest('.tb'); if(!btn) return; document.querySelectorAll('.tb').forEach(function(t){t.classList.remove('on');}); btn.classList.add('on'); S.viewMode=btn.dataset.mode; if(S.viewMode==='subgroups'&&!S.activeGroupID&&S.snap.cards_group?.length) S.activeGroupID=S.snap.cards_group[0].group_id; S.selectedKey=null; renderAll(); });
+document.getElementById('tab-bar').addEventListener('click',function(e){ var btn=e.target.closest('.tb'); if(!btn) return; document.querySelectorAll('.tb').forEach(function(t){t.classList.remove('on');}); btn.classList.add('on'); S.viewMode=btn.dataset.mode; if(S.viewMode==='subgroups'&&!S.activeGroupID&&S.snap&&S.snap.cards_group&&S.snap.cards_group.length) S.activeGroupID=S.snap.cards_group[0].group_id; S.selectedKey=null; renderAll(); });
 function selPay(card){ if(!card) return {scope:'personal',card_id:0,card_uid:0,id:0,group_id:0,subgroup_id:0,iban:''}; var cid=card.card_uid||card.card_id||card.id||0; return {scope:card.scope||'personal',card_id:cid,card_uid:cid,id:cid,group_id:card.group_id||0,subgroup_id:card.subgroup_id||0,iban:card.iban||''}; }
 
 function showInitScreen(){ document.getElementById('init-screen').classList.add('open'); document.getElementById('dashboard').style.display='none'; }
@@ -848,7 +848,7 @@ var BLOCK_ERRORS=['account_frozen','frozen','account_closed_doj','account_closed
 var PIN_STATE={cards:[],idx:0,pin:''};
 function openPinPrompt(payload){
   var all=(payload.cards||[]).concat(payload.group_cards||[]);
-  if(!all.length) all=(S.snap?.cards_personal||[]); if(!all.length)return;
+  if(!all.length) all=(S.snap?S.snap.cards_personal||[]:[]); if(!all.length)return;
   PIN_STATE.cards=all; PIN_STATE.idx=0; PIN_STATE.pin='';
   renderPinCard(); renderPinDots(); renderPinNumpad(); document.getElementById('pin-overlay').classList.add('open');
 }
@@ -864,7 +864,7 @@ function pinKey(k){
 }
 
 function bridgeSend(action,payload){ if(window.GN&&window.GN.Receive){ try{ window.GN.Receive(action,JSON.stringify(payload)); }catch(e){} } }
-window.GN_SetSnapshot=function(data){ if(data&&data.ok===false){ if(BLOCK_ERRORS.indexOf(String(data.error||''))>=0) showBlockScreen(String(data.error)); return; } S.snap=normSnap(data?.data||data); S.viewMode='cards'; S.selectedKey=null; renderAll(); };
+window.GN_SetSnapshot=function(data){ if(data&&data.ok===false){ if(BLOCK_ERRORS.indexOf(String(data.error||''))>=0) showBlockScreen(String(data.error)); return; } S.snap=normSnap(data?data.data||data:null); S.viewMode='cards'; S.selectedKey=null; renderAll(); };
 window.GN_SetPlayerName=function(name){ S.playerName=name; var a=document.getElementById('player-name'); var b=document.getElementById('info-player-name'); if(a)a.textContent=name; if(b)b.textContent=name; };
 window.GN_HandleResult=function(payload){
   payload=payload||{}; var action=String(payload.action||''); var err=String(payload.error||'');
