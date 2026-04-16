@@ -89,7 +89,7 @@ button { cursor:pointer; }
 .mcb-grp{background:linear-gradient(135deg,#1a1400 0%,#2a2200 60%,#100e00 100%);}
 .mcb-eject{background:linear-gradient(135deg,#3a1010 0%,#501616 60%,#280a0a 100%);}
 
-.mcb-inner{position:absolute;inset:0;padding:0 16px;display:flex;align-items:center;gap:14px;}
+.mcb-inner{position:absolute;top:0;right:0;bottom:0;left:0;padding:0 16px;display:flex;align-items:center;gap:14px;}
 .mcb-chip{width:14px;height:10px;border-radius:2px;flex-shrink:0;}
 .mcb-chip-blu{background:linear-gradient(135deg,#d4a830,#b88e28);}
 .mcb-chip-gry{background:linear-gradient(135deg,#6a6a80,#4a4a60);}
@@ -121,7 +121,7 @@ button { cursor:pointer; }
 .cc-visa{background:linear-gradient(145deg,#0c1830 0%,#152060 55%,#080e24 100%);}
 .cc-mc{background:#18181e;}
 .cc-amex{background:linear-gradient(145deg,#6a7480 0%,#929eaa 50%,#788490 100%);}
-.cc-inner{position:absolute;inset:0;padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between;}
+.cc-inner{position:absolute;top:0;right:0;bottom:0;left:0;padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between;}
 .cc-top-row{display:flex;justify-content:space-between;align-items:flex-start;}
 .cc-top-left{display:flex;align-items:center;gap:6px;}
 .cc-type-lbl{font-size:8px;letter-spacing:1.5px;color:rgba(255,255,255,0.5);text-transform:uppercase;}
@@ -253,45 +253,54 @@ button { cursor:pointer; }
 .block-msg{font-size:12px;color:#6a7890;text-align:center;max-width:320px;line-height:1.7;margin-bottom:32px;}
 .block-code{font-size:10px;letter-spacing:.2em;color:#4a5870;font-family:'Courier New',monospace;}
 
-#pin-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:300;background:rgba(0,0,0,0.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);align-items:center;justify-content:center;}
+#pin-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:300;background:#08090c;align-items:center;justify-content:center;flex-direction:column;}
 #pin-overlay.open{display:flex;}
-.pin-box{background:#0a0a0e;border:1px solid rgba(255,255,255,0.09);border-radius:22px;padding:28px 24px 24px;width:440px;max-width:88vw;position:relative;}
-.pin-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:7px;background:transparent;color:#6a7890;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .18s;}
-.pin-close:hover{background:rgba(255,255,255,0.05);color:#fff;}
-.pin-title{font-size:13px;font-weight:700;letter-spacing:.18em;color:#c0c4d4;text-align:center;margin-bottom:4px;}
-.pin-sub{font-size:11px;color:#7a8898;text-align:center;margin-bottom:20px;}
 
-.pin-carousel{position:relative;height:160px;margin-bottom:18px;}
-.pin-arrow{position:absolute;top:0;bottom:0;width:36px;display:flex;align-items:center;justify-content:center;background:transparent;color:#6a7890;font-size:22px;font-weight:300;}
-.pin-arrow:hover{color:#b8bcc8;}
-.pin-arrow.left{left:0;}
-.pin-arrow.right{right:0;}
-.pin-card-wrap{position:absolute;left:40px;right:40px;top:0;bottom:0;}
-.pin-cc{width:100%;height:148px;border-radius:12px;position:relative;overflow:hidden;}
+/* PIN ATM SCREEN */
+.pin-atm-header{text-align:center;margin-bottom:32px;}
+.pin-atm-logo{font-size:11px;font-weight:700;letter-spacing:.45em;color:#3a4a60;text-transform:uppercase;margin-bottom:8px;}
+.pin-atm-title{font-size:22px;font-weight:200;letter-spacing:.3em;color:#e8eaf0;text-transform:uppercase;}
+.pin-atm-sub{font-size:10px;color:#5a6880;letter-spacing:.15em;margin-top:6px;}
+
+.pin-stage{display:flex;align-items:flex-start;justify-content:center;gap:48px;}
+
+/* Colonne gauche : carte + flèches */
+.pin-card-col{display:flex;flex-direction:column;align-items:center;gap:16px;}
+.pin-carousel{position:relative;width:260px;}
+.pin-arrow{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;color:#6a7890;font-size:18px;font-weight:300;cursor:pointer;transition:all .18s;z-index:1;}
+.pin-arrow:hover{background:rgba(255,255,255,0.09);color:#b8bcc8;}
+.pin-arrow.left{left:-44px;}
+.pin-arrow.right{right:-44px;}
+.pin-card-wrap{width:260px;}
+.pin-cc{width:260px;height:164px;border-radius:14px;position:relative;overflow:hidden;}
 .pin-cc-visa{background:linear-gradient(145deg,#0c1830 0%,#152060 55%,#080e24 100%);}
 .pin-cc-mc{background:#18181e;}
 .pin-cc-amex{background:linear-gradient(145deg,#6a7480 0%,#929eaa 50%,#788490 100%);}
-.pin-cc-inner{position:absolute;inset:0;padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between;}
-.pin-cc-chip{width:22px;height:17px;border-radius:2px;background:linear-gradient(135deg,#d4a830,#b88e28);}
-.pin-cc-brand{font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.55);}
-.pin-cc-number{font-size:10px;font-family:'Courier New',monospace;color:rgba(255,255,255,0.7);letter-spacing:1px;}
-.pin-cc-name{font-size:8.5px;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase;}
-.pin-cc-type{font-size:7.5px;color:rgba(255,255,255,0.45);letter-spacing:1.5px;text-transform:uppercase;}
-.pin-cc-group-badge{font-size:8px;color:#22b960;letter-spacing:.5px;margin-top:1px;}
+.pin-cc-inner{position:absolute;top:0;right:0;bottom:0;left:0;padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between;}
+.pin-cc-chip{width:26px;height:20px;border-radius:3px;background:linear-gradient(135deg,#d4a830,#b88e28);}
+.pin-cc-brand{font-size:12px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.65);}
+.pin-cc-number{font-size:12px;font-family:'Courier New',monospace;color:rgba(255,255,255,0.8);letter-spacing:2px;}
+.pin-cc-name{font-size:9px;color:rgba(255,255,255,0.45);letter-spacing:1.5px;text-transform:uppercase;}
+.pin-cc-type{font-size:8px;color:rgba(255,255,255,0.45);letter-spacing:2px;text-transform:uppercase;}
+.pin-cc-group-badge{font-size:8.5px;color:#22b960;letter-spacing:.5px;margin-top:1px;}
 
-.pin-dots{display:flex;justify-content:center;gap:28px;margin-bottom:20px;}
-.pin-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.12);background:transparent;}
-.pin-dot.filled{background:#b8bcc8;border-color:#b8bcc8;}
-.pin-dot.filled.gold{background:#d4a830;border-color:#e8c040;box-shadow:0 0 6px rgba(212,168,48,0.4);}
+.pin-card-label{font-size:10px;color:#5a6880;letter-spacing:.1em;text-align:center;}
 
-.pin-numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.pin-key{height:56px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);color:#c0c4d4;font-size:18px;font-weight:500;}
-.pin-key:hover{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.1);}
-.pin-key:active{transform:scale(.95);}
-.pin-key.action{font-size:11px;color:#8090a0;background:rgba(255,255,255,0.015);}
-.pin-key.action:hover{color:#c0c4d4;}
+/* Colonne droite : dots + numpad */
+.pin-input-col{display:flex;flex-direction:column;align-items:center;gap:20px;}
+.pin-dots{display:flex;justify-content:center;gap:20px;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.15);background:transparent;transition:all .2s;}
+.pin-dot.filled{background:#b8bcc8;border-color:#b8bcc8;box-shadow:0 0 8px rgba(184,188,200,0.3);}
+.pin-dot.filled.gold{background:#d4a830;border-color:#e8c040;box-shadow:0 0 8px rgba(212,168,48,0.4);}
+
+.pin-numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:240px;}
+.pin-key{height:60px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:#d0d4e0;font-size:20px;font-weight:400;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.pin-key:hover{background:rgba(255,255,255,0.09);border-color:rgba(255,255,255,0.14);}
+.pin-key:active{transform:scale(.94);background:rgba(255,255,255,0.14);}
+.pin-key.action{font-size:11px;color:#7a8898;background:rgba(255,255,255,0.02);}
+.pin-key.action:hover{color:#c0c4d4;background:rgba(255,255,255,0.06);}
 .pin-key.cancel{color:#a04848;}
-.pin-key.cancel:hover{color:#e06060;background:rgba(180,50,50,0.06);}
+.pin-key.cancel:hover{color:#e06060;background:rgba(180,50,50,0.07);}
 
 #notif-stack{position:fixed;top:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:300px;}
 .notif{border-radius:10px;padding:12px 16px;background:rgba(14,14,18,0.96);border:1px solid rgba(255,255,255,0.07);position:relative;overflow:hidden;animation:notifIn .25s ease;}
@@ -304,7 +313,7 @@ button { cursor:pointer; }
 
 #init-screen{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#030305;z-index:50;align-items:center;justify-content:center;flex-direction:column;}
 #init-screen.open{display:flex;}
-#stars-canvas{position:absolute;inset:0;}
+#stars-canvas{position:absolute;top:0;right:0;bottom:0;left:0;}
 .init-title{font-size:36px;font-weight:100;letter-spacing:.5em;color:#fff;position:relative;z-index:1;margin-bottom:60px;}
 .init-btn{padding:14px 48px;background:#fff;color:#05050a;font-size:13px;font-weight:600;letter-spacing:.15em;position:relative;z-index:1;}
 .init-btn:hover{opacity:.88;}
@@ -462,36 +471,53 @@ button { cursor:pointer; }
   </div>
 
   <div id="pin-overlay">
-    <div class="pin-box">
-      <button class="pin-close" onclick="closePinPrompt()">✕</button>
-      <div class="pin-title">VÉRIFICATION PIN</div>
-      <div class="pin-sub">Sélectionnez la carte et entrez le code</div>
-      <div class="pin-carousel">
-        <button class="pin-arrow left" onclick="pinNav(-1)">‹</button>
-        <div class="pin-card-wrap">
-          <div class="pin-cc pin-cc-visa" id="pin-cc">
-            <div class="pin-cc-inner">
-              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-                <div>
-                  <div class="pin-cc-type" id="pin-cc-type"></div>
-                  <div style="display:flex;align-items:center;margin-top:7px;"><div class="pin-cc-chip"></div><span style="font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:-2px;font-weight:300;margin-left:6px;">)))</span></div>
+    <div class="pin-atm-header">
+      <div class="pin-atm-logo">Genesis Network</div>
+      <div class="pin-atm-title">VÉRIFICATION</div>
+      <div class="pin-atm-sub">Sélectionnez votre carte et entrez votre code PIN</div>
+    </div>
+    <div class="pin-stage">
+      <div class="pin-card-col">
+        <div class="pin-carousel">
+          <button class="pin-arrow left" onclick="pinNav(-1)">‹</button>
+          <div class="pin-card-wrap">
+            <div class="pin-cc pin-cc-visa" id="pin-cc">
+              <div class="pin-cc-inner">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                  <div>
+                    <div class="pin-cc-type" id="pin-cc-type"></div>
+                    <div style="display:flex;align-items:center;margin-top:8px;gap:8px;">
+                      <div class="pin-cc-chip"></div>
+                      <span style="font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:-2px;font-weight:300;">)))</span>
+                    </div>
+                  </div>
+                  <div id="pin-cc-brand" class="pin-cc-brand"></div>
                 </div>
-                <div id="pin-cc-brand" class="pin-cc-brand"></div>
-              </div>
-              <div>
-                <div class="pin-cc-number" id="pin-cc-number"></div>
-                <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:4px;">
-                  <div><div class="pin-cc-name" id="pin-cc-name"></div><div class="pin-cc-group-badge" id="pin-cc-badge" style="display:none;">✔ ENTREPRISE VÉRIFIÉE</div></div>
-                  <span style="font-size:7px;color:rgba(255,255,255,0.35);"></span>
+                <div>
+                  <div class="pin-cc-number" id="pin-cc-number"></div>
+                  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:6px;">
+                    <div>
+                      <div class="pin-cc-name" id="pin-cc-name"></div>
+                      <div class="pin-cc-group-badge" id="pin-cc-badge" style="display:none;">✔ ENTREPRISE VÉRIFIÉE</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+          <button class="pin-arrow right" onclick="pinNav(1)">›</button>
         </div>
-        <button class="pin-arrow right" onclick="pinNav(1)">›</button>
+        <div class="pin-card-label" id="pin-card-label">Carte sélectionnée</div>
       </div>
-      <div class="pin-dots" id="pin-dots"><div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div><div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div></div>
-      <div class="pin-numpad" id="pin-numpad"></div>
+      <div class="pin-input-col">
+        <div class="pin-dots" id="pin-dots">
+          <div class="pin-dot" id="pd0"></div>
+          <div class="pin-dot" id="pd1"></div>
+          <div class="pin-dot" id="pd2"></div>
+          <div class="pin-dot" id="pd3"></div>
+        </div>
+        <div class="pin-numpad" id="pin-numpad"></div>
+      </div>
     </div>
   </div>
 
@@ -602,41 +628,58 @@ function notify(msg, level){
 }
 
 function renderSidebar(){
-  var snap=S.snap; var cards=getCards(snap); 
-  var shown = []; var total = 0;
-  for(var i=0; i<cards.length; i++) {
-      if(cardPassesView(cards[i])) {
-          shown.push(cards[i]);
-          total += (cards[i].balance || 0);
-      }
+  var snap=S.snap; var cards=getCards(snap);
+  var shown=[]; var total=0;
+  for(var i=0;i<cards.length;i++){
+    if(cardPassesView(cards[i])){ shown.push(cards[i]); total+=(cards[i].balance||0); }
   }
-  
+
   var labels={cards:'PATRIMOINE PERSONNEL',groups:'TRÉSORERIE DES GROUPES',subgroups:'FONDS DÉPARTEMENTS',invoices:'FACTURES'};
-  document.getElementById('bal-label').textContent=labels[S.viewMode]||''; document.getElementById('sidebar-total').textContent=fmt(total);
+  document.getElementById('bal-label').textContent=labels[S.viewMode]||'';
+  document.getElementById('sidebar-total').textContent=fmt(total);
   document.getElementById('stat-cards').textContent=(snap.personal_cards_count||0)+'/'+(snap.max_personal_cards||3);
-  document.getElementById('stat-groups').textContent=(snap.cards_group||[]).length; document.getElementById('stat-sub').textContent=(snap.cards_subgroups||[]).length;
-  
-  var canNew=(Number(snap.personal_cards_count||0)<Number(snap.max_personal_cards||3)); 
+  document.getElementById('stat-groups').textContent=(snap.cards_group||[]).length;
+  document.getElementById('stat-sub').textContent=(snap.cards_subgroups||[]).length;
+
+  var canNew=(Number(snap.personal_cards_count||0)<Number(snap.max_personal_cards||3));
   var btnNew=document.getElementById('btn-new-account');
-  if(btnNew) {
-      if(!canNew) btnNew.classList.add('disabled');
-      else btnNew.classList.remove('disabled');
+  if(btnNew){ if(!canNew) btnNew.classList.add('disabled'); else btnNew.classList.remove('disabled'); }
+
+  /* Tabs dynamiques : n'afficher Groupes/Sous-Groupes/Factures que si pertinent */
+  var hasGroups=(snap.cards_group||[]).length>0;
+  var hasSubgroups=(snap.cards_subgroups||[]).length>0;
+  var hasInvoices=((snap.invoices_received||[]).length+(snap.invoices_sent||[]).length)>0||hasGroups;
+  var tabs=[{k:'cards',l:'Mes Cartes',show:true}];
+  if(hasGroups) tabs.push({k:'groups',l:'Groupes',show:true});
+  if(hasSubgroups) tabs.push({k:'subgroups',l:'Sous-Groupes',show:true});
+  if(hasInvoices) tabs.push({k:'invoices',l:'Factures',show:true});
+  var tabHtml='';
+  for(var t=0;t<tabs.length;t++){
+    tabHtml+='<button class="tb'+(S.viewMode===tabs[t].k?' on':'')+'" data-mode="'+tabs[t].k+'">'+tabs[t].l+'</button>';
   }
-  
+  document.getElementById('tab-bar').innerHTML=tabHtml;
+
   var list=document.getElementById('card-list');
-  if(S.viewMode==='invoices'||(S.viewMode==='subgroups'&&!S.activeGroupID)){ list.innerHTML='<div class="empty-msg">'+(S.viewMode==='subgroups'?'Sélectionnez un groupe dans l\'onglet Groupes.':'Voir l\'onglet Factures.')+'</div>'; return; }
-  if(!shown.length){ list.innerHTML='<div class="empty-msg">Aucune carte.</div>'; return; }
-  
-  var html = '';
-  for(var i=0; i<shown.length; i++){
-    var c = shown[i];
-    var k=cardKey(c); var isSel=k===S.selectedKey; var scope=c.scope||'personal'; var meta=getMeta(c); var isVerif=meta.is_verified;
-    var tier=getCardTier(c.card_number||''); var tierLabel=tier.toUpperCase(); var scopeLabel=scope==='group'?(isVerif?'ENTREPRISE':'GROUPE'):scope==='subgroup'?'DÉPARTEMENT':'PERSONNEL';
-    var name=scope==='group'?c.group_name:scope==='subgroup'?c.subgroup_name:(c.label||''); var subIbans=meta.subgroup_ibans||[];
-    var balOrCount=scope==='subgroup' ? subIbans.length+' salarié'+(subIbans.length>1?'s':'') : fmt(c.balance||0);
-    html += '<div class="card-row'+(isSel?' sel':'')+'" onclick="selectCard(\''+k+'\',this)"><div class="cr-top"><span class="cr-scope'+(isSel?' on':'')+'">'+tierLabel+' · '+scopeLabel+'</span>'+(isVerif?'<span class="cr-verified">✔ VÉRIFIÉ</span>':'')+'</div><div style="display:flex;justify-content:space-between;align-items:center;"><div><div class="cr-iban">'+c.iban+'</div><div class="cr-label">'+name+'</div></div><div class="cr-bal'+(isSel?' sel-bal':'')+'">'+balOrCount+'</div></div></div>';
+  if(S.viewMode==='invoices'||(S.viewMode==='subgroups'&&!S.activeGroupID)){
+    list.innerHTML='<div class="empty-msg">'+(S.viewMode==='subgroups'?'Sélectionnez un groupe dans l\'onglet Groupes.':'Voir l\'onglet Factures.')+'</div>';
+    return;
   }
-  list.innerHTML = html;
+  if(!shown.length){ list.innerHTML='<div class="empty-msg">Aucune carte.</div>'; return; }
+
+  var html='';
+  for(var i=0;i<shown.length;i++){
+    var c=shown[i]; var k=cardKey(c); var isSel=k===S.selectedKey; var scope=c.scope||'personal'; var meta=getMeta(c); var isVerif=meta.is_verified;
+    var tier=getCardTier(c.card_number||''); var tierLabel=tier.toUpperCase(); var scopeLabel=scope==='group'?(isVerif?'ENTREPRISE':'GROUPE'):scope==='subgroup'?'DÉPARTEMENT':'PERSONNEL';
+    var name=scope==='group'?c.group_name:scope==='subgroup'?c.subgroup_name:(c.label||'');
+    var subIbans=meta.subgroup_ibans||[];
+    var balOrCount=scope==='subgroup'?subIbans.length+' salarié'+(subIbans.length>1?'s':''):fmt(c.balance||0);
+    html+='<div class="card-row'+(isSel?' sel':'')+'" data-ckey="'+k+'"><div class="cr-top"><span class="cr-scope'+(isSel?' on':'')+'">'+tierLabel+' · '+scopeLabel+'</span>'+(isVerif?'<span class="cr-verified">✔ VÉRIFIÉ</span>':'')+'</div><div style="display:flex;justify-content:space-between;align-items:center;"><div><div class="cr-iban">'+c.iban+'</div><div class="cr-label">'+name+'</div></div><div class="cr-bal'+(isSel?' sel-bal':'')+'">'+balOrCount+'</div></div></div>';
+  }
+  list.innerHTML=html;
+  var rows=document.querySelectorAll('[data-ckey]');
+  for(var r=0;r<rows.length;r++){
+    (function(row){ row.addEventListener('click',function(){ selectCard(row.getAttribute('data-ckey')); }); })(rows[r]);
+  }
 }
 
 function renderCreditCard(card){
@@ -654,25 +697,38 @@ function renderCreditCard(card){
 
 function renderHero(card){
   if(!card) return; var meta=getMeta(card); var scope=card.scope||'personal';
-  document.getElementById('info-iban').textContent=card.iban||''; document.getElementById('info-bal').textContent=fmt(card.balance||0)+'.00';
-  var pills=document.getElementById('cfg-pills'); var tier=getCardTier(card.card_number||''); var btns=[];
+  document.getElementById('info-iban').textContent=card.iban||'';
+  document.getElementById('info-bal').textContent=fmt(card.balance||0)+'.00';
+  var pills=document.getElementById('cfg-pills');
+  var tier=getCardTier(card.card_number||''); var btns=[];
   if(scope==='personal'){
-    if(tier==='visa') btns.push({l:'Upgrade Mastercard',fn:'doUpgrade("mastercard")'}); else if(tier==='mastercard') btns.push({l:'Upgrade Amex',fn:'doUpgrade("amex")'});
-    btns.push({l:'Plafonds (+30min)',fn:'doTempLimit()'}); btns.push({l:'Modifier PIN',fn:'doChangePin()'}); btns.push({l:'Renommer',fn:'doRename()'});
+    if(tier==='visa')       btns.push({l:'Upgrade Mastercard', fn:function(){ doUpgrade('mastercard'); }});
+    else if(tier==='mastercard') btns.push({l:'Upgrade Amex',  fn:function(){ doUpgrade('amex'); }});
+    btns.push({l:'Plafonds (+30min)', fn:doTempLimit});
+    btns.push({l:'Modifier PIN',      fn:doChangePin});
+    btns.push({l:'Renommer',          fn:doRename});
   } else if(scope==='group'){
-    btns.push({l:'Modifier PIN',fn:'doChangePin()'}); btns.push({l:'Renommer',fn:'doRename()'}); btns.push({l:'Infos Entreprise',fn:'doGroupInfo()'});
-    if(meta.can_manage_members) btns.push({l:'Gérer les membres',fn:'doManageMembers()'});
-    if(meta.can_invite) btns.push({l:'Inviter',fn:'doInvite()'});
-    if(meta.can_create_subgroups) btns.push({l:'Créer un sous-groupe',fn:'doCreateSubgroup()'});
-    if(meta.is_group_member&&!meta.is_group_owner) btns.push({l:'Quitter',fn:'doLeaveGroup()',danger:true});
+    btns.push({l:'Modifier PIN',       fn:doChangePin});
+    btns.push({l:'Renommer',           fn:doRename});
+    btns.push({l:'Infos Entreprise',   fn:doGroupInfo});
+    if(meta.can_manage_members) btns.push({l:'Gérer les membres', fn:doManageMembers});
+    if(meta.can_invite)         btns.push({l:'Inviter',           fn:doInvite});
+    if(meta.can_create_subgroups) btns.push({l:'Créer un sous-groupe', fn:doCreateSubgroup});
+    if(meta.is_group_member&&!meta.is_group_owner) btns.push({l:'Quitter', fn:doLeaveGroup, danger:true});
   } else if(scope==='subgroup'){
-    btns.push({l:'Ajouter un salarié',fn:'doAddEmployee()'}); btns.push({l:'Gérer les salariés',fn:'doManageEmployees()'}); btns.push({l:'Quitter',fn:'doLeaveGroup()',danger:true});
+    btns.push({l:'Ajouter un salarié',  fn:doAddEmployee});
+    btns.push({l:'Gérer les salariés',  fn:doManageEmployees});
+    btns.push({l:'Quitter',             fn:doLeaveGroup, danger:true});
   }
-  var html = '';
-  for(var i=0; i<btns.length; i++) {
-      if(btns[i].l) html += '<button class="cfg-pill'+(btns[i].danger?' danger':'')+'" onclick="'+(btns[i].fn||'return')+'">'+(btns[i].l)+'</button>';
+  var html='';
+  for(var i=0;i<btns.length;i++){
+    html+='<button class="cfg-pill'+(btns[i].danger?' danger':'')+'" data-pill="'+i+'">'+(btns[i].l)+'</button>';
   }
-  pills.innerHTML = html;
+  pills.innerHTML=html;
+  var pillEls=pills.querySelectorAll('[data-pill]');
+  for(var p=0;p<pillEls.length;p++){
+    (function(el,b){ el.addEventListener('click',function(){ b.fn(); }); })(pillEls[p],btns[p]);
+  }
 }
 
 function renderQuickActions(card){
@@ -729,39 +785,69 @@ function renderTxList(area){
       var meta=tx.metadata||{}; var title=tx.description||type; var sub='Transaction';
       if(type.indexOf('transfer')!==-1){ sub='Virement instantané'; if(isNeg) title=meta.beneficiary_name||meta.target_name||tx.counterparty_iban||title; else title=meta.source_group_name||meta.sender_name||title; if(meta.source_group_name&&meta.source_group_verified) title+=' LLC.'; }
       else if(type==='deposit'){title='Dépôt';sub='Espèces';} else if(type==='withdraw'){title='Retrait';sub='Espèces';}
-      rows+='<button class="tx-row" onclick="openTxModal('+realIdx+')"><div class="tx-left"><div class="tx-datebox"><div class="tx-day">'+tx.date+'</div><div class="tx-mon">'+tx.month+'</div></div><div><div class="tx-title">'+title+'</div><div class="tx-sub">'+sub+'</div></div></div><div class="tx-right"><div style="text-align:right;"><div class="tx-amt '+(pos?'pos':'neg')+'">'+(pos?'+':'-')+' '+fmt(tx.amount)+'</div><div class="tx-bal">Solde: '+fmt(tx.balance_after||0)+'</div></div><svg class="tx-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div></button>';
+      rows+='<div class="tx-row" data-txidx="'+realIdx+'"><div class="tx-left"><div class="tx-datebox"><div class="tx-day">'+tx.date+'</div><div class="tx-mon">'+tx.month+'</div></div><div><div class="tx-title">'+title+'</div><div class="tx-sub">'+sub+'</div></div></div><div class="tx-right"><div style="text-align:right;"><div class="tx-amt '+(pos?'pos':'neg')+'">'+(pos?'+':'-')+' '+fmt(tx.amount)+'</div><div class="tx-bal">Solde: '+fmt(tx.balance_after||0)+'</div></div><svg class="tx-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div></div>';
     }
   }
-  area.innerHTML='<div class="tx-panel"><div class="tx-hdr"><span class="lxs">HISTORIQUE DES TRANSACTIONS</span><button class="tx-refresh" onclick="bridgeSend(\'refresh\',{})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>Actualiser</button></div><div id="tx-list">'+rows+'</div></div>';
+  area.innerHTML='<div class="tx-panel"><div class="tx-hdr"><span class="lxs">HISTORIQUE DES TRANSACTIONS</span><button class="tx-refresh" id="tx-refresh-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>Actualiser</button></div><div id="tx-list">'+rows+'</div></div>';
+  var rfBtn=document.getElementById('tx-refresh-btn');
+  if(rfBtn) rfBtn.addEventListener('click',function(){ bridgeSend('refresh',{}); });
+  var txBtns=area.querySelectorAll('.tx-row[data-txidx]');
+  for(var tb=0;tb<txBtns.length;tb++){
+    (function(btn){ btn.addEventListener('click',function(){ openTxModal(Number(btn.getAttribute('data-txidx'))); }); })(txBtns[tb]);
+  }
 }
 
 function setInvTab(mode){ S.invSubMode=mode; renderInvoices(document.getElementById('content-area')); }
 
 function renderInvoices(area){
   var mode=S.invSubMode; var snap=S.snap||{}; var received=snap.invoices_received||[]; var sent=snap.invoices_sent||[]; var list=mode==='received'?received:mode==='sent'?sent:[];
-  var tabs='<div class="inv-tabs"><button class="itb'+(mode==='received'?' on':'')+'" onclick="setInvTab(\'received\')">Reçues <span style="font-size:9px;opacity:.5;">('+received.length+')</span></button><button class="itb'+(mode==='sent'?' on':'')+'" onclick="setInvTab(\'sent\')">Envoyées <span style="font-size:9px;opacity:.5;">('+sent.length+')</span></button><button class="itb'+(mode==='create'?' on':'')+'" onclick="setInvTab(\'create\')">+ Créer</button></div>';
   var body='';
   if(mode==='create'){
-    var groupCards=snap.cards_group||[]; 
-    var groupOpts = '';
-    if(groupCards.length) {
-        for(var i=0; i<groupCards.length; i++) groupOpts += '<option value="'+i+'">'+String(groupCards[i].group_name||'')+'</option>';
-    } else {
-        groupOpts = '<option value="">Aucun groupe disponible</option>';
-    }
-    body='<div class="inv-create-form" style="padding:4px 0 8px;"><div class="mfield"><div class="mlabel">IBAN destinataire</div><input class="minput mono" id="inv-iban" placeholder="GN-XXXX-XXXX" autocomplete="off"></div><div class="mfield"><div class="mlabel">Montant</div><input class="minput" id="inv-amount" type="number" min="1" placeholder="0"></div><div class="mfield"><div class="mlabel">Description / Objet</div><input class="minput" id="inv-desc" placeholder="Commande, prestation..."></div>'+(groupCards.length?'<div class="mfield"><div class="mlabel">Groupe émetteur</div><select class="minput" id="inv-group" style="appearance:none;cursor:pointer;">'+groupOpts+'</select></div>':'')+'<button class="mbtn" onclick="doCreateInvoice()">Émettre la facture</button></div>';
-  } else if(!list.length){ body='<div class="tx-empty">'+(mode==='received'?'Aucune facture reçue.':'Aucune facture envoyée.')+'</div>'; }
-  else {
-    for(var i=0; i<list.length; i++){
-      var inv = list[i];
+    var groupCards=snap.cards_group||[]; var groupOpts='';
+    if(groupCards.length){ for(var i=0;i<groupCards.length;i++) groupOpts+='<option value="'+i+'">'+String(groupCards[i].group_name||'')+'</option>'; }
+    else { groupOpts='<option value="">Aucun groupe disponible</option>'; }
+    body='<div class="inv-create-form" style="padding:4px 0 8px;">'
+      +'<div class="mfield"><div class="mlabel">IBAN destinataire</div><input class="minput mono" id="inv-iban" placeholder="GN-XXXX-XXXX" autocomplete="off"></div>'
+      +'<div class="mfield"><div class="mlabel">Montant</div><input class="minput" id="inv-amount" type="number" min="1" placeholder="0"></div>'
+      +'<div class="mfield"><div class="mlabel">Description / Objet</div><input class="minput" id="inv-desc" placeholder="Commande, prestation..."></div>'
+      +(groupCards.length?'<div class="mfield"><div class="mlabel">Groupe émetteur</div><select class="minput" id="inv-group" style="-webkit-appearance:none;cursor:pointer;">'+groupOpts+'</select></div>':'')
+      +'<button class="mbtn" id="inv-submit-btn">Émettre la facture</button></div>';
+  } else if(!list.length){
+    body='<div class="tx-empty">'+(mode==='received'?'Aucune facture reçue.':'Aucune facture envoyée.')+'</div>';
+  } else {
+    for(var i=0;i<list.length;i++){
+      var inv=list[i];
       var sc=inv.status||'pending'; var scCls=sc==='paid'?'inv-paid':sc==='cancelled'?'inv-cancel':'inv-pending'; var scLbl=sc==='paid'?'PAYÉE':sc==='cancelled'?'ANNULÉE':'EN ATTENTE';
-      var peer=mode==='received'?String(inv.creator_iban||''):String(inv.target_iban||''); var amtColor=mode==='received'?'#d4a020':'#22b960'; var amtPrefix=mode==='received'?'+':'-'; var clickable=sc==='pending';
-      body += '<button class="inv-row" style="'+(clickable?'':'opacity:.5;cursor:default;')+'" onclick="'+(clickable?'doInvoiceAction('+i+',\''+mode+'\')':'return')+'"><div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">'+(sc==='pending'?'<div style="width:3px;height:36px;border-radius:2px;flex-shrink:0;background:'+(mode==='received'?'#d4a020':'#22b960')+'"></div>':'<div style="width:3px;height:36px;flex-shrink:0;"></div>')+'<div style="min-width:0;"><div style="font-size:11.5px;font-weight:500;color:#c0c4d4;font-family:\'Courier New\',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+peer+'</div><div style="font-size:10px;color:#6a7890;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+String(inv.description||'')+'</div><div style="font-size:9px;color:#5a6880;margin-top:1px;">'+fmtDate(inv.created_at)+'  ·  #'+String(inv.id||i+1)+'</div></div></div><div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;margin-left:12px;"><div style="font-size:12.5px;font-weight:700;color:'+amtColor+';">'+amtPrefix+' '+fmt(inv.amount||0)+'</div><span class="inv-status '+scCls+'">'+scLbl+'</span></div></button>';
+      var peer=mode==='received'?String(inv.creator_iban||''):String(inv.target_iban||'');
+      var amtColor=mode==='received'?'#d4a020':'#22b960'; var amtPrefix=mode==='received'?'+':'-'; var clickable=sc==='pending';
+      body+='<div class="inv-row'+(clickable?'':' inv-row-done')+'" data-inv-idx="'+i+'" style="'+(clickable?'':'opacity:.5;cursor:default;')+'"><div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">'+(sc==='pending'?'<div style="width:3px;height:36px;border-radius:2px;flex-shrink:0;background:'+amtColor+'"></div>':'<div style="width:3px;height:36px;flex-shrink:0;"></div>')+'<div style="min-width:0;"><div style="font-size:11.5px;font-weight:500;color:#c0c4d4;font-family:\'Courier New\',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+peer+'</div><div style="font-size:10px;color:#6a7890;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+String(inv.description||'')+'</div><div style="font-size:9px;color:#5a6880;margin-top:1px;">'+fmtDate(inv.created_at)+' · #'+String(inv.id||i+1)+'</div></div></div><div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;margin-left:12px;"><div style="font-size:12.5px;font-weight:700;color:'+amtColor+';">'+amtPrefix+' '+fmt(inv.amount||0)+'</div><span class="inv-status '+scCls+'">'+scLbl+'</span></div></div>';
     }
   }
-  area.innerHTML='<div class="inv-panel"><div class="inv-tabs">'+tabs+'</div><div id="inv-list">'+body+'</div></div>';
+  area.innerHTML='<div class="inv-panel">'
+    +'<div class="inv-tabs">'
+      +'<button class="itb'+(mode==='received'?' on':'')+'" data-invtab="received">Reçues <span style="font-size:9px;opacity:.5;">('+received.length+')</span></button>'
+      +'<button class="itb'+(mode==='sent'?' on':'')+'" data-invtab="sent">Envoyées <span style="font-size:9px;opacity:.5;">('+sent.length+')</span></button>'
+      +'<button class="itb'+(mode==='create'?' on':'')+'" data-invtab="create">+ Créer</button>'
+    +'</div>'
+    +'<div id="inv-list">'+body+'</div>'
+  +'</div>';
+  /* Attach tab listeners */
+  var itbs=area.querySelectorAll('[data-invtab]');
+  for(var t=0;t<itbs.length;t++){
+    (function(btn){ btn.addEventListener('click',function(){ setInvTab(btn.getAttribute('data-invtab')); }); })(itbs[t]);
+  }
+  /* Attach invoice row listeners */
+  var invRows=area.querySelectorAll('[data-inv-idx]');
+  for(var r=0;r<invRows.length;r++){
+    (function(row,m){ 
+      if(row.classList.contains('inv-row-done')) return;
+      row.addEventListener('click',function(){ doInvoiceAction(Number(row.getAttribute('data-inv-idx')),m); });
+    })(invRows[r],mode);
+  }
+  /* Attach invoice submit */
+  var subBtn=document.getElementById('inv-submit-btn');
+  if(subBtn) subBtn.addEventListener('click',doCreateInvoice);
 }
-
 function openTxModal(idx){
   var tx=(S.snap.transactions||[])[idx]; if(!tx) return;
   var pos=(tx.amount||0)>=0; var type=String(tx.txn_type||'').toLowerCase(); if(type==='withdraw'||type==='transfer_out') pos=false; var meta=tx.metadata||{};
@@ -777,16 +863,32 @@ function openTxModal(idx){
   var dHtml = '';
   for(var i=0; i<details.length; i++) dHtml += '<div class="mrow"><span class="k">'+details[i].k+'</span><span class="v">'+details[i].v+'</span></div>';
 
-  document.getElementById('tx-modal-body').innerHTML='<div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;"><div class="micon '+(pos?'pos':'neg')+'">'+(pos?arrowIn:arrowOut)+'</div><div><div style="font-size:16px;font-weight:600;color:#fff;">'+(tx.description||tx.txn_type)+'</div><div style="font-size:11.5px;color:#6a7890;margin-top:2px;">'+(type.indexOf('transfer')!==-1?'Virement instantané':type==='deposit'?'Espèces':type)+'</div></div></div><div class="mamount-box"><div class="lxs" style="margin-bottom:4px;">'+(pos?'MONTANT REÇU':'MONTANT DÉBITÉ')+'</div><div class="mamount '+(pos?'pos':'neg')+'">'+(pos?'+':'-')+' '+fmt(tx.amount)+'.00</div></div>'+dHtml+'<div style="display:flex;gap:10px;margin-top:20px;"><button class="mbtn" style="flex:1;" onclick="notify(\'Téléchargement simulé\',\'info\')">Télécharger</button><button class="mbtn" style="flex:1;" onclick="notify(\'Transaction signalée\',\'info\')">Signaler</button></div>';
+  document.getElementById('tx-modal-body').innerHTML='<div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;"><div class="micon '+(pos?'pos':'neg')+'">'+(pos?arrowIn:arrowOut)+'</div><div><div style="font-size:16px;font-weight:600;color:#fff;">'+(tx.description||tx.txn_type)+'</div><div style="font-size:11.5px;color:#6a7890;margin-top:2px;">'+(type.indexOf('transfer')!==-1?'Virement instantané':type==='deposit'?'Espèces':type)+'</div></div></div><div class="mamount-box"><div class="lxs" style="margin-bottom:4px;">'+(pos?'MONTANT REÇU':'MONTANT DÉBITÉ')+'</div><div class="mamount '+(pos?'pos':'neg')+'">'+(pos?'+':'-')+' '+fmt(tx.amount)+'.00</div></div>'+dHtml+'<div style="display:flex;gap:10px;margin-top:20px;"><button class="mbtn" style="flex:1;" id="tx-dl-btn">Télécharger</button><button class="mbtn" style="flex:1;" id="tx-rep-btn">Signaler</button></div>';
   document.getElementById('tx-modal').classList.add('open');
+  var dlBtn=document.getElementById('tx-dl-btn'); if(dlBtn) dlBtn.addEventListener('click',function(){ notify('Téléchargement simulé','info'); });
+  var repBtn=document.getElementById('tx-rep-btn'); if(repBtn) repBtn.addEventListener('click',function(){ notify('Transaction signalée','info'); });
 }
 function closeTxModal(){ document.getElementById('tx-modal').classList.remove('open'); }
 
-function openModal(html, wide){ document.getElementById('modal-box').className='mbox'+(wide?' wide':''); document.getElementById('modal-body').innerHTML=html; document.getElementById('modal').classList.add('open'); }
-function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+/* === MODAL ACTION REGISTRY (fix onclick attribute quoting in Chrome 49) === */
+window._mActs = {};
+var _mActId = 0;
+function _reg(fn){ var id = ++_mActId; window._mActs[id] = fn; return id; }
+window._run = function(id){ if(window._mActs[id]) window._mActs[id](); };
+
+function openModal(html, wide){
+  _mActId = 0; window._mActs = {};
+  document.getElementById('modal-box').className='mbox'+(wide?' wide':'');
+  document.getElementById('modal-body').innerHTML=html;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('open'); window._mActs={}; }
 function mTitle(t){ return '<div class="mtitle">'+t+'</div>'; }
 function mField(label,id,type,ph,mono){ return '<div class="mfield"><div class="mlabel">'+label+'</div><input class="minput'+(mono?' mono':'')+'" id="'+id+'" type="'+(type||'text')+'" placeholder="'+(ph||'')+'"></div>'; }
-function mBtn(label, onclick, danger){ return '<button class="mbtn'+(danger?' danger':'')+'" onclick="'+onclick+'">'+label+'</button>'; }
+function mBtn(label, fn, danger){
+  var id = _reg(typeof fn==='function' ? fn : function(){ try{ eval(fn); }catch(e){} });
+  return '<button class="mbtn'+(danger?' danger':'')+'" onclick="_run('+id+')">'+label+'</button>';
+}
 
 /* ============================================================
    LES ACTIONS DU DISTRIBUTEUR (Retraits / Dépôts)
@@ -799,77 +901,219 @@ function doWithdraw(){
     +'<div class="mfield"><div class="mlabel">Montant du retrait</div>'
     +'<input class="minput" id="wit-amount" type="number" value="0"></div>'
     +'<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:14px;">'
-      +'<button class="mbtn bill" onclick="addWit(10)">+ $10</button>'
-      +'<button class="mbtn bill" onclick="addWit(20)">+ $20</button>'
-      +'<button class="mbtn bill" onclick="addWit(50)">+ $50</button>'
-      +'<button class="mbtn bill" onclick="addWit(100)">+ $100</button>'
-      +'<button class="mbtn bill" onclick="addWit(500)">+ $500</button>'
-      +'<button class="mbtn danger" style="margin-top:0;" onclick="clearWit()">Corriger</button>'
+      +mBtn('+$10',  function(){ var e=document.getElementById('wit-amount'); if(e) e.value=Number(e.value||0)+10; })
+      +mBtn('+$20',  function(){ var e=document.getElementById('wit-amount'); if(e) e.value=Number(e.value||0)+20; })
+      +mBtn('+$50',  function(){ var e=document.getElementById('wit-amount'); if(e) e.value=Number(e.value||0)+50; })
+      +mBtn('+$100', function(){ var e=document.getElementById('wit-amount'); if(e) e.value=Number(e.value||0)+100; })
+      +mBtn('+$500', function(){ var e=document.getElementById('wit-amount'); if(e) e.value=Number(e.value||0)+500; })
+      +mBtn('Corriger', function(){ var e=document.getElementById('wit-amount'); if(e) e.value='0'; }, true)
     +'</div>'
-    +mBtn('Confirmer le retrait','confirmWithdraw()');
+    +mBtn('Confirmer le retrait', function(){
+      var amt=Number(document.getElementById('wit-amount').value||0);
+      if(amt<=0){notify('Montant invalide.','error');return;}
+      bridgeSend('withdraw',{amount:amt,selection:selPay(getSelectedCard())}); closeModal();
+    });
   openModal(html);
 }
-window.addWit = function(val) {
-  var el = document.getElementById('wit-amount');
-  if(el) el.value = Number(el.value || 0) + val;
-};
-window.clearWit = function() {
-  var el = document.getElementById('wit-amount');
-  if(el) el.value = "0";
-};
-function confirmWithdraw(){
-  var amt=Number(document.getElementById('wit-amount').value||0);
-  if(amt<=0){notify('Montant invalide.','error');return;}
-  bridgeSend('withdraw',{amount:amt,selection:selPay(getSelectedCard())}); closeModal();
-}
 
-function doDeposit(){ var c=getSelectedCard(); openModal(mTitle('EFFECTUER UN DÉPÔT')+'<div style="font-size:11px;color:#6a7890;margin-bottom:14px;">Carte: <span style="color:#9aa0b0;font-family:\'Courier New\',monospace;">'+(c?c.iban:'')+'</span></div>'+mField('Montant','dep-amount','number','0')+mBtn('Confirmer le dépôt','confirmDeposit()')); }
-function confirmDeposit(){ var amt=Number(document.getElementById('dep-amount').value||0); if(amt<=0){notify('Montant invalide.','error');return;} bridgeSend('deposit',{amount:amt,selection:selPay(getSelectedCard())}); closeModal(); }
+function doDeposit(){
+  var c=getSelectedCard();
+  openModal(mTitle('EFFECTUER UN DÉPÔT')
+    +'<div style="font-size:11px;color:#6a7890;margin-bottom:14px;">Carte: <span style="color:#9aa0b0;font-family:\'Courier New\',monospace;">'+(c?c.iban:'')+'</span></div>'
+    +mField('Montant','dep-amount','number','0')
+    +mBtn('Confirmer le dépôt', function(){
+      var amt=Number(document.getElementById('dep-amount').value||0);
+      if(amt<=0){notify('Montant invalide.','error');return;}
+      bridgeSend('deposit',{amount:amt,selection:selPay(getSelectedCard())}); closeModal();
+    }));
+}
 
 function doTransfer(){
   var cardsList=getCards(S.snap);
   var validCards = [];
   for(var j=0; j<cardsList.length; j++) { if(cardsList[j].scope !== 'subgroup') validCards.push(cardsList[j]); }
-  
   S.transferSourceKey=getSelectedCard()?cardKey(getSelectedCard()):'';
   var cardRows = '';
   for(var i=0; i<validCards.length; i++) {
-      var c = validCards[i];
-      var k=cardKey(c); var isSel=k===S.transferSourceKey; 
-      cardRows += '<div class="csel-row'+(isSel?' on':'')+'" onclick="S.transferSourceKey=\''+k+'\'; var rs=document.querySelectorAll(\'.csel-row\'); for(var a=0;a<rs.length;a++) rs[a].classList.remove(\'on\'); this.classList.add(\'on\')"><div><div style="font-size:10px;font-weight:500;color:#c0c4d4;">'+c.iban+'</div><div style="font-size:9px;color:#6a7890;">'+(c.label||c.group_name||'')+'</div></div><div style="font-size:10px;color:#8892a8;">'+fmt(c.balance||0)+'</div></div>'; 
+    var c = validCards[i]; var k=cardKey(c); var isSel=k===S.transferSourceKey;
+    cardRows += '<div class="csel-row'+(isSel?' on':'')+'" data-ckey="'+k+'"><div><div style="font-size:10px;font-weight:500;color:#c0c4d4;">'+c.iban+'</div><div style="font-size:9px;color:#6a7890;">'+(c.label||c.group_name||'')+'</div></div><div style="font-size:10px;color:#8892a8;">'+fmt(c.balance||0)+'</div></div>';
   }
-  openModal(mTitle('ENVOYER UN VIREMENT')+'<div class="mlabel" style="margin-bottom:6px;">COMPTE SOURCE</div><div class="csel-list">'+cardRows+'</div>'+mField('IBAN destinataire','tr-iban','text','GN-XXXX-XXXX',true)+mField('Nom du bénéficiaire','tr-benef','text','')+mField('Montant','tr-amount','number','0')+mField('Motif / Référence','tr-comment','text','')+mBtn('Envoyer le virement','confirmTransfer()'), true);
-}
-function confirmTransfer(){
-  var iban=String(document.getElementById('tr-iban').value||'').trim(); var benef=String(document.getElementById('tr-benef').value||'').trim(); var amt=Number(document.getElementById('tr-amount').value||0); var comment=String(document.getElementById('tr-comment').value||'').trim();
-  if(!iban||amt<=0){notify('Informations invalides.','error');return;}
-  
-  var cardsList = getCards(S.snap);
-  var src = null;
-  for(var i=0; i<cardsList.length; i++){
-      if(cardKey(cardsList[i]) === S.transferSourceKey){ src = cardsList[i]; break; }
+  openModal(mTitle('ENVOYER UN VIREMENT')
+    +'<div class="mlabel" style="margin-bottom:6px;">COMPTE SOURCE</div>'
+    +'<div class="csel-list" id="csel-list">'+cardRows+'</div>'
+    +mField('IBAN destinataire','tr-iban','text','GN-XXXX-XXXX',true)
+    +mField('Nom du bénéficiaire','tr-benef','text','')
+    +mField('Montant','tr-amount','number','0')
+    +mField('Motif / Référence','tr-comment','text','')
+    +mBtn('Envoyer le virement', function(){
+      var iban=String(document.getElementById('tr-iban').value||'').trim();
+      var benef=String(document.getElementById('tr-benef').value||'').trim();
+      var amt=Number(document.getElementById('tr-amount').value||0);
+      var comment=String(document.getElementById('tr-comment').value||'').trim();
+      if(!iban||amt<=0){notify('Informations invalides.','error');return;}
+      var cardsList2=getCards(S.snap); var src=null;
+      for(var i=0;i<cardsList2.length;i++){ if(cardKey(cardsList2[i])===S.transferSourceKey){src=cardsList2[i];break;} }
+      bridgeSend('transfer',{iban:iban,amount:amt,beneficiary_name:benef,comment:comment,selection:selPay(src||getSelectedCard())});
+      closeModal();
+    }), true);
+  /* Attach csel click after modal open */
+  var rows=document.querySelectorAll('[data-ckey]');
+  for(var r=0;r<rows.length;r++){
+    (function(row){ row.addEventListener('click',function(){
+      S.transferSourceKey=row.getAttribute('data-ckey');
+      var all=document.querySelectorAll('.csel-row');
+      for(var a=0;a<all.length;a++) all[a].classList.remove('on');
+      row.classList.add('on');
+    }); })(rows[r]);
   }
-  bridgeSend('transfer',{iban:iban,amount:amt,beneficiary_name:benef,comment:comment,selection:selPay(src||getSelectedCard())}); closeModal();
 }
 
-function doBatchTransfer(){ var c = getSelectedCard(); openModal(mTitle('VIREMENT GROUPÉ')+'<div style="font-size:11px;color:#6a7890;margin-bottom:14px;">Virement aux salariés.</div>'+mField('Montant par bénéficiaire','batch-amount','number','0')+mBtn('Envoyer','confirmBatchTransfer()')); }
-function confirmBatchTransfer(){ var amt=Number(document.getElementById('batch-amount').value||0); if(amt<=0)return; var c = getSelectedCard(); bridgeSend('batch_transfer',{group_id:c?c.group_id:0,subgroup_id:c?c.subgroup_id:0,amount:amt,comment:'Virement groupe'}); closeModal(); }
-function doUpgrade(tier){ openModal(mTitle('UPGRADE CARTE')+'<div style="font-size:12px;color:#5a6478;margin-bottom:18px;">Upgrader vers <strong style="color:#c0c4d4;">'+tier.toUpperCase()+'</strong>.</div>'+mBtn('Confirmer l\'upgrade','bridgeSend("card_config",{card_action:"upgrade",tier:"'+tier+'",selection:selPay(getSelectedCard())});closeModal()')); }
-function doTempLimit(){ openModal(mTitle('PLAFOND TEMPORAIRE (+30min)')+mField('Montant du bonus','limit-bonus','number','0')+mBtn('Activer','bridgeSend("card_config",{card_action:"temp_limit",bonus:Number(document.getElementById("limit-bonus").value||0),selection:selPay(getSelectedCard())});closeModal()')); }
-function doChangePin(){ openModal(mTitle('MODIFIER LE CODE PIN')+mField('Nouveau PIN','new-pin','password','••••')+mBtn('Confirmer','var p=document.getElementById("new-pin").value; if(/^\\d{4}$/.test(p)){bridgeSend("pin_change",{pin:p,selection:selPay(getSelectedCard())});closeModal();}else{notify("PIN invalide","error");}')); }
-function doRename(){ var c=getSelectedCard(); openModal(mTitle('RENOMMER LA CARTE')+mField('Nouveau nom','rename-label','text',c?c.label:'')+mBtn('Confirmer','bridgeSend("card_config",{card_action:"rename",label:document.getElementById("rename-label").value,selection:selPay(getSelectedCard())});closeModal()')); }
-function doGroupInfo(){ var c=getSelectedCard(); if(c)openModal(mTitle('INFOS ENTREPRISE')+'<div class="mrow"><span class="k">Groupe</span><span class="v">'+(c.group_name||'—')+'</span></div><div class="mrow"><span class="k">IBAN</span><span class="v">'+(c.iban||'—')+'</span></div><div class="mrow"><span class="k">Solde</span><span class="v">'+fmt(c.balance||0)+'</span></div>'); }
-function doManageMembers(){ var c = getSelectedCard(); var m=(c?getMeta(c).members||[]:[]); var html = ''; for(var i=0; i<m.length; i++){ html += '<div class="member-row"><div><div style="font-size:12px;color:#c0c4d4;">'+(m[i].name||'')+'</div><div style="font-size:9.5px;color:#6a7890;">'+(m[i].steamid||'')+'</div></div><button class="kick-btn" onclick="bridgeSend(\'group_action\',{action:\'kick_member\',group_id:getSelectedCard().group_id,target:\''+(m[i].steamid||'')+'\'});closeModal()">Expulser</button></div>'; } openModal(mTitle('MEMBRES DU GROUPE')+'<div style="max-height:220px;overflow-y:auto;">'+(html!==''?html:'<div class="tx-empty">Aucun membre</div>')+'</div>'); }
-function doInvite(){ openModal(mTitle('INVITER UN MEMBRE')+mField('SteamID/Nom','invite-target','text','')+mBtn('Envoyer l\'invitation','var c=getSelectedCard(); bridgeSend("group_action",{action:"invite_member",group_id:c?c.group_id:0,target:document.getElementById("invite-target").value});closeModal()')); }
-function doCreateSubgroup(){ openModal(mTitle('CRÉER UN SOUS-GROUPE')+mField('Nom','sg-name','text','')+mBtn('Créer','var c=getSelectedCard(); bridgeSend("group_action",{action:"create_subgroup",group_id:c?c.group_id:0,name:document.getElementById("sg-name").value});closeModal()')); }
-function doLeaveGroup(){ openModal(mTitle('QUITTER CE GROUPE')+mBtn('Oui, quitter','var c=getSelectedCard(); bridgeSend("group_action",{action:"leave_group",group_id:c?c.group_id:0});closeModal()',true)); }
-function doAddEmployee(){ openModal(mTitle('AJOUTER UN SALARIÉ')+mField('IBAN','emp-iban','text','GN-')+mField('Nom','emp-name','text','')+mBtn('Ajouter','var c=getSelectedCard(); bridgeSend("group_action",{action:"subgroup_add_iban",group_id:c?c.group_id:0,subgroup_id:c?c.subgroup_id:0,iban:document.getElementById("emp-iban").value,beneficiary_name:document.getElementById("emp-name").value});closeModal()')); }
-function doManageEmployees(){ var c=getSelectedCard(); var e=(c?getMeta(c).subgroup_ibans||[]:[]); var html=''; for(var i=0; i<e.length; i++){ html+='<div class="member-row"><div><div style="font-size:12px;color:#c0c4d4;">'+(e[i].beneficiary_name||'')+'</div></div><button class="kick-btn" onclick="bridgeSend(\'group_action\',{action:\'subgroup_remove_iban\',group_id:getSelectedCard().group_id,subgroup_id:getSelectedCard().subgroup_id,iban:\''+e[i].iban+'\'});closeModal()">Retirer</button></div>'; } openModal(mTitle('SALARIÉS')+'<div style="max-height:220px;overflow-y:auto;">'+(html!==''?html:'<div class="tx-empty">Aucun salarié</div>')+'</div>'); }
+function doBatchTransfer(){
+  var c=getSelectedCard();
+  openModal(mTitle('VIREMENT GROUPÉ')
+    +'<div style="font-size:11px;color:#6a7890;margin-bottom:14px;">Virement aux salariés du département.</div>'
+    +mField('Montant par bénéficiaire','batch-amount','number','0')
+    +mBtn('Envoyer', function(){
+      var amt=Number(document.getElementById('batch-amount').value||0); if(amt<=0)return;
+      var c2=getSelectedCard(); bridgeSend('batch_transfer',{group_id:c2?c2.group_id:0,subgroup_id:c2?c2.subgroup_id:0,amount:amt,comment:'Virement groupe'}); closeModal();
+    }));
+}
+function doUpgrade(tier){
+  openModal(mTitle('UPGRADE CARTE')
+    +'<div style="font-size:12px;color:#7a8498;margin-bottom:18px;">Upgrader vers <strong style="color:#c0c4d4;">'+tier.toUpperCase()+'</strong>.</div>'
+    +mBtn('Confirmer', function(){
+      bridgeSend('card_config',{card_action:'upgrade',tier:tier,selection:selPay(getSelectedCard())}); closeModal();
+    }));
+}
+function doTempLimit(){
+  openModal(mTitle('PLAFOND TEMPORAIRE (+30min)')
+    +mField('Montant du bonus','limit-bonus','number','0')
+    +mBtn('Activer', function(){
+      var bonus=Number(document.getElementById('limit-bonus').value||0);
+      bridgeSend('card_config',{card_action:'temp_limit',bonus:bonus,selection:selPay(getSelectedCard())}); closeModal();
+    }));
+}
+function doChangePin(){
+  openModal(mTitle('MODIFIER LE CODE PIN')
+    +mField('Ancien PIN','old-pin','password','••••')
+    +mField('Nouveau PIN','new-pin','password','••••')
+    +mField('Confirmer le nouveau PIN','conf-pin','password','••••')
+    +mBtn('Confirmer le changement', function(){
+      var oldP=String(document.getElementById('old-pin').value||'').trim();
+      var newP=String(document.getElementById('new-pin').value||'').trim();
+      var confP=String(document.getElementById('conf-pin').value||'').trim();
+      if(!/^\d{4}$/.test(oldP)){notify('Ancien PIN invalide (4 chiffres).','error');return;}
+      if(!/^\d{4}$/.test(newP)){notify('Nouveau PIN invalide (4 chiffres).','error');return;}
+      if(newP!==confP){notify('Les PINs ne correspondent pas.','error');return;}
+      bridgeSend('pin_change',{pin:newP,old_pin:oldP,selection:selPay(getSelectedCard())}); closeModal();
+    }));
+}
+function doRename(){
+  var c=getSelectedCard();
+  openModal(mTitle('RENOMMER LA CARTE')
+    +mField('Nouveau nom','rename-label','text',c?c.label:'')
+    +mBtn('Confirmer', function(){
+      var lbl=String(document.getElementById('rename-label').value||'').trim();
+      if(!lbl){notify('Nom invalide.','error');return;}
+      bridgeSend('card_config',{card_action:'rename',label:lbl,selection:selPay(getSelectedCard())}); closeModal();
+    }));
+}
+function doGroupInfo(){
+  var c=getSelectedCard();
+  if(c) openModal(mTitle('INFOS ENTREPRISE')
+    +'<div class="mrow"><span class="k">Groupe</span><span class="v">'+(c.group_name||'—')+'</span></div>'
+    +'<div class="mrow"><span class="k">IBAN</span><span class="v">'+(c.iban||'—')+'</span></div>'
+    +'<div class="mrow"><span class="k">Solde</span><span class="v">'+fmt(c.balance||0)+'</span></div>');
+}
+function doManageMembers(){
+  var c=getSelectedCard(); var m=(c?getMeta(c).members||[]:[]); var html='';
+  for(var i=0;i<m.length;i++){
+    (function(mbr){
+      html+='<div class="member-row"><div><div style="font-size:12px;color:#c0c4d4;">'+(mbr.name||'')+'</div><div style="font-size:9.5px;color:#6a7890;">'+(mbr.steamid||'')+'</div></div>'
+      +'<button class="kick-btn" data-mbr-sid="'+(mbr.steamid||'')+'">Expulser</button></div>';
+    })(m[i]);
+  }
+  openModal(mTitle('MEMBRES DU GROUPE')+'<div style="max-height:220px;overflow-y:auto;">'+(html||'<div class="tx-empty">Aucun membre</div>')+'</div>');
+  var btns=document.querySelectorAll('[data-mbr-sid]');
+  for(var b=0;b<btns.length;b++){
+    (function(btn){ btn.addEventListener('click',function(){
+      var c2=getSelectedCard(); bridgeSend('group_action',{action:'kick_member',group_id:c2?c2.group_id:0,target:btn.getAttribute('data-mbr-sid')}); closeModal();
+    }); })(btns[b]);
+  }
+}
+function doInvite(){
+  openModal(mTitle('INVITER UN MEMBRE')
+    +mField('SteamID/Nom','invite-target','text','')
+    +mBtn('Envoyer', function(){
+      var c=getSelectedCard(); bridgeSend('group_action',{action:'invite_member',group_id:c?c.group_id:0,target:document.getElementById('invite-target').value}); closeModal();
+    }));
+}
+function doCreateSubgroup(){
+  openModal(mTitle('CRÉER UN SOUS-GROUPE')
+    +mField('Nom','sg-name','text','')
+    +mBtn('Créer', function(){
+      var c=getSelectedCard(); bridgeSend('group_action',{action:'create_subgroup',group_id:c?c.group_id:0,name:document.getElementById('sg-name').value}); closeModal();
+    }));
+}
+function doLeaveGroup(){
+  openModal(mTitle('QUITTER CE GROUPE')
+    +mBtn('Oui, quitter', function(){
+      var c=getSelectedCard(); bridgeSend('group_action',{action:'leave_group',group_id:c?c.group_id:0}); closeModal();
+    }, true));
+}
+function doAddEmployee(){
+  openModal(mTitle('AJOUTER UN SALARIÉ')
+    +mField('IBAN','emp-iban','text','GN-')
+    +mField('Nom','emp-name','text','')
+    +mBtn('Ajouter', function(){
+      var c=getSelectedCard();
+      bridgeSend('group_action',{action:'subgroup_add_iban',group_id:c?c.group_id:0,subgroup_id:c?c.subgroup_id:0,iban:document.getElementById('emp-iban').value,beneficiary_name:document.getElementById('emp-name').value});
+      closeModal();
+    }));
+}
+function doManageEmployees(){
+  var c=getSelectedCard(); var e=(c?getMeta(c).subgroup_ibans||[]:[]); var html='';
+  for(var i=0;i<e.length;i++){
+    html+='<div class="member-row"><div><div style="font-size:12px;color:#c0c4d4;">'+(e[i].beneficiary_name||e[i].iban||'')+'</div></div>'
+    +'<button class="kick-btn" data-emp-iban="'+(e[i].iban||'')+'">Retirer</button></div>';
+  }
+  openModal(mTitle('SALARIÉS')+'<div style="max-height:220px;overflow-y:auto;">'+(html||'<div class="tx-empty">Aucun salarié</div>')+'</div>');
+  var btns=document.querySelectorAll('[data-emp-iban]');
+  for(var b=0;b<btns.length;b++){
+    (function(btn){ btn.addEventListener('click',function(){
+      var c2=getSelectedCard(); bridgeSend('group_action',{action:'subgroup_remove_iban',group_id:c2?c2.group_id:0,subgroup_id:c2?c2.subgroup_id:0,iban:btn.getAttribute('data-emp-iban')}); closeModal();
+    }); })(btns[b]);
+  }
+}
 
 function doNewAccount(){ bridgeSend('card_create',{label:'Compte Principal',pin:1234}); }
 function doAddCard(){ bridgeSend('atm_open',{force_pin:true,refresh:true}); }
-function doCreateGroup(){ openModal(mTitle('CRÉER ENTREPRISE')+mField('Nom','grp-name','text','')+mField('PIN (Optionnel)','grp-pin','password','')+mBtn('Créer','bridgeSend("group_action",{action:"create_multi_group",requested_name:document.getElementById("grp-name").value,group_pin:document.getElementById("grp-pin").value});closeModal()')); }
-function doTheme(){ var themes=['Genesis Dark','Maze Bank','Revolut Clair','VIP Gold']; var html=''; for(var i=0; i<themes.length; i++){ html+='<button class="theme-option" onclick="bridgeSend(\'set_theme\',{theme:\''+themes[i]+'\'});closeModal()">'+themes[i]+'</button>'; } openModal(mTitle('THÈMES')+'<div class="theme-grid">'+html+'</div>'); }
+function doCreateGroup(){
+  openModal(mTitle('CRÉER UNE ENTREPRISE')
+    +mField('Nom de l\'entreprise','grp-name','text','')
+    +mField('PIN groupe (optionnel)','grp-pin','password','')
+    +mBtn('Créer', function(){
+      var name=String(document.getElementById('grp-name').value||'').trim();
+      var pin=String(document.getElementById('grp-pin').value||'').trim();
+      if(!name){notify('Nom requis.','error');return;}
+      bridgeSend('group_action',{action:'create_multi_group',requested_name:name,group_pin:pin}); closeModal();
+    }));
+}
+function doTheme(){
+  var themes=[['genesis','Genesis Dark'],['maze','Maze Bank'],['revolut','Revolut Clair'],['gold','VIP Gold']];
+  var html=mTitle('THÈMES')+'<div class="theme-grid">';
+  for(var i=0;i<themes.length;i++){
+    html+='<button class="theme-option" data-theme="'+themes[i][0]+'">'+themes[i][1]+'</button>';
+  }
+  html+='</div>';
+  openModal(html);
+  var btns=document.querySelectorAll('[data-theme]');
+  for(var b=0;b<btns.length;b++){
+    (function(btn){ btn.addEventListener('click',function(){
+      bridgeSend('set_theme',{theme:btn.getAttribute('data-theme')}); closeModal();
+    }); })(btns[b]);
+  }
+}
 
 function doCreateInvoice(){
   var iban=String(document.getElementById('inv-iban').value||'').trim(); var amt=Math.floor(Number(document.getElementById('inv-amount').value||0)); var desc=String(document.getElementById('inv-desc').value||'').trim(); var grp=document.getElementById('inv-group');
@@ -880,10 +1124,18 @@ function doCreateInvoice(){
   if(iban&&amt>0&&desc){ bridgeSend('invoice_create',{target_iban:iban,amount:amt,description:desc,group_id:gid}); document.getElementById('inv-iban').value=''; document.getElementById('inv-amount').value=''; document.getElementById('inv-desc').value=''; }
 }
 function doInvoiceAction(idx,mode){
-  var list = (mode==='received' ? (S.snap?S.snap.invoices_received:[]) : (S.snap?S.snap.invoices_sent:[]));
-  var inv=list[idx]; if(!inv||inv.status!=='pending')return;
-  if(mode==='received') openModal(mTitle('FACTURE REÇUE')+'<div class="mamount-box"><div class="mamount neg">- '+fmt(inv.amount)+'</div></div>'+mBtn('Payer','bridgeSend("invoice_action",{action:"pay",invoice_id:'+inv.id+'});closeModal()')+'<br>'+mBtn('Refuser','bridgeSend("invoice_action",{action:"refuse",invoice_id:'+inv.id+'});closeModal()',true));
-  else openModal(mTitle('ANNULER LA FACTURE')+mBtn('Confirmer l\'annulation','bridgeSend("invoice_action",{action:"cancel",invoice_id:'+inv.id+'});closeModal()',true));
+  var list=(mode==='received'?(S.snap?S.snap.invoices_received:[]):(S.snap?S.snap.invoices_sent:[]));
+  var inv=list[idx]; if(!inv||inv.status!=='pending') return;
+  if(mode==='received'){
+    openModal(mTitle('FACTURE REÇUE')
+      +'<div class="mamount-box"><div class="mamount neg">- '+fmt(inv.amount)+'</div></div>'
+      +mBtn('Payer', function(){ bridgeSend('invoice_action',{action:'pay',invoice_id:inv.id}); closeModal(); })
+      +'<br>'
+      +mBtn('Refuser', function(){ bridgeSend('invoice_action',{action:'refuse',invoice_id:inv.id}); closeModal(); }, true));
+  } else {
+    openModal(mTitle('ANNULER LA FACTURE')
+      +mBtn('Confirmer l\'annulation', function(){ bridgeSend('invoice_action',{action:'cancel',invoice_id:inv.id}); closeModal(); }, true));
+  }
 }
 
 function setFilter(f){ S.activeFilter=f; renderQuickActions(getSelectedCard()); renderContent(); }
@@ -932,7 +1184,27 @@ function openPinPrompt(payload){
 }
 function closePinPrompt(){ document.getElementById('pin-overlay').classList.remove('open'); PIN_STATE.pin=''; }
 function pinNav(dir){ PIN_STATE.idx=(PIN_STATE.idx+dir+PIN_STATE.cards.length)%PIN_STATE.cards.length; PIN_STATE.pin=''; renderPinCard(); renderPinDots(); }
-function renderPinCard(){ var c=PIN_STATE.cards[PIN_STATE.idx]; if(c){ document.getElementById('pin-cc-number').textContent=c.card_number||'••••'; document.getElementById('pin-cc-name').textContent=c.label||c.group_name||''; } }
+function renderPinCard(){
+  var c=PIN_STATE.cards[PIN_STATE.idx]; if(!c) return;
+  document.getElementById('pin-cc-number').textContent=c.card_number||'•••• •••• •••• ••••';
+  document.getElementById('pin-cc-name').textContent=(c.label||c.group_name||'').toUpperCase();
+  var scope=c.scope||'personal';
+  var typeLabel=scope==='group'?'GROUPE':scope==='subgroup'?'DÉPARTEMENT':'PERSONNEL';
+  document.getElementById('pin-cc-type').textContent=typeLabel;
+  var meta=c.metadata||{}; if(typeof meta==='string'){try{meta=JSON.parse(meta);}catch(e){meta={};}}
+  var badge=document.getElementById('pin-cc-badge');
+  if(badge){ badge.style.display=(meta.is_verified?'block':'none'); }
+  var lbl=document.getElementById('pin-card-label');
+  if(lbl){ lbl.textContent=(c.label||c.group_name||c.iban||'Carte'); }
+  var tier=getCardTier(c.card_number||''); var brandEl=document.getElementById('pin-cc-brand');
+  var pinCc=document.getElementById('pin-cc');
+  if(pinCc){ pinCc.className='pin-cc pin-cc-'+tier; }
+  if(brandEl){
+    if(tier==='mastercard') brandEl.innerHTML='<div style="display:flex;"><div style="width:22px;height:22px;border-radius:50%;background:rgba(220,0,27,0.82);"></div><div style="width:22px;height:22px;border-radius:50%;background:rgba(255,90,0,0.82);margin-left:-8px;"></div></div>';
+    else if(tier==='amex') brandEl.innerHTML='<span style="font-size:10px;font-weight:800;letter-spacing:1px;color:rgba(255,255,255,0.55);">AMEX</span>';
+    else brandEl.innerHTML='<span style="font-size:12px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,0.65);">VISA</span>';
+  }
+}
 function renderPinDots(){ for(var i=0;i<4;i++) document.getElementById('pd'+i).className='pin-dot'+(i<PIN_STATE.pin.length?' filled':''); }
 function renderPinNumpad(){ 
     var keys = ['1','2','3','4','5','6','7','8','9','Annuler','0','Effacer'];
