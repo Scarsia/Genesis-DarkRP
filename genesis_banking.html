@@ -1925,6 +1925,26 @@ window.GN_OpenPinPrompt=function(payload){ openPinPrompt(payload||{}); };
   document.getElementById('dashboard').style.display='none';
   document.getElementById('init-screen').classList.remove('open');
 })();
+  /* ============================================================
+   AUTO-SCALE (Adaptation parfaite aux panels GMod)
+   ============================================================ */
+function autoScaleUI() {
+    // Ton design d'origine semble pensé pour une petite fenêtre (environ 950x600)
+    var baseWidth = 950;  
+    var baseHeight = 600; 
+    
+    // Calcule le ratio pour remplir la fenêtre Lua sans déformer
+    var scaleX = window.innerWidth / baseWidth;
+    var scaleY = window.innerHeight / baseHeight;
+    var finalScale = Math.min(scaleX, scaleY);
+    
+    // Applique le zoom global à la page
+    document.body.style.zoom = finalScale;
+}
+
+// Lancer le calcul au démarrage et à chaque redimensionnement
+window.addEventListener('resize', autoScaleUI);
+autoScaleUI();
 </script>
 </body>
 </html>
