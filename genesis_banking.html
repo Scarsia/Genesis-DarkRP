@@ -383,13 +383,55 @@ button { cursor:pointer; }
 .cs-act-date{font-size:9px;color:#5a6880;margin-top:1px;}
 .cs-act-badge{font-size:9px;color:#4a5870;}
 
+/* ===== INIT SCREEN ===== */
 #init-screen{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#030305;z-index:50;align-items:center;justify-content:center;flex-direction:column;}
 #init-screen.open{display:flex;}
 #stars-canvas{position:absolute;top:0;right:0;bottom:0;left:0;}
-.init-title{font-size:36px;font-weight:100;letter-spacing:.5em;color:#fff;position:relative;z-index:1;margin-bottom:60px;}
-.init-btn{padding:14px 48px;background:#fff;color:#05050a;font-size:13px;font-weight:600;letter-spacing:.15em;position:relative;z-index:1;}
-.init-btn:hover{opacity:.88;}
+.init-title{font-size:36px;font-weight:100;letter-spacing:.5em;color:#fff;position:relative;z-index:1;margin-bottom:48px;}
+.init-btn{padding:14px 48px;background:#fff;color:#05050a;font-size:13px;font-weight:600;letter-spacing:.15em;position:relative;z-index:1;border:none;cursor:pointer;border-radius:2px;}
+.init-btn:hover{opacity:.85;}
+.init-hint{position:relative;z-index:1;margin-top:20px;font-size:10px;color:#3a4a60;letter-spacing:.08em;text-align:center;}
+.init-hint a{color:#5a7090;text-decoration:none;border-bottom:1px solid rgba(90,112,144,0.3);padding-bottom:1px;cursor:pointer;transition:color .18s,border-color .18s;}
+.init-hint a:hover{color:#8aaccf;border-color:rgba(138,172,207,0.5);}
 .init-progress{position:absolute;bottom:40px;font-size:10px;letter-spacing:.15em;color:#b8bcc8;z-index:1;}
+
+/* ===== PIN FROZEN SCREEN (dans pin-overlay) ===== */
+.pin-frozen-screen{display:none;flex-direction:column;align-items:center;justify-content:center;position:relative;z-index:2;gap:28px;}
+#pin-overlay.frozen-mode .pin-frozen-screen{display:flex;}
+#pin-overlay.frozen-mode .pin-atm-header,
+#pin-overlay.frozen-mode .pin-stage{display:none;}
+
+.pfz-card-wrap{position:relative;width:300px;height:190px;}
+.pfz-card{width:300px;height:190px;border-radius:16px;background:linear-gradient(145deg,#0a1428 0%,#0f1a50 55%,#0a1028 100%);filter:grayscale(1) brightness(0.45) contrast(1.1);position:relative;overflow:hidden;}
+.pfz-card-inner{position:absolute;top:0;right:0;bottom:0;left:0;padding:18px 20px;display:flex;flex-direction:column;justify-content:space-between;}
+.pfz-chip{width:28px;height:21px;border-radius:3px;background:linear-gradient(135deg,#888,#555);}
+.pfz-number{font-size:12px;font-family:'Courier New',monospace;color:rgba(255,255,255,0.3);letter-spacing:2.5px;}
+.pfz-name{font-size:8.5px;color:rgba(255,255,255,0.2);letter-spacing:1.5px;text-transform:uppercase;}
+
+/* Effet cristaux de glace */
+.pfz-ice-overlay{position:absolute;top:0;left:0;right:0;bottom:0;border-radius:16px;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60px 60px at 20% 30%, rgba(150,200,255,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 80px 40px at 75% 20%, rgba(120,180,255,0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 40px 80px at 60% 80%, rgba(100,160,255,0.04) 0%, transparent 70%);
+  animation:iceGlimmer 4s ease-in-out infinite;
+}
+/* Bordure gelée */
+.pfz-ice-border{position:absolute;top:-2px;left:-2px;right:-2px;bottom:-2px;border-radius:18px;border:1.5px solid rgba(100,160,255,0.15);box-shadow:0 0 30px rgba(80,140,255,0.12),inset 0 0 20px rgba(80,140,255,0.06);pointer-events:none;animation:iceBorderPulse 3s ease-in-out infinite;}
+/* Icône cadenas centré sur la carte */
+.pfz-lock-icon{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:40px;opacity:.35;filter:grayscale(1);}
+
+@keyframes iceGlimmer{0%,100%{opacity:.6;}50%{opacity:1;}}
+@keyframes iceBorderPulse{0%,100%{box-shadow:0 0 30px rgba(80,140,255,0.12),inset 0 0 20px rgba(80,140,255,0.06);}50%{box-shadow:0 0 50px rgba(80,140,255,0.2),inset 0 0 30px rgba(80,140,255,0.1);}}
+
+.pfz-texts{text-align:center;}
+.pfz-title{font-size:13px;font-weight:600;letter-spacing:.28em;color:#8090a8;text-transform:uppercase;margin-bottom:6px;}
+.pfz-reason{font-size:10px;color:#4a5870;letter-spacing:.1em;margin-bottom:16px;}
+.pfz-countdown-wrap{display:inline-flex;align-items:center;gap:10px;background:rgba(80,120,200,0.07);border:1px solid rgba(80,120,200,0.18);border-radius:10px;padding:8px 18px;}
+.pfz-countdown-label{font-size:9px;color:#4a5870;letter-spacing:.12em;text-transform:uppercase;}
+.pfz-countdown{font-size:20px;font-weight:300;letter-spacing:.2em;color:#8090b8;font-family:'Courier New',monospace;}
+.pfz-close-btn{padding:10px 32px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#6a7890;font-size:11px;letter-spacing:.1em;cursor:pointer;transition:all .18s;}
+.pfz-close-btn:hover{background:rgba(255,255,255,0.08);color:#c0c4d4;border-color:rgba(255,255,255,0.16);}
 </style>
 </head>
 <body>
@@ -400,6 +442,7 @@ button { cursor:pointer; }
     <canvas id="stars-canvas"></canvas>
     <div class="init-title" id="init-label">G &nbsp; E &nbsp; N &nbsp; E &nbsp; S &nbsp; I &nbsp; S &nbsp; &nbsp; B &nbsp; A &nbsp; N &nbsp; K &nbsp; I &nbsp; N &nbsp; G</div>
     <button class="init-btn" id="init-btn">INITIALISER MON COMPTE</button>
+    <div class="init-hint">Première connexion ? <a id="init-hint-link">Ouvrir un compte personnel →</a></div>
     <div class="init-progress" id="init-progress" style="display:none;"></div>
   </div>
 
@@ -553,6 +596,42 @@ button { cursor:pointer; }
     <div class="pin-light-beam"></div>
     <div class="pin-scanlines"></div>
 
+    <!-- Écran carte gelée (affiché quand .frozen-mode) -->
+    <div class="pin-frozen-screen">
+      <div class="pfz-card-wrap">
+        <div class="pfz-ice-border"></div>
+        <div class="pfz-card" id="pfz-card">
+          <div class="pfz-card-inner">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div>
+                <div style="font-size:7.5px;color:rgba(255,255,255,0.2);letter-spacing:2px;text-transform:uppercase;" id="pfz-type">PERSONNEL</div>
+                <div style="display:flex;align-items:center;margin-top:9px;gap:8px;">
+                  <div class="pfz-chip"></div>
+                </div>
+              </div>
+              <span style="font-size:12px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,0.18);" id="pfz-brand">VISA</span>
+            </div>
+            <div>
+              <div class="pfz-number" id="pfz-number">•••• •••• •••• ••••</div>
+              <div class="pfz-name" id="pfz-name"></div>
+            </div>
+          </div>
+          <div class="pfz-ice-overlay"></div>
+          <div class="pfz-lock-icon">🔒</div>
+        </div>
+      </div>
+      <div class="pfz-texts">
+        <div class="pfz-title">Accès temporairement bloqué</div>
+        <div class="pfz-reason">3 tentatives incorrectes — carte gelée</div>
+        <div class="pfz-countdown-wrap">
+          <span class="pfz-countdown-label">Réessayez dans</span>
+          <span class="pfz-countdown" id="pfz-countdown">05:00</span>
+        </div>
+      </div>
+      <button class="pfz-close-btn" id="pfz-close-btn">Quitter le distributeur</button>
+    </div>
+
+    <!-- Écran normal de saisie PIN -->
     <div class="pin-atm-header">
       <div class="pin-atm-logo">Genesis Network</div>
       <div class="pin-atm-title">VÉRIFICATION</div>
@@ -1388,19 +1467,59 @@ function renderAll(){
 function showBlockScreen(err){ document.getElementById('block-code').textContent='CODE: '+err.toUpperCase(); document.getElementById('dashboard').style.display='none'; document.getElementById('init-screen').classList.remove('open'); document.getElementById('block-screen').classList.add('open'); }
 var BLOCK_ERRORS=['account_frozen','frozen','account_closed_doj','account_closed'];
 
-var PIN_STATE={cards:[],idx:0,pin:'',attempts:{},frozen:{}};
+var PIN_STATE={cards:[],idx:0,pin:'',attempts:{},frozen:{},waiting:false};
 var PIN_MAX_ATTEMPTS=3;
-var PIN_FREEZE_SECONDS=300; /* 5 minutes */
+var PIN_FREEZE_SECONDS=300;
+var _pinCountdownInterval=null;
 
 function openPinPrompt(payload){
   var all=(payload.cards||[]).concat(payload.group_cards||[]);
   if(!all.length) all=(S.snap&&S.snap.cards_personal)?S.snap.cards_personal:[];
   if(!all.length) return;
-  PIN_STATE.cards=all; PIN_STATE.idx=0; PIN_STATE.pin='';
+  PIN_STATE.cards=all; PIN_STATE.idx=0; PIN_STATE.pin=''; PIN_STATE.waiting=false;
+  /* Attacher le bouton pfz-close une seule fois */
+  var pfzBtn=document.getElementById('pfz-close-btn');
+  if(pfzBtn){ pfzBtn.onclick=function(){ _clearCountdown(); document.getElementById('pin-overlay').classList.remove('open','frozen-mode'); PIN_STATE.pin=''; PIN_STATE.cards=[]; bridgeSend('close',{}); }; }
   renderPinCard(); renderPinDots(); renderPinNumpad();
+  document.getElementById('pin-overlay').classList.remove('frozen-mode');
   document.getElementById('pin-overlay').classList.add('open');
 }
-function closePinPrompt(){ document.getElementById('pin-overlay').classList.remove('open'); PIN_STATE.pin=''; }
+function closePinPrompt(){ _clearCountdown(); document.getElementById('pin-overlay').classList.remove('open','frozen-mode'); PIN_STATE.pin=''; PIN_STATE.waiting=false; }
+
+function _clearCountdown(){ if(_pinCountdownInterval){ clearInterval(_pinCountdownInterval); _pinCountdownInterval=null; } }
+
+function _showFrozenMode(uid){
+  _clearCountdown();
+  /* Peupler la carte gelée */
+  var c=PIN_STATE.cards[PIN_STATE.idx];
+  if(c){
+    document.getElementById('pfz-number').textContent=c.card_number||'•••• •••• •••• ••••';
+    document.getElementById('pfz-name').textContent=(c.label||c.group_name||'').toUpperCase();
+    var scope=c.scope||'personal';
+    document.getElementById('pfz-type').textContent=scope==='group'?'GROUPE':scope==='subgroup'?'DÉPARTEMENT':'PERSONNEL';
+    var tier=getCardTier(c.card_number||'');
+    document.getElementById('pfz-brand').textContent=tier==='mastercard'?'MC':tier==='amex'?'AMEX':'VISA';
+  }
+  /* Activer frozen mode */
+  document.getElementById('pin-overlay').classList.add('frozen-mode');
+  /* Countdown */
+  var startTs=PIN_STATE.frozen[uid]||Math.floor(Date.now()/1000);
+  function updateCountdown(){
+    var remaining=PIN_FREEZE_SECONDS-(Math.floor(Date.now()/1000)-startTs);
+    if(remaining<=0){
+      _clearCountdown();
+      delete PIN_STATE.frozen[uid]; delete PIN_STATE.attempts[uid];
+      document.getElementById('pin-overlay').classList.remove('frozen-mode');
+      renderPinCard(); renderPinDots(); renderPinNumpad();
+      return;
+    }
+    var m=Math.floor(remaining/60); var s=remaining%60;
+    var el=document.getElementById('pfz-countdown');
+    if(el) el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  }
+  updateCountdown();
+  _pinCountdownInterval=setInterval(updateCountdown,1000);
+}
 
 function _getPinCardUid(){ var c=PIN_STATE.cards[PIN_STATE.idx]; return c?(String(c.card_uid||c.group_id||c.id||c.iban||0)):'0'; }
 function _isCardFrozen(){
@@ -1416,24 +1535,45 @@ function _getAttemptsLeft(){
 function _freezeCard(){
   var uid=_getPinCardUid();
   PIN_STATE.frozen[uid]=Math.floor(Date.now()/1000);
-  PIN_STATE.pin=''; renderPinCard(); renderPinDots(); renderPinNumpad();
+  PIN_STATE.pin=''; PIN_STATE.waiting=false;
+  _showFrozenMode(uid);
 }
 
 function pinShakeNumpad(){
   var np=document.getElementById('pin-numpad'); if(!np) return;
-  np.classList.remove('shake');
-  /* Force reflow */
-  void np.offsetWidth;
-  np.classList.add('shake');
-  setTimeout(function(){ np.classList.remove('shake'); }, 500);
+  np.classList.remove('shake'); void np.offsetWidth; np.classList.add('shake');
+  setTimeout(function(){ np.classList.remove('shake'); },500);
 }
 
-function pinDotsError(){
+function pinDotsError(cb){
   for(var i=0;i<4;i++){
     var d=document.getElementById('pd'+i);
-    if(d){ d.classList.add('filled','error');
-      (function(dot){ setTimeout(function(){ dot.classList.remove('filled','error'); }, 600); })(d);
-    }
+    if(d) d.className='pin-dot filled error';
+  }
+  setTimeout(function(){
+    /* Vider les dots après l'animation d'erreur */
+    PIN_STATE.pin='';
+    renderPinDots();
+    if(cb) cb();
+  }, 700);
+}
+
+function pinAuthFailed(){
+  var uid=_getPinCardUid();
+  PIN_STATE.attempts[uid]=(PIN_STATE.attempts[uid]||0)+1;
+  PIN_STATE.waiting=false;
+  pinShakeNumpad();
+  pinDotsError(function(){
+    /* Callback après animation : re-activer le numpad */
+    renderPinNumpad();
+    renderPinCard(); /* Met à jour les tentatives restantes */
+  });
+  if(PIN_STATE.attempts[uid]>=PIN_MAX_ATTEMPTS){
+    setTimeout(function(){ _freezeCard(); },800); /* Légère pause avant le gel */
+    notify('Carte gelée — 3 tentatives incorrectes.','error');
+  } else {
+    var left=_getAttemptsLeft();
+    notify('PIN incorrect. '+left+' tentative'+(left>1?'s':'')+' restante'+(left>1?'s':'')+'.','error');
   }
 }
 
@@ -1494,90 +1634,48 @@ function renderPinDots(){
 
 function renderPinNumpad(){
   var keys=['1','2','3','4','5','6','7','8','9','Annuler','0','Effacer'];
-  var isFrozen=_isCardFrozen(); var html='';
+  var isFrozen=_isCardFrozen(); var isWaiting=PIN_STATE.waiting; var html='';
   for(var i=0;i<keys.length;i++){
     var k=keys[i];
     var cls='pin-key'+(k==='Annuler'?' action cancel':k==='Effacer'?' action':'');
-    var disabled=(isFrozen&&k!=='Annuler')?'style="opacity:.3;pointer-events:none;"':'';
-    html+='<button class="'+cls+'" '+disabled+' onclick="pinKey(\''+k+'\')">'+k+'</button>';
+    var dis=((isFrozen||isWaiting)&&k!=='Annuler')?'style="opacity:.3;pointer-events:none;"':'';
+    html+='<button class="'+cls+'" '+dis+' onclick="pinKey(\''+k+'\')">'+k+'</button>';
   }
   document.getElementById('pin-numpad').innerHTML=html;
 }
 
+  var frozenOv=document.getElementById('pin-frozen-overlay');
+  var frozenBadge=document.getElementById('pin-frozen-badge');
+  var isFrozen=_isCardFrozen();
+  if(frozenOv) frozenOv.className='pin-frozen-overlay'+(isFrozen?' show':'');
+  if(frozenBadge) frozenBadge.className='pin-frozen-badge'+(isFrozen?' show':'');
+  var attBar=document.getElementById('pin-attempts-bar');
+  if(attBar){
+    var left=_getAttemptsLeft(); var html='';
+    for(var i=0;i<PIN_MAX_ATTEMPTS;i++) html+='<div class="pin-att-dot '+(i<left?'ok':'used')+'"></div>';
+    attBar.innerHTML=html; attBar.style.display=isFrozen?'none':'flex';
+  }
+}
+
 function pinKey(k){
   if(k==='Annuler'){
-    document.getElementById('pin-overlay').classList.remove('open');
-    PIN_STATE.pin=''; PIN_STATE.cards=[];
+    _clearCountdown();
+    document.getElementById('pin-overlay').classList.remove('open','frozen-mode');
+    PIN_STATE.pin=''; PIN_STATE.cards=[]; PIN_STATE.waiting=false;
     bridgeSend('close',{});
     return;
   }
-  if(_isCardFrozen()) return; /* Carte gelée — ignorer toutes les touches */
+  if(_isCardFrozen()||PIN_STATE.waiting) return;
   if(k==='Effacer'){PIN_STATE.pin=PIN_STATE.pin.slice(0,-1);renderPinDots();return;}
   if(PIN_STATE.pin.length<4) PIN_STATE.pin+=k;
   renderPinDots();
   if(PIN_STATE.pin.length===4){
     var c=PIN_STATE.cards[PIN_STATE.idx];
+    PIN_STATE.waiting=true;
+    renderPinNumpad();
     bridgeSend('atm_pin_auth',{card_uid:c.card_uid||c.group_id||0,pin:PIN_STATE.pin});
-    PIN_STATE.pin=''; renderPinDots();
+    /* Dots restent remplis — PIN_STATE.pin non vidé ici */
   }
-}
-
-/* Appelé depuis GN_HandleResult quand le PIN est refusé côté serveur */
-function pinAuthFailed(){
-  var uid=_getPinCardUid();
-  PIN_STATE.attempts[uid]=(PIN_STATE.attempts[uid]||0)+1;
-  pinShakeNumpad(); pinDotsError();
-  if(PIN_STATE.attempts[uid]>=PIN_MAX_ATTEMPTS){
-    _freezeCard();
-    notify('Carte gelée — 3 tentatives incorrectes. Réessayez dans 5 min.','error');
-  } else {
-    var left=_getAttemptsLeft();
-    notify('PIN incorrect. '+left+' tentative'+(left>1?'s':'')+' restante'+(left>1?'s':'')+'.','error');
-  }
-  renderPinCard(); renderPinNumpad();
-}
-function renderPinCard(){
-  var c=PIN_STATE.cards[PIN_STATE.idx]; if(!c) return;
-  document.getElementById('pin-cc-number').textContent=c.card_number||'•••• •••• •••• ••••';
-  document.getElementById('pin-cc-name').textContent=(c.label||c.group_name||'').toUpperCase();
-  var scope=c.scope||'personal';
-  var typeLabel=scope==='group'?'GROUPE':scope==='subgroup'?'DÉPARTEMENT':'PERSONNEL';
-  document.getElementById('pin-cc-type').textContent=typeLabel;
-  var meta=c.metadata||{}; if(typeof meta==='string'){try{meta=JSON.parse(meta);}catch(e){meta={};}}
-  var badge=document.getElementById('pin-cc-badge');
-  if(badge){ badge.style.display=(meta.is_verified?'block':'none'); }
-  var lbl=document.getElementById('pin-card-label');
-  if(lbl){ lbl.textContent=(c.label||c.group_name||c.iban||'Carte'); }
-  var tier=getCardTier(c.card_number||''); var brandEl=document.getElementById('pin-cc-brand');
-  var pinCc=document.getElementById('pin-cc');
-  if(pinCc){ pinCc.className='pin-cc pin-cc-'+tier; }
-  if(brandEl){
-    if(tier==='mastercard') brandEl.innerHTML='<div style="display:flex;"><div style="width:22px;height:22px;border-radius:50%;background:rgba(220,0,27,0.82);"></div><div style="width:22px;height:22px;border-radius:50%;background:rgba(255,90,0,0.82);margin-left:-8px;"></div></div>';
-    else if(tier==='amex') brandEl.innerHTML='<span style="font-size:10px;font-weight:800;letter-spacing:1px;color:rgba(255,255,255,0.55);">AMEX</span>';
-    else brandEl.innerHTML='<span style="font-size:12px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,0.65);">VISA</span>';
-  }
-}
-function renderPinDots(){ for(var i=0;i<4;i++) document.getElementById('pd'+i).className='pin-dot'+(i<PIN_STATE.pin.length?' filled':''); }
-function renderPinNumpad(){ 
-    var keys = ['1','2','3','4','5','6','7','8','9','Annuler','0','Effacer'];
-    var html = '';
-    for(var i=0; i<keys.length; i++) {
-        var k = keys[i];
-        html += '<button class="pin-key'+(k==='Annuler'?' action cancel':k==='Effacer'?' action':'')+'" onclick="pinKey(\''+k+'\')">'+k+'</button>';
-    }
-    document.getElementById('pin-numpad').innerHTML = html;
-}
-function pinKey(k){
-  if(k==='Annuler'){
-    /* Annuler = fermeture complète de l'ATM, pas juste masquer l'overlay */
-    document.getElementById('pin-overlay').classList.remove('open');
-    PIN_STATE.pin=''; PIN_STATE.cards=[];
-    bridgeSend('close',{});
-    return;
-  }
-  if(k==='Effacer'){PIN_STATE.pin=PIN_STATE.pin.slice(0,-1);renderPinDots();return;}
-  if(PIN_STATE.pin.length<4) PIN_STATE.pin+=k; renderPinDots();
-  if(PIN_STATE.pin.length===4){ var c=PIN_STATE.cards[PIN_STATE.idx]; bridgeSend('atm_pin_auth',{card_uid:c.card_uid||c.group_id||0,pin:PIN_STATE.pin}); closePinPrompt(); }
 }
 
 function bridgeSend(action,payload){ if(window.GN&&window.GN.Receive){ try{ window.GN.Receive(action,JSON.stringify(payload)); }catch(e){} } }
@@ -1587,17 +1685,25 @@ window.GN_HandleResult=function(payload){
   payload=payload||{}; var action=String(payload.action||''); var err=String(payload.error||'');
   if(action==='pin_required'){ openPinPrompt(payload); return; }
   if(action==='atm_locked_temp'||(action==='pin_auth'&&err==='pin_locked')){
-    /* Serveur confirme le gel — on gèle localement si pas déjà fait */
+    /* Serveur confirme gel — afficher l'écran frozen */
     var uid=_getPinCardUid();
     if(!PIN_STATE.frozen[uid]) PIN_STATE.frozen[uid]=Math.floor(Date.now()/1000);
-    renderPinCard(); renderPinNumpad();
-    notify('Compte temporairement gelé. Réessayez plus tard.','error');
+    PIN_STATE.waiting=false;
+    /* S'assurer que l'overlay est ouvert puis passer en frozen-mode */
+    document.getElementById('pin-overlay').classList.add('open');
+    _showFrozenMode(uid);
     return;
   }
   if(BLOCK_ERRORS.indexOf(err)>=0){ showBlockScreen(err); return; }
   if(action==='pin_auth'&&!payload.ok){
-    /* PIN refusé par le serveur → incrémenter le compteur de tentatives */
+    PIN_STATE.waiting=false;
     pinAuthFailed();
+    return;
+  }
+  if(action==='pin_auth'&&payload.ok){
+    /* Succès — fermer l'overlay PIN */
+    closePinPrompt();
+    setTimeout(function(){ bridgeSend('refresh',{}); },200);
     return;
   }
   if(payload.ok){ notify('Action réussie.','success'); setTimeout(function(){ bridgeSend('refresh',{}); },300); return; }
@@ -1605,7 +1711,17 @@ window.GN_HandleResult=function(payload){
 };
 window.GN_OpenPinPrompt=function(payload){ openPinPrompt(payload||{}); };
 
-(function(){ S.snap=null; S.playerName=''; S.viewMode='cards'; S.selectedKey=null; document.getElementById('dashboard').style.display='none'; document.getElementById('init-screen').classList.remove('open'); })();
+(function(){
+  S.snap=null; S.playerName=''; S.viewMode='cards'; S.selectedKey=null;
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('init-screen').classList.remove('open');
+  /* Bouton principal init screen */
+  var initBtn=document.getElementById('init-btn');
+  if(initBtn) initBtn.addEventListener('click',function(){ bridgeSend('card_create',{label:'Compte Principal',pin:1234}); });
+  /* Lien hint "Ouvrir un compte" */
+  var hintLink=document.getElementById('init-hint-link');
+  if(hintLink) hintLink.addEventListener('click',function(){ bridgeSend('card_create',{label:'Compte Principal',pin:1234}); });
+})();
 </script>
 </body>
 </html>
