@@ -6,8 +6,18 @@
 <title>Genesis Banking</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;}
-body{background:#050505;color:#e8eaf0;font-family:'Segoe UI',system-ui,sans-serif;position:relative;}
+html,body{
+    height:100%;
+    width:100%;
+    overflow:hidden;
+    background:#050505;
+}
+body{
+    color:#e8eaf0;
+    font-family:'Segoe UI',system-ui,sans-serif;
+    position:relative;
+    transform-origin: top left;
+}
 
 /* Ambient glows */
 .glow{position:fixed;border-radius:50%;pointer-events:none;z-index:0;}
@@ -23,21 +33,15 @@ button{cursor:pointer;font-family:inherit;}
 input,select{font-family:inherit;}
 
 /* =========== DASHBOARD SHELL =========== */
-html,body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  margin:0;
-  padding:0;
-}
 #dashboard{
-  width:100%;
-  height:100%;
+  width:1000px; /* Taille verrouillée pour l'autoscale */
+  height:680px;
   display:flex;
   flex-direction:column;
   padding:12px 18px 10px;
   overflow:hidden;
   box-sizing:border-box;
+  margin: 0 auto;
 }
 
 /* Header */
@@ -81,17 +85,16 @@ html,body{
 .tb:hover{color:#7a8498;}
 .tb.on{background:rgba(255,255,255,0.08);color:#e0e4ef;border-color:rgba(255,255,255,0.1);}
 
-/* Card list — SCROLLABLE INTERNE */
-/* Card list — SCROLLABLE INTERNE */
-.card-list {
+/* Card list */
+.card-list{
   flex: 1 1 0%;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-height: 0;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.06) transparent;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-height:0;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,0.06) transparent;
 }
 .card-row{background:rgba(255,255,255,0.025);border:0.5px solid rgba(255,255,255,0.05);border-radius:9px;padding:8px 10px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;flex-shrink:0;}
 .card-row:hover{background:rgba(255,255,255,0.045);border-color:rgba(255,255,255,0.09);}
@@ -107,9 +110,19 @@ html,body{
 .cr-bal.sel-bal{color:#d0d4e0;}
 .empty-msg{padding:14px 8px;text-align:center;font-size:10px;color:#1e2430;}
 
-/* Mini card buttons — EN BAS, JAMAIS SCROLL */
+/* Mini card buttons */
 .mini-card-btns{display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
-.mini-card-btn{width:100%;height:50px;border-radius:9px;position:relative;overflow:hidden;cursor:pointer;border:none;transition:transform .15s,opacity .15s;}
+.mini-card-btn{
+  width:100%;
+  height:50px;
+  min-height:50px;
+  border-radius:9px;
+  position:relative;
+  overflow:hidden;
+  cursor:pointer;
+  border:none;
+  transition:transform .15s,opacity .15s;
+}
 .mini-card-btn:hover{transform:translateY(-1px);opacity:.88;}
 .mini-card-btn.disabled{opacity:.32;pointer-events:none;}
 .mcb-new{background:linear-gradient(135deg,#0d1a38 0%,#162450 60%,#0a1228 100%);}
@@ -184,7 +197,7 @@ html,body{
 .cfg-pill.danger{color:#803838;border-color:rgba(180,60,60,0.2);}
 .cfg-pill.danger:hover{color:#e06060;background:rgba(180,60,60,0.06);}
 
-/* Quick actions — RESPONSIVE */
+/* Quick actions */
 .quick{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 12px;}
 .qbtn{padding:5px 12px;font-size:11px;font-weight:500;border-radius:18px;border:0.5px solid rgba(255,255,255,0.07);background:transparent;color:#5a6478;transition:all .18s;white-space:nowrap;}
 .qbtn:hover{color:#c0c4d0;border-color:rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);}
@@ -193,39 +206,38 @@ html,body{
 .qbtn.on{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.12);color:#d8dce8;}
 .qsep{flex:1;min-width:8px;}
 
-/* Content area — PREND TOUT L'ESPACE RESTANT */
-#content-area {
+/* Content area */
+#content-area{
   flex: 1 1 0%;
-  min-height: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  min-height:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
 }
 
 /* Transactions panel */
-.tx-panel {
-  display: flex;
-  flex-direction: column;
+.tx-panel{
+  display:flex;
+  flex-direction:column;
   flex: 1 1 0%;
-  padding: 12px 14px 0;
-  min-height: 0;
-  overflow: hidden;
+  padding:12px 14px 0;
+  min-height:0;
+  overflow:hidden;
 }
 .tx-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-shrink:0;}
 .tx-refresh{display:flex;align-items:center;gap:5px;font-size:10px;color:#3a4255;background:transparent;border:none;padding:4px 8px;border-radius:6px;transition:all .18s;}
 .tx-refresh:hover{color:#8892a8;background:rgba(255,255,255,0.04);}
 .tx-refresh svg{width:10px;height:10px;}
 
-
-  
-/* LISTE TX — SCROLL INTERNE */
-#tx-list {
+/* LISTE TX */
+#tx-list{
   flex: 1 1 0%;
-  overflow-y: auto;
-  min-height: 0;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.06) transparent;
-  padding-bottom: 8px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  min-height:0;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,0.06) transparent;
+  padding-bottom:8px;
 }
 
 .tx-row{display:flex;align-items:center;justify-content:space-between;padding:10px 8px;margin:0 -8px;border-radius:9px;border:none;background:none;color:inherit;width:calc(100% + 16px);text-align:left;transition:background .15s;cursor:pointer;}
@@ -247,25 +259,11 @@ html,body{
 .tx-empty{padding:24px;text-align:center;font-size:11px;color:#1e2430;}
 
 /* Invoice panel */
-.inv-panel {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 0%;
-  padding: 12px 14px 0;
-  min-height: 0;
-  overflow: hidden;
-}
+.inv-panel{display:flex;flex-direction:column;flex: 1 1 0%;padding:12px 14px 0;min-height:0;overflow:hidden;}
 .inv-tabs{display:flex;gap:4px;padding-bottom:10px;flex-shrink:0;}
 .itb{padding:4px 12px;font-size:10px;border-radius:7px;border:0.5px solid rgba(255,255,255,0.06);background:transparent;color:#3a4255;transition:all .18s;}
 .itb.on{background:rgba(184,188,200,0.09);border-color:rgba(184,188,200,0.25);color:#b8bcc8;}
-#inv-list {
-  flex: 1 1 0%;
-  overflow-y: auto;
-  min-height: 0;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.06) transparent;
-  padding-bottom: 8px;
-}
+#inv-list{flex: 1 1 0%;overflow-y:auto;overflow-x:hidden;min-height:0;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.06) transparent;padding-bottom:8px;}
 .inv-row{display:flex;align-items:center;justify-content:space-between;padding:10px 8px;margin:0 -8px;border-radius:9px;border:none;background:none;color:inherit;width:calc(100% + 16px);text-align:left;cursor:pointer;transition:background .15s;}
 .inv-row:hover{background:rgba(255,255,255,0.04);}
 .inv-status{font-size:7.5px;letter-spacing:1px;padding:2px 7px;border-radius:9px;}
@@ -366,7 +364,10 @@ html,body{
 .pin-key.action{font-size:10px;color:#5a6478;background:rgba(255,255,255,0.015);}
 .pin-key.action:hover{color:#c0c4d4;}
 .pin-key.cancel{color:#803838;}
-.pin-key.cancel:hover{color:#e06060;background:rgba(180,50,50,0.06);}{position:fixed;top:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:300px;}
+.pin-key.cancel:hover{color:#e06060;background:rgba(180,50,50,0.06);}
+
+/* =========== NOTIF =========== */
+#notif-stack{position:fixed;top:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:300px;}
 .notif{border-radius:10px;padding:12px 16px;background:rgba(14,14,18,0.96);border:0.5px solid rgba(255,255,255,0.07);position:relative;overflow:hidden;animation:notifIn .25s ease;}
 .notif.success .notif-bar{background:#22b960;}
 .notif.error .notif-bar{background:#d03030;}
@@ -392,7 +393,6 @@ html,body{
 <div class="glow g2"></div>
 <div class="glow g3"></div>
 
-<!-- Init screen (no personal cards) -->
 <div id="init-screen">
   <canvas id="stars-canvas"></canvas>
   <div class="init-title" id="init-label">G &nbsp; E &nbsp; N &nbsp; E &nbsp; S &nbsp; I &nbsp; S &nbsp; &nbsp; B &nbsp; A &nbsp; N &nbsp; K &nbsp; I &nbsp; N &nbsp; G</div>
@@ -401,7 +401,6 @@ html,body{
 </div>
 
 <div id="dashboard" style="display:none;">
-  <!-- HEADER -->
   <div class="hdr">
     <div>
       <div class="hdr-title">BANKING DASHBOARD</div>
@@ -414,7 +413,6 @@ html,body{
   </div>
 
   <div class="layout">
-    <!-- SIDEBAR -->
     <div class="sidebar">
       <div class="glass" style="padding:13px;flex-shrink:0;">
         <div class="lxs" id="bal-label"></div>
@@ -434,7 +432,6 @@ html,body{
       </div>
 
       <div class="card-list" id="card-list"></div>
-
 
       <div class="mini-card-btns">
         <button class="mini-card-btn mcb-new" id="btn-new-account" onclick="doNewAccount()">
@@ -479,12 +476,9 @@ html,body{
       </div>
     </div>
 
-    <!-- MAIN -->
     <div class="main">
-      <!-- HERO -->
       <div class="glass hero">
         <div class="hero-grid">
-          <!-- Credit card -->
           <div>
             <div class="cc cc-visa" id="cc-wrap">
               <div class="cc-inner">
@@ -513,7 +507,6 @@ html,body{
             </div>
           </div>
 
-          <!-- Info + config -->
           <div class="info-panel">
             <div class="info-top">
               <div class="info-greet">BIENVENUE,</div>
@@ -529,18 +522,15 @@ html,body{
         </div>
       </div>
 
-      <!-- QUICK ACTIONS -->
       <div class="glass-sm" style="flex-shrink:0;">
         <div class="quick" id="quick-actions"></div>
       </div>
 
-      <!-- CONTENT (tx / factures) -->
-      <div class="glass" id="content-area" style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;"></div>
+      <div class="glass" id="content-area"></div>
     </div>
   </div>
 </div>
 
-<!-- ======================== BLOCK SCREEN (frozen / DOJ) ======================== -->
 <div id="block-screen">
   <div class="block-icon" id="block-icon">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
@@ -550,7 +540,6 @@ html,body{
   <div class="block-code" id="block-code">CODE: ACCOUNT_FROZEN</div>
 </div>
 
-<!-- ======================== PIN PROMPT ======================== -->
 <div id="pin-overlay">
   <div class="pin-box">
     <button class="pin-close" onclick="closePinPrompt()">✕</button>
@@ -596,8 +585,6 @@ html,body{
   </div>
 </div>
 
-<!-- ======================== MODALS ======================== -->
-<!-- Generic action modal -->
 <div class="moverlay" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="mbox" id="modal-box">
     <button class="mclose" onclick="closeModal()">✕</button>
@@ -605,7 +592,6 @@ html,body{
   </div>
 </div>
 
-<!-- Transaction detail modal -->
 <div class="moverlay" id="tx-modal" onclick="if(event.target===this)closeTxModal()">
   <div class="mbox">
     <button class="mclose" onclick="closeTxModal()">✕</button>
@@ -614,6 +600,27 @@ html,body{
 </div>
 
 <script>
+/* ============================================================
+   AUTO-SCALE (Adaptation parfaite aux panels GMod)
+   ============================================================ */
+function autoScaleUI() {
+    var baseWidth = 1000;  
+    var baseHeight = 680; 
+    
+    var scaleX = window.innerWidth / baseWidth;
+    var scaleY = window.innerHeight / baseHeight;
+    var finalScale = Math.min(scaleX, scaleY);
+    
+    document.body.style.transform = 'scale(' + finalScale + ')';
+    
+    var dash = document.getElementById('dashboard');
+    if(dash) {
+        dash.style.marginTop = ((window.innerHeight - (baseHeight * finalScale)) / 2 / finalScale) + 'px';
+    }
+}
+window.addEventListener('resize', autoScaleUI);
+autoScaleUI();
+
 /* ============================================================
    STATE
    ============================================================ */
@@ -630,9 +637,6 @@ var S = {
 };
 
 /* ============================================================
-   MOCK DATA  (remplacé par GN_SetSnapshot en prod)
-   ============================================================ */
-/* ============================================================
    UTILS
    ============================================================ */
 function fmt(v){ return '$' + Math.round(Math.abs(v)).toLocaleString('fr-FR'); }
@@ -640,21 +644,17 @@ function fmtDate(ts){ if(!ts) return ''; var d=new Date(ts*1000); return d.getDa
 
 var MONTHS=['JAN','FÉV','MAR','AVR','MAI','JUN','JUL','AOÛ','SEP','OCT','NOV','DÉC'];
 
-// IBAN brut - 6 chars configuré côté serveur, on affiche tel quel
 function fmtIban(raw){
   if(!raw) return '';
   return String(raw).trim().toUpperCase();
 }
 
-// Normalise une transaction serveur (created_at → date/month, metadata string → object)
 function normTx(tx){
   if(!tx) return tx;
-  // Parser metadata si c'est une string JSON
   if(typeof tx.metadata === 'string' && tx.metadata !== ''){
     try{ tx.metadata = JSON.parse(tx.metadata); }catch(e){ tx.metadata = {}; }
   }
   if(!tx.metadata || typeof tx.metadata !== 'object') tx.metadata = {};
-  // Générer date/month depuis created_at si absents
   if(!tx.date && tx.created_at){
     var d = new Date((tx.created_at)*1000);
     tx.date  = String(d.getDate());
@@ -662,12 +662,10 @@ function normTx(tx){
   }
   tx.date  = tx.date  || '—';
   tx.month = tx.month || '';
-  // Normaliser les IBANs counterparty
   if(tx.counterparty_iban) tx.counterparty_iban = fmtIban(tx.counterparty_iban);
   return tx;
 }
 
-// Normalise une carte (iban brut, metadata string)
 function normCard(c){
   if(!c) return c;
   if(c.iban) c.iban = fmtIban(c.iban);
@@ -678,7 +676,6 @@ function normCard(c){
   return c;
 }
 
-// Normalise tout le snapshot à la réception
 function normSnap(snap){
   if(!snap) return snap;
   (snap.cards_personal||[]).forEach(normCard);
@@ -767,12 +764,10 @@ function renderSidebar(){
   document.getElementById('stat-groups').textContent=(snap.cards_group||[]).length;
   document.getElementById('stat-sub').textContent=(snap.cards_subgroups||[]).length;
 
-  // New account button
   var canNew=(Number(snap.personal_cards_count||0)<Number(snap.max_personal_cards||3));
   var btnNew=document.getElementById('btn-new-account');
   if(btnNew) btnNew.classList.toggle('disabled',!canNew);
 
-  // Card list
   var list=document.getElementById('card-list');
   if(S.viewMode==='invoices'||S.viewMode==='subgroups'&&!S.activeGroupID){
     list.innerHTML='<div class="empty-msg">'+(S.viewMode==='subgroups'?'Sélectionnez un groupe dans l\'onglet Groupes.':'Voir l\'onglet Factures.')+'</div>';
@@ -1574,7 +1569,7 @@ document.getElementById('tab-bar').addEventListener('click',function(e){
 });
 
 /* ============================================================
-   SELECTION PAYLOAD (mirrors Lua selectionPayloadFromCard)
+   SELECTION PAYLOAD
    ============================================================ */
 function selPay(card){
   if(!card) return {scope:'personal',card_id:0,card_uid:0,id:0,group_id:0,subgroup_id:0,iban:''};
@@ -1664,7 +1659,7 @@ function renderAll(){
 }
 
 /* ============================================================
-   BLOCK SCREEN — frozen / DOJ / closed
+   BLOCK SCREEN
    ============================================================ */
 function showBlockScreen(errorCode){
   var msgs={
@@ -1698,7 +1693,7 @@ function showBlockScreen(errorCode){
 var BLOCK_ERRORS=['account_frozen','frozen','account_closed_doj','account_closed'];
 
 /* ============================================================
-   PIN PROMPT — carrousel + pavé + dots
+   PIN PROMPT
    ============================================================ */
 var PIN_STATE={cards:[],idx:0,pin:'',onSubmit:null};
 
@@ -1816,15 +1811,6 @@ function pinKey(k){
 
 /* ============================================================
    BRIDGE GMod
-   ============================================================
-   Lua → JS :
-     frame:RunJavascript('GN_SetSnapshot('..util.TableToJSON(data)..')')
-     frame:RunJavascript('GN_SetPlayerName("'..ply:Nick()..'")')
-     frame:RunJavascript('GN_HandleResult('..util.TableToJSON(payload)..')')
-     frame:RunJavascript('GN_OpenPinPrompt('..util.TableToJSON(payload)..')')
-
-   JS → Lua :
-     frame:AddFunction("GN","Receive",function(_,action,payloadJSON) ... end)
    ============================================================ */
 function bridgeSend(action,payload){
   if(window.GN&&window.GN.Receive){
@@ -1845,16 +1831,6 @@ window.GN_SetSnapshot=function(data){
   renderAll();
 };
 
-window.GN_SetSize=function(w,h){
-  var r=document.documentElement;
-  r.style.width=w+'px'; r.style.height=h+'px';
-  document.body.style.width=w+'px'; document.body.style.height=h+'px';
-  var d=document.getElementById('dashboard');
-  if(d){ d.style.width=w+'px'; d.style.height=h+'px'; }
-  var is=document.getElementById('init-screen');
-  if(is){ is.style.width=w+'px'; is.style.height=h+'px'; }
-};
-
 window.GN_SetPlayerName=function(name){
   S.playerName=name;
   var a=document.getElementById('player-name');
@@ -1863,45 +1839,38 @@ window.GN_SetPlayerName=function(name){
   if(b) b.textContent=name;
 };
 
-/* Appelé par le Lua sur chaque ATM_RESULT */
 window.GN_HandleResult=function(payload){
   payload=payload||{};
   var action=String(payload.action||'');
   var err=String(payload.error||'');
 
-  /* 1 — PIN requis → ouvrir le carrousel PIN */
   if(action==='pin_required'){
     openPinPrompt(payload);
     return;
   }
 
-  /* 2 — PIN lock temporaire */
   if(action==='atm_locked_temp'||(action==='pin_auth'&&err==='pin_locked')){
     var remaining=Number(payload.remaining||30);
     notify('Compte temporairement gelé — réessayez dans '+remaining+'s.','error');
     return;
   }
 
-  /* 3 — PIN pas encore validé pour cette carte */
   if(err==='pin_auth_required'){
     notify('Veuillez d\'abord valider le PIN de cette carte (Ajouter une carte).','error');
     return;
   }
 
-  /* 4 — Compte gelé / clôturé → blocage forcé de l'UI */
   if(BLOCK_ERRORS.indexOf(err)>=0){
     showBlockScreen(err);
     return;
   }
 
-  /* 5 — PIN incorrect */
   if(action==='pin_auth'&&!payload.ok){
     var left=payload.attempts_left!=null?' ('+payload.attempts_left+' tentative'+(payload.attempts_left>1?'s':'')+' restante'+(payload.attempts_left>1?'s':'')+'.)':'.';
     notify('PIN incorrect'+left,'error');
     return;
   }
 
-  /* 6 — Succès */
   if(payload.ok){
     var msgs={
       pin_auth:   'Carte ajoutée au gestionnaire.',
@@ -1918,7 +1887,6 @@ window.GN_HandleResult=function(payload){
     return;
   }
 
-  /* 7 — Erreurs métier */
   var errMap={
     card_limit_balance_reached:        'Capacité maximale de la carte atteinte.',
     target_card_limit_balance_reached: 'La carte destinataire dépasse sa capacité.',
@@ -1928,41 +1896,19 @@ window.GN_HandleResult=function(payload){
   notify(errMap[err]||('Erreur ATM: '+err),'error');
 };
 
-/* Peut aussi être appelé directement par le Lua pour ouvrir le PIN prompt */
 window.GN_OpenPinPrompt=function(payload){ openPinPrompt(payload||{}); };
 
 /* ============================================================
-   INIT — état vide, attente de GN_SetSnapshot() depuis Lua
+   INIT
    ============================================================ */
 (function(){
   S.snap=null;
   S.playerName='';
   S.viewMode='cards';
   S.selectedKey=null;
-  // Dashboard caché, init screen caché — on attend le bridge Lua
   document.getElementById('dashboard').style.display='none';
   document.getElementById('init-screen').classList.remove('open');
 })();
-  /* ============================================================
-   AUTO-SCALE (Adaptation parfaite aux panels GMod)
-   ============================================================ */
-function autoScaleUI() {
-    // Ton design d'origine semble pensé pour une petite fenêtre (environ 950x600)
-    var baseWidth = 950;  
-    var baseHeight = 600; 
-    
-    // Calcule le ratio pour remplir la fenêtre Lua sans déformer
-    var scaleX = window.innerWidth / baseWidth;
-    var scaleY = window.innerHeight / baseHeight;
-    var finalScale = Math.min(scaleX, scaleY);
-    
-    // Applique le zoom global à la page
-    document.body.style.zoom = finalScale;
-}
-
-// Lancer le calcul au démarrage et à chaque redimensionnement
-window.addEventListener('resize', autoScaleUI);
-autoScaleUI();
 </script>
 </body>
 </html>
