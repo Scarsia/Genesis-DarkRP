@@ -1054,12 +1054,16 @@ function _reg(fn){ var id = ++_mActId; window._mActs[id] = fn; return id; }
 window._run = function(id){ if(window._mActs[id]) window._mActs[id](); };
 
 function openModal(html, wide){
-  _mActId = 0; window._mActs = {};
+  /* NE PAS reset _mActs ici — les fonctions sont enregistrées AVANT cet appel */
   document.getElementById('modal-box').className='mbox'+(wide?' wide':'');
   document.getElementById('modal-body').innerHTML=html;
   document.getElementById('modal').classList.add('open');
 }
-function closeModal(){ document.getElementById('modal').classList.remove('open'); window._mActs={}; }
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  /* Reset ici — après fermeture, plus besoin des fonctions */
+  _mActId=0; window._mActs={};
+}
 function mTitle(t){ return '<div class="mtitle">'+t+'</div>'; }
 function mField(label,id,type,ph,mono){ return '<div class="mfield"><div class="mlabel">'+label+'</div><input class="minput'+(mono?' mono':'')+'" id="'+id+'" type="'+(type||'text')+'" placeholder="'+(ph||'')+'"></div>'; }
 function mBtn(label, fn, danger){
