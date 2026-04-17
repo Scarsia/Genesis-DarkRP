@@ -201,6 +201,37 @@ button { cursor:pointer; }
 .inv-cancel{background:rgba(100,100,120,0.1);color:#5a6478;border:0.5px solid rgba(100,100,120,0.15);}
 .inv-create-form{padding:4px 0;}
 
+/* ===== DOMICILIATION STYLES ===== */
+.dom-row{display:flex;align-items:center;justify-content:space-between;padding:11px 10px;margin-bottom:5px;border-radius:10px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.05);transition:background .15s;}
+.dom-row:hover{background:rgba(255,255,255,0.04);}
+.dom-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:10px;}
+.dom-dot.active{background:#22b960;box-shadow:0 0 6px rgba(34,185,96,0.4);}
+.dom-dot.blocked{background:#d4a030;}
+.dom-dot.failed{background:#d03030;}
+.dom-dot.cancelled{background:#4a5870;}
+.dom-info{flex:1;min-width:0;}
+.dom-iban{font-size:11px;font-weight:500;color:#c0c4d4;font-family:'Courier New',monospace;}
+.dom-desc{font-size:10px;color:#6a7890;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dom-meta{font-size:9px;color:#4a5870;margin-top:2px;}
+.dom-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;margin-left:10px;}
+.dom-amt{font-size:13px;font-weight:700;}
+.dom-interval{font-size:9px;color:#5a6880;letter-spacing:.05em;}
+.dom-actions{display:flex;gap:5px;margin-top:3px;}
+.dom-btn{padding:3px 9px;font-size:9px;border-radius:6px;cursor:pointer;border:1px solid;transition:all .15s;}
+.dom-btn.block{color:#d4a030;border-color:rgba(212,168,48,0.3);background:rgba(212,168,48,0.06);}
+.dom-btn.block:hover{background:rgba(212,168,48,0.14);}
+.dom-btn.unblock{color:#22b960;border-color:rgba(34,185,96,0.3);background:rgba(34,185,96,0.06);}
+.dom-btn.unblock:hover{background:rgba(34,185,96,0.14);}
+.dom-btn.cancel{color:#c05050;border-color:rgba(180,50,50,0.3);background:rgba(180,50,50,0.06);}
+.dom-btn.cancel:hover{background:rgba(180,50,50,0.14);}
+.dom-failed-badge{font-size:9px;color:#d03030;background:rgba(210,50,50,0.1);border:1px solid rgba(210,50,50,0.2);border-radius:5px;padding:2px 7px;}
+
+/* Créer domiciliation form */
+.dom-create-form{padding:4px 0 8px;}
+.dom-interval-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.dom-interval-btn{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.03);color:#7a8898;font-size:10px;cursor:pointer;text-align:center;transition:all .18s;}
+.dom-interval-btn:hover,.dom-interval-btn.sel{background:rgba(184,188,200,0.1);border-color:rgba(184,188,200,0.3);color:#c0c4d4;}
+
 /* =========== MODALS =========== */
 .moverlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:100;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,0.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
 .moverlay.open{display:flex;}
@@ -719,7 +750,7 @@ button { cursor:pointer; }
   /* Notif stack position stays correct regardless of zoom */
   window._uiZoom = zoom;
 })();
-var S = { snap: null, selectedKey: null, viewMode: 'cards', activeGroupID: null, playerName: '', isAdmin: false, transferSourceKey: null, activeFilter: 'all', invSubMode: 'received' };
+var S = { snap: null, selectedKey: null, viewMode: 'cards', activeGroupID: null, playerName: '', isAdmin: false, transferSourceKey: null, activeFilter: 'all', invSubMode: 'received', isGroupSession: false, groupSessionCards: [] };
 
 function fmt(v){ return '$' + Math.round(Math.abs(v)).toLocaleString('fr-FR'); }
 
@@ -758,8 +789,13 @@ function normSnap(snap){
   if(snap.transactions) { for(var l=0; l<snap.transactions.length; l++) normTx(snap.transactions[l]); }
   return snap;
 }
-function getCardTier(num){
-  var clean = String(num||'').replace(/\s/g,''); var pre = clean.substring(0,2);
+function getCardTier(num, meta){
+  /* Pour les cartes groupe/sous-groupe, utiliser le tier hérité si disponible */
+  if(meta){
+    var t=meta.group_tier||meta.card_tier||meta._group_tier;
+    if(t&&(t==='visa'||t==='mastercard'||t==='amex')) return t;
+  }
+  var clean=String(num||'').replace(/\s/g,''); var pre=clean.substring(0,2);
   if(pre==='50') return 'amex'; if(pre==='40') return 'mastercard'; return 'visa';
 }
 function cardKey(card){
@@ -819,14 +855,26 @@ function renderSidebar(){
   var btnNew=document.getElementById('btn-new-account');
   if(btnNew){ if(!canNew) btnNew.classList.add('disabled'); else btnNew.classList.remove('disabled'); }
 
-  /* Tabs dynamiques : n'afficher Groupes/Sous-Groupes/Factures que si pertinent */
+  /* Tabs dynamiques selon le mode session */
   var hasGroups=(snap.cards_group||[]).length>0;
   var hasSubgroups=(snap.cards_subgroups||[]).length>0;
   var hasInvoices=((snap.invoices_received||[]).length+(snap.invoices_sent||[]).length)>0||hasGroups;
-  var tabs=[{k:'cards',l:'Mes Cartes',show:true}];
-  if(hasGroups) tabs.push({k:'groups',l:'Groupes',show:true});
-  if(hasSubgroups) tabs.push({k:'subgroups',l:'Sous-Groupes',show:true});
-  if(hasInvoices) tabs.push({k:'invoices',l:'Factures',show:true});
+  var tabs;
+  if(S.isGroupSession){
+    /* Session carte groupe : uniquement onglets groupe */
+    tabs=[];
+    if(hasGroups)    tabs.push({k:'groups',    l:'Groupes'});
+    if(hasSubgroups) tabs.push({k:'subgroups', l:'Sous-Groupes'});
+    tabs.push({k:'invoices',l:'Factures'});
+    /* Forcer le viewMode sur groupes si on est encore sur cards */
+    if(S.viewMode==='cards') S.viewMode='groups';
+  } else {
+    /* Session carte personnelle : onglets selon contenu */
+    tabs=[{k:'cards',l:'Mes Cartes',show:true}];
+    if(hasGroups)               tabs.push({k:'groups',    l:'Groupes'});
+    if(hasSubgroups)            tabs.push({k:'subgroups', l:'Sous-Groupes'});
+    if(hasInvoices||hasGroups)  tabs.push({k:'invoices',  l:'Factures'});
+  }
   var tabHtml='';
   for(var t=0;t<tabs.length;t++){
     tabHtml+='<button class="tb'+(S.viewMode===tabs[t].k?' on':'')+'" data-mode="'+tabs[t].k+'">'+tabs[t].l+'</button>';
@@ -857,12 +905,19 @@ function renderSidebar(){
 }
 
 function renderCreditCard(card){
-  if(!card) return; var meta=getMeta(card); var scope=card.scope||'personal'; var tier=getCardTier(card.card_number||'');
+  if(!card) return; var meta=getMeta(card); var scope=card.scope||'personal';
+  /* Tier : utiliser l'héritage du groupe pour groupe/sous-groupe */
+  var tier=getCardTier(card.card_number||'',meta);
   document.getElementById('cc-wrap').className='cc cc-'+tier;
-  document.getElementById('cc-type').textContent=scope==='group'?(meta.is_verified?'ENTREPRISE':'GROUPE'):scope==='subgroup'?'DÉPARTEMENT':'PERSONNEL';
-  document.getElementById('cc-number').textContent=card.card_number||'•••• •••• •••• ••••'; document.getElementById('cc-iban-lbl').textContent=card.iban||'';
-  var nameEl=document.getElementById('cc-name-lbl'); if(scope==='group') nameEl.textContent=(card.group_name||'').toUpperCase(); else if(scope==='subgroup') nameEl.textContent=(card.subgroup_name||'').toUpperCase(); else nameEl.textContent=(card.label||'').toUpperCase();
-  document.getElementById('cc-verified').style.display=meta.is_verified?'block':'none';
+  var typeLabel=scope==='group'?(meta.is_verified?'ENTREPRISE':'GROUPE'):scope==='subgroup'?'DÉPARTEMENT':'PERSONNEL';
+  document.getElementById('cc-type').textContent=typeLabel;
+  document.getElementById('cc-number').textContent=card.card_number||'•••• •••• •••• ••••';
+  document.getElementById('cc-iban-lbl').textContent=card.iban||'';
+  var nameEl=document.getElementById('cc-name-lbl');
+  if(scope==='group')    nameEl.textContent=(card.group_name||'').toUpperCase();
+  else if(scope==='subgroup') nameEl.textContent=(card.subgroup_name||card.group_name||'').toUpperCase();
+  else nameEl.textContent=(card.label||'').toUpperCase();
+  document.getElementById('cc-verified').style.display=(meta.is_verified)?'block':'none';
   var brandArea=document.getElementById('cc-brand-area');
   if(tier==='mastercard') brandArea.innerHTML='<div class="cc-mc-circles"><div class="cc-mc-c1"></div><div class="cc-mc-c2"></div></div>';
   else if(tier==='amex') brandArea.innerHTML='<span class="cc-brand-text cc-amx">AMEX</span>';
@@ -871,10 +926,45 @@ function renderCreditCard(card){
 
 function renderHero(card){
   if(!card) return; var meta=getMeta(card); var scope=card.scope||'personal';
+  var tier=getCardTier(card.card_number||'',meta);
+
+  if(scope==='subgroup'){
+    /* SOUS-GROUPE : afficher informations utiles pour la gestion */
+    var memberCount=0;
+    if(meta.subgroup_ibans) memberCount=meta.subgroup_ibans.length;
+    else if(meta.subgroup_count) memberCount=Number(meta.subgroup_count)||0;
+    document.getElementById('info-iban').textContent=(meta.group_iban||card.iban||'');
+    document.getElementById('info-bal').textContent=fmt(card.balance||0)+'.00';
+    var pills=document.getElementById('cfg-pills');
+    /* Infos groupe parent dans les pills */
+    pills.innerHTML=''
+      +'<div style="width:100%;display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;">'
+      +'<div style="font-size:9px;color:#6a7890;letter-spacing:.1em;">GROUPE PARENT</div>'
+      +'<div style="width:100%;font-size:11px;font-weight:600;color:#c0c4d4;margin-bottom:4px;">'+(meta.group_name||card.group_name||'—')+'</div>'
+      +'<span class="cfg-pill">'+memberCount+' salarié'+(memberCount>1?'s':'')+'</span>'
+      +'<span class="cfg-pill">'+String(meta.group_account_number||'').split('-')[0]+'</span>'
+      +(meta.is_verified?'<span class="cfg-pill" style="color:#22b960;border-color:rgba(34,185,96,0.3);">✔ Vérifié</span>':'')
+      +'</div>';
+    /* Actions sous-groupe */
+    var btns=[];
+    btns.push({l:'Ajouter un salarié',fn:doAddEmployee});
+    btns.push({l:'Gérer les salariés',fn:doManageEmployees});
+    btns.push({l:'Paramètres',fn:doCardSettings});
+    btns.push({l:'Quitter',fn:doLeaveGroup,danger:true});
+    var bhtml='';
+    for(var i=0;i<btns.length;i++) bhtml+='<button class="cfg-pill'+(btns[i].danger?' danger':'')+'" data-pill="'+i+'">'+(btns[i].l)+'</button>';
+    pills.innerHTML+=bhtml;
+    var pillEls=pills.querySelectorAll('[data-pill]');
+    for(var p=0;p<pillEls.length;p++){
+      (function(el,b){ el.addEventListener('click',function(){ b.fn(); }); })(pillEls[p],btns[p]);
+    }
+    return;
+  }
+
   document.getElementById('info-iban').textContent=card.iban||'';
   document.getElementById('info-bal').textContent=fmt(card.balance||0)+'.00';
   var pills=document.getElementById('cfg-pills');
-  var tier=getCardTier(card.card_number||''); var btns=[];
+  var btns=[];
   if(scope==='personal'){
     if(tier==='visa')       btns.push({l:'Upgrade Mastercard', fn:function(){ doUpgrade('mastercard'); }});
     else if(tier==='mastercard') btns.push({l:'Upgrade Amex',  fn:function(){ doUpgrade('amex'); }});
@@ -891,11 +981,6 @@ function renderHero(card){
     if(meta.can_create_subgroups) btns.push({l:'Créer un sous-groupe', fn:doCreateSubgroup});
     if(meta.is_group_member&&!meta.is_group_owner) btns.push({l:'Quitter', fn:doLeaveGroup, danger:true});
     btns.push({l:'Paramètres', fn:doCardSettings});
-  } else if(scope==='subgroup'){
-    btns.push({l:'Ajouter un salarié',  fn:doAddEmployee});
-    btns.push({l:'Gérer les salariés',  fn:doManageEmployees});
-    btns.push({l:'Paramètres',          fn:doCardSettings});
-    btns.push({l:'Quitter',             fn:doLeaveGroup, danger:true});
   }
   var html='';
   for(var i=0;i<btns.length;i++){
@@ -976,54 +1061,227 @@ function renderTxList(area){
 
 function setInvTab(mode){ S.invSubMode=mode; renderInvoices(document.getElementById('content-area')); }
 
+function _buildDomRow(d, i, isIssuer){
+  var st=String(d.status||'active');
+  var dotCls=st==='active'?'active':st==='blocked'?'blocked':st==='failed'?'failed':'cancelled';
+  var stLabel=st==='active'?'ACTIVE':st==='blocked'?'BLOQUÉE':st==='failed'?'ÉCHOUÉE':'ANNULÉE';
+  var intervalStr=Number(d.interval_hours||24)>=24?Math.round(d.interval_hours/24)+' jour'+(d.interval_hours>=48?'s':''):d.interval_hours+'h';
+  var nextStr=d.next_payment_at?fmtDate(d.next_payment_at):'—';
+  var failedBadge=d.last_failed_at>0?'<span class="dom-failed-badge">Dernier échec: '+fmtDate(d.last_failed_at)+'</span>':'';
+  var peerLabel=isIssuer?String(d.payer_iban||''):String(d.issuer_iban||d.creator_iban||'');
+  var amtColor=isIssuer?'#22b960':'#c0c4d4';
+  var actions='';
+  if(!isIssuer){
+    if(st==='active')   actions+='<button class="dom-btn block" data-dom-idx="'+i+'" data-dom-act="block">Bloquer</button>';
+    if(st==='blocked')  actions+='<button class="dom-btn unblock" data-dom-idx="'+i+'" data-dom-act="unblock">Activer</button>';
+    if(st!=='cancelled')actions+='<button class="dom-btn cancel" data-dom-idx="'+i+'" data-dom-act="cancel">Résilier</button>';
+  } else {
+    if(st!=='cancelled')actions+='<button class="dom-btn cancel" data-dom-idx="'+i+'" data-dom-act="cancel">Résilier</button>';
+  }
+  return '<div class="dom-row" data-dom-id="'+(d.id||0)+'">'
+    +'<div class="dom-dot '+dotCls+'"></div>'
+    +'<div class="dom-info">'
+      +'<div class="dom-iban">'+peerLabel+'</div>'
+      +'<div class="dom-desc">'+String(d.description||'')+'</div>'
+      +'<div class="dom-meta">Tous les '+intervalStr+' · Prochain: '+nextStr+' · '+stLabel
+        +(d.attempts_count?' · '+d.attempts_count+' tentative'+(d.attempts_count>1?'s':''):'')+' '+failedBadge+'</div>'
+    +'</div>'
+    +'<div class="dom-right">'
+      +'<div class="dom-amt" style="color:'+amtColor+';">'+(isIssuer?'+ ':'')+fmt(d.amount||0)+'</div>'
+      +'<div class="dom-actions">'+actions+'</div>'
+    +'</div>'
+  +'</div>';
+}
+
 function renderInvoices(area){
-  var mode=S.invSubMode; var snap=S.snap||{}; var received=snap.invoices_received||[]; var sent=snap.invoices_sent||[]; var list=mode==='received'?received:mode==='sent'?sent:[];
+  var mode=S.invSubMode;
+  var snap=S.snap||{};
+  var received=snap.invoices_received||[];
+  var sent=snap.invoices_sent||[];
+  var doms=S.domiciliations||{};
+  var domPayer=doms.payer||[];
+  var domIssuer=doms.issuer||[];
+
+  /* Onglets */
+  var isGroup=S.isGroupSession||(getSelectedCard()&&(getSelectedCard().scope||'personal')==='group');
+  var tabs='<div class="inv-tabs">'
+    +'<button class="itb'+(mode==='received'?' on':'')+'" data-invtab="received">Reçues <span style="font-size:9px;opacity:.5;">('+received.length+')</span></button>'
+    +'<button class="itb'+(mode==='sent'?' on':'')+'" data-invtab="sent">Envoyées <span style="font-size:9px;opacity:.5;">('+sent.length+')</span></button>'
+    +'<button class="itb'+(mode==='domiciliations'?' on':'')+'" data-invtab="domiciliations">Domiciliations <span style="font-size:9px;opacity:.5;">('+domPayer.length+')</span></button>'
+    +(isGroup?'<button class="itb'+(mode==='issuer'?' on':'')+'" data-invtab="issuer">Entreprise</button>':'')
+    +'<button class="itb'+(mode==='create'?' on':'')+'" data-invtab="create">+ Facture</button>'
+    +'<button class="itb'+(mode==='dom_create'?' on':'')+'" data-invtab="dom_create">+ Domiciliation</button>'
+  +'</div>';
+
   var body='';
+
+  /* ── Mode factures reçues / envoyées ── */
+  if(mode==='received'||mode==='sent'){
+    var list=mode==='received'?received:sent;
+    if(!list.length){
+      body='<div class="tx-empty">'+(mode==='received'?'Aucune facture reçue.':'Aucune facture envoyée.')+'</div>';
+    } else {
+      for(var i=0;i<list.length;i++){
+        var inv=list[i];
+        var sc=inv.status||'pending';
+        var scCls=sc==='paid'?'inv-paid':sc==='cancelled'||sc==='refused'?'inv-cancel':'inv-pending';
+        var scLbl=sc==='paid'?'PAYÉE':sc==='cancelled'?'ANNULÉE':sc==='refused'?'REFUSÉE':'EN ATTENTE';
+        var peer=mode==='received'?String(inv.creator_iban||''):String(inv.target_iban||'');
+        var amtColor=mode==='received'?'#d4a020':'#22b960';
+        var amtPrefix=mode==='received'?'+ ':'-  ';
+        var clickable=sc==='pending';
+        body+='<div class="inv-row'+(clickable?'':' inv-row-done')+'" data-inv-idx="'+i+'" style="'+(clickable?'':'opacity:.5;cursor:default;')+'"><div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">'+(sc==='pending'?'<div style="width:3px;height:36px;border-radius:2px;flex-shrink:0;background:'+amtColor+'"></div>':'<div style="width:3px;height:36px;flex-shrink:0;"></div>')+'<div style="min-width:0;"><div style="font-size:11.5px;font-weight:500;color:#c0c4d4;font-family:\'Courier New\',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+peer+'</div><div style="font-size:10px;color:#6a7890;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+String(inv.description||'')+'</div><div style="font-size:9px;color:#5a6880;margin-top:1px;">'+fmtDate(inv.created_at)+' · #'+String(inv.id||i+1)+'</div></div></div><div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;margin-left:12px;"><div style="font-size:12.5px;font-weight:700;color:'+amtColor+';">'+amtPrefix+fmt(inv.amount||0)+'</div><span class="inv-status '+scCls+'">'+scLbl+'</span></div></div>';
+      }
+    }
+  }
+
+  /* ── Domiciliations payeur ── */
+  if(mode==='domiciliations'){
+    if(!domPayer.length){
+      body='<div class="tx-empty">Aucune domiciliation active.</div>';
+    } else {
+      for(var i=0;i<domPayer.length;i++) body+=_buildDomRow(domPayer[i],i,false);
+    }
+  }
+
+  /* ── Panel entreprise (issuer) ── */
+  if(mode==='issuer'){
+    var issuerHtml='<div style="margin-bottom:14px;"><div class="lxs" style="margin-bottom:8px;">FACTURES EN COURS</div>';
+    var pendingSent=[];
+    for(var i=0;i<sent.length;i++){ if(sent[i].status==='pending') pendingSent.push(sent[i]); }
+    if(!pendingSent.length) issuerHtml+='<div class="tx-empty">Aucune facture en cours.</div>';
+    else for(var i=0;i<pendingSent.length;i++){
+      var inv=pendingSent[i];
+      issuerHtml+='<div class="dom-row" style="cursor:default;">'
+        +'<div class="dom-dot active"></div>'
+        +'<div class="dom-info">'
+          +'<div class="dom-iban">'+String(inv.target_iban||'')+'</div>'
+          +'<div class="dom-desc">'+String(inv.description||'')+'</div>'
+          +'<div class="dom-meta">'+fmtDate(inv.created_at)+' · #'+String(inv.id||i+1)+'</div>'
+        +'</div>'
+        +'<div class="dom-right"><div class="dom-amt" style="color:#22b960;">+ '+fmt(inv.amount||0)+'</div>'
+        +'<span class="inv-status inv-pending">EN ATTENTE</span></div></div>';
+    }
+    issuerHtml+='</div>';
+    issuerHtml+='<div style="margin-bottom:14px;"><div class="lxs" style="margin-bottom:8px;">DOMICILIATIONS ÉMISES</div>';
+    if(!domIssuer.length) issuerHtml+='<div class="tx-empty">Aucune domiciliation émise.</div>';
+    else for(var i=0;i<domIssuer.length;i++) issuerHtml+=_buildDomRow(domIssuer[i],i,true);
+    issuerHtml+='</div>';
+    body=issuerHtml;
+  }
+
+  /* ── Créer une facture ── */
   if(mode==='create'){
     var groupCards=snap.cards_group||[]; var groupOpts='';
     if(groupCards.length){ for(var i=0;i<groupCards.length;i++) groupOpts+='<option value="'+i+'">'+String(groupCards[i].group_name||'')+'</option>'; }
     else { groupOpts='<option value="">Aucun groupe disponible</option>'; }
-    body='<div class="inv-create-form" style="padding:4px 0 8px;">'
+    body='<div class="inv-create-form">'
       +'<div class="mfield"><div class="mlabel">IBAN destinataire</div><input class="minput mono" id="inv-iban" placeholder="GN-XXXX-XXXX" autocomplete="off"></div>'
       +'<div class="mfield"><div class="mlabel">Montant</div><input class="minput" id="inv-amount" type="number" min="1" placeholder="0"></div>'
-      +'<div class="mfield"><div class="mlabel">Description / Objet</div><input class="minput" id="inv-desc" placeholder="Commande, prestation..."></div>'
+      +'<div class="mfield"><div class="mlabel">Description / Objet</div><input class="minput" id="inv-desc" placeholder="Loyer, Prestation..."></div>'
       +(groupCards.length?'<div class="mfield"><div class="mlabel">Groupe émetteur</div><select class="minput" id="inv-group" style="-webkit-appearance:none;cursor:pointer;">'+groupOpts+'</select></div>':'')
       +'<button class="mbtn" id="inv-submit-btn">Émettre la facture</button></div>';
-  } else if(!list.length){
-    body='<div class="tx-empty">'+(mode==='received'?'Aucune facture reçue.':'Aucune facture envoyée.')+'</div>';
-  } else {
-    for(var i=0;i<list.length;i++){
-      var inv=list[i];
-      var sc=inv.status||'pending'; var scCls=sc==='paid'?'inv-paid':sc==='cancelled'?'inv-cancel':'inv-pending'; var scLbl=sc==='paid'?'PAYÉE':sc==='cancelled'?'ANNULÉE':'EN ATTENTE';
-      var peer=mode==='received'?String(inv.creator_iban||''):String(inv.target_iban||'');
-      var amtColor=mode==='received'?'#d4a020':'#22b960'; var amtPrefix=mode==='received'?'+':'-'; var clickable=sc==='pending';
-      body+='<div class="inv-row'+(clickable?'':' inv-row-done')+'" data-inv-idx="'+i+'" style="'+(clickable?'':'opacity:.5;cursor:default;')+'"><div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">'+(sc==='pending'?'<div style="width:3px;height:36px;border-radius:2px;flex-shrink:0;background:'+amtColor+'"></div>':'<div style="width:3px;height:36px;flex-shrink:0;"></div>')+'<div style="min-width:0;"><div style="font-size:11.5px;font-weight:500;color:#c0c4d4;font-family:\'Courier New\',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+peer+'</div><div style="font-size:10px;color:#6a7890;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+String(inv.description||'')+'</div><div style="font-size:9px;color:#5a6880;margin-top:1px;">'+fmtDate(inv.created_at)+' · #'+String(inv.id||i+1)+'</div></div></div><div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;margin-left:12px;"><div style="font-size:12.5px;font-weight:700;color:'+amtColor+';">'+amtPrefix+' '+fmt(inv.amount||0)+'</div><span class="inv-status '+scCls+'">'+scLbl+'</span></div></div>';
-    }
   }
-  area.innerHTML='<div class="inv-panel">'
-    +'<div class="inv-tabs">'
-      +'<button class="itb'+(mode==='received'?' on':'')+'" data-invtab="received">Reçues <span style="font-size:9px;opacity:.5;">('+received.length+')</span></button>'
-      +'<button class="itb'+(mode==='sent'?' on':'')+'" data-invtab="sent">Envoyées <span style="font-size:9px;opacity:.5;">('+sent.length+')</span></button>'
-      +'<button class="itb'+(mode==='create'?' on':'')+'" data-invtab="create">+ Créer</button>'
-    +'</div>'
-    +'<div id="inv-list">'+body+'</div>'
-  +'</div>';
-  /* Attach tab listeners */
+
+  /* ── Créer une domiciliation ── */
+  if(mode==='dom_create'){
+    var card=getSelectedCard(); var cardIban=card?String(card.iban||''):'';
+    var groupCards2=snap.cards_group||[]; var gOpts='';
+    if(groupCards2.length){ for(var i=0;i<groupCards2.length;i++) gOpts+='<option value="'+i+'">'+String(groupCards2[i].group_name||'')+'</option>'; }
+    body='<div class="dom-create-form">'
+      +'<div class="mfield"><div class="mlabel">IBAN du payeur (à prélever)</div><input class="minput mono" id="dom-payer-iban" placeholder="GN-XXXX-XXXX" autocomplete="off"></div>'
+      +'<div class="mfield"><div class="mlabel">Montant par échéance</div><input class="minput" id="dom-amount" type="number" min="1" placeholder="0"></div>'
+      +'<div class="mfield"><div class="mlabel">Description / Objet du contrat</div><input class="minput" id="dom-desc" placeholder="Abonnement mensuel, Loyer..."></div>'
+      +(groupCards2.length?'<div class="mfield"><div class="mlabel">Compte entreprise émetteur</div><select class="minput" id="dom-issuer-group" style="-webkit-appearance:none;cursor:pointer;">'+gOpts+'</select></div>':'')
+      +'<div class="mfield"><div class="mlabel">Intervalle de prélèvement</div>'
+      +'<div class="dom-interval-grid">'
+        +'<button class="dom-interval-btn" data-hours="24">Quotidien</button>'
+        +'<button class="dom-interval-btn" data-hours="168">Hebdomadaire</button>'
+        +'<button class="dom-interval-btn sel" data-hours="720">Mensuel</button>'
+        +'<button class="dom-interval-btn" data-hours="2160">Trimestriel</button>'
+      +'</div>'
+      +'<div style="font-size:9px;color:#5a6880;margin-top:6px;">Ou saisir manuellement :</div>'
+      +'<input class="minput" id="dom-interval-hours" type="number" min="1" value="720" style="margin-top:6px;" placeholder="Heures">'
+      +'</div>'
+      +'<button class="mbtn" id="dom-submit-btn" style="margin-top:8px;">Créer la domiciliation</button></div>';
+  }
+
+  area.innerHTML='<div class="inv-panel">'+tabs+'<div id="inv-list" style="overflow-y:auto;flex:1;">'+body+'</div></div>';
+
+  /* Listeners tabs */
   var itbs=area.querySelectorAll('[data-invtab]');
   for(var t=0;t<itbs.length;t++){
-    (function(btn){ btn.addEventListener('click',function(){ setInvTab(btn.getAttribute('data-invtab')); }); })(itbs[t]);
+    (function(btn){ btn.addEventListener('click',function(){
+      var m=btn.getAttribute('data-invtab');
+      if(m==='domiciliations'||m==='issuer'){
+        var c=getSelectedCard();
+        if(c){ S._lastDomiciliationIban=c.iban||''; bridgeSend('domiciliation_list',{iban:c.iban||'',group_id:c.group_id||0,mode:'both'}); }
+      }
+      setInvTab(m);
+    }); })(itbs[t]);
   }
-  /* Attach invoice row listeners */
+
+  /* Listeners invoice rows */
   var invRows=area.querySelectorAll('[data-inv-idx]');
   for(var r=0;r<invRows.length;r++){
-    (function(row,m){ 
+    (function(row){ 
       if(row.classList.contains('inv-row-done')) return;
-      row.addEventListener('click',function(){ doInvoiceAction(Number(row.getAttribute('data-inv-idx')),m); });
-    })(invRows[r],mode);
+      row.addEventListener('click',function(){ doInvoiceAction(Number(row.getAttribute('data-inv-idx')),mode); });
+    })(invRows[r]);
   }
-  /* Attach invoice submit */
+
+  /* Listener invoice submit */
   var subBtn=document.getElementById('inv-submit-btn');
   if(subBtn) subBtn.addEventListener('click',doCreateInvoice);
+
+  /* Listeners domiciliation actions */
+  var domBtns=area.querySelectorAll('[data-dom-act]');
+  for(var d=0;d<domBtns.length;d++){
+    (function(btn){ btn.addEventListener('click',function(){
+      var idx=Number(btn.getAttribute('data-dom-idx'));
+      var act=String(btn.getAttribute('data-dom-act'));
+      var list=(mode==='issuer')?domIssuer:domPayer;
+      var dom=list[idx]; if(!dom) return;
+      bridgeSend('domiciliation_action',{domiciliation_id:dom.id||0,action:act});
+    }); })(domBtns[d]);
+  }
+
+  /* Interval buttons for dom_create */
+  var intBtns=area.querySelectorAll('[data-hours]');
+  for(var b=0;b<intBtns.length;b++){
+    (function(btn){ btn.addEventListener('click',function(){
+      var all=area.querySelectorAll('[data-hours]');
+      for(var x=0;x<all.length;x++) all[x].classList.remove('sel');
+      btn.classList.add('sel');
+      var el=document.getElementById('dom-interval-hours');
+      if(el) el.value=btn.getAttribute('data-hours');
+    }); })(intBtns[b]);
+  }
+
+  /* Submit domiciliation */
+  var domSubmit=document.getElementById('dom-submit-btn');
+  if(domSubmit) domSubmit.addEventListener('click',function(){
+    var payerIban=String((document.getElementById('dom-payer-iban')||{}).value||'').trim();
+    var amount=Math.floor(Number((document.getElementById('dom-amount')||{}).value||0));
+    var desc=String((document.getElementById('dom-desc')||{}).value||'').trim();
+    var hours=Number((document.getElementById('dom-interval-hours')||{}).value||720);
+    var grpEl=document.getElementById('dom-issuer-group');
+    var grpCards=snap.cards_group||[];
+    var issuerIban=''; var issuerGid=0;
+    if(grpEl&&grpCards[Number(grpEl.value)]){
+      issuerIban=grpCards[Number(grpEl.value)].iban||'';
+      issuerGid=grpCards[Number(grpEl.value)].group_id||0;
+    }
+    if(!payerIban){notify('IBAN du payeur requis.','error');return;}
+    if(amount<=0){notify('Montant invalide.','error');return;}
+    if(!desc){notify('Description requise.','error');return;}
+    if(hours<1){notify('Intervalle invalide.','error');return;}
+    bridgeSend('domiciliation_create',{
+      issuer_iban:issuerIban,issuer_group_id:issuerGid,
+      payer_iban:payerIban,amount:amount,description:desc,interval_hours:hours
+    });
+    notify('Domiciliation en cours de création...','info');
+  });
 }
 function openTxModal(idx){
   var tx=(S.snap.transactions||[])[idx]; if(!tx) return;
@@ -1268,16 +1526,22 @@ function doManageEmployees(){
 }
 
 function doNewAccount(){ bridgeSend('card_create',{label:'Compte Principal',pin:1234}); }
-function doAddCard(){ bridgeSend('atm_open',{force_pin:true,refresh:true}); }
+function doAddCard(){ bridgeSend('atm_open',{force_pin:true,refresh:true,personal_only:true}); }
 function doCreateGroup(){
   openModal(mTitle('CRÉER UNE ENTREPRISE')
     +mField('Nom de l\'entreprise','grp-name','text','')
-    +mField('PIN groupe (optionnel)','grp-pin','password','')
-    +mBtn('Créer', function(){
+    +'<div class="mfield"><div class="mlabel" style="color:#d4a030;">CODE PIN OBLIGATOIRE</div><input class="minput" id="grp-pin" type="password" maxlength="4" placeholder="4 chiffres" autocomplete="off"></div>'
+    +'<div class="mfield"><div class="mlabel">Confirmer le PIN</div><input class="minput" id="grp-pin-confirm" type="password" maxlength="4" placeholder="Répéter le PIN" autocomplete="off"></div>'
+    +'<div style="font-size:10px;color:#6a7890;margin:-8px 0 12px;">Le PIN sécurise l\'accès à votre carte entreprise à l\'ATM.</div>'
+    +mBtn('Créer l\'entreprise', function(){
       var name=String(document.getElementById('grp-name').value||'').trim();
       var pin=String(document.getElementById('grp-pin').value||'').trim();
-      if(!name){notify('Nom requis.','error');return;}
-      bridgeSend('group_action',{action:'create_multi_group',requested_name:name,group_pin:pin}); closeModal();
+      var pinConfirm=String(document.getElementById('grp-pin-confirm').value||'').trim();
+      if(!name||name.length<3){notify('Nom trop court (3 caractères minimum).','error');return;}
+      if(!/^\d{4}$/.test(pin)){notify('Code PIN invalide — 4 chiffres requis.','error');return;}
+      if(pin!==pinConfirm){notify('Les codes PIN ne correspondent pas.','error');return;}
+      bridgeSend('group_action',{action:'create_multi_group',requested_name:name,group_pin:pin});
+      closeModal();
     }));
 }
 function doTheme(){
@@ -1484,10 +1748,11 @@ var PIN_FREEZE_SECONDS=300;
 var _pinCountdownInterval=null;
 
 function openPinPrompt(payload){
-  var all=(payload.cards||[]).concat(payload.group_cards||[]);
+  var personalOnly=!!(payload.personalOnly||payload.force_pin_personal_only);
+  var all=(payload.cards||[]).concat(personalOnly?[]:(payload.group_cards||[]));
   if(!all.length) all=(S.snap&&S.snap.cards_personal)?S.snap.cards_personal:[];
   if(!all.length) return;
-  PIN_STATE.cards=all; PIN_STATE.idx=0; PIN_STATE.pin=''; PIN_STATE.waiting=false;
+  PIN_STATE.cards=all; PIN_STATE.idx=0; PIN_STATE.pin=''; PIN_STATE.waiting=false; PIN_STATE.personalOnly=personalOnly;
   /* Attacher le bouton pfz-close une seule fois */
   var pfzBtn=document.getElementById('pfz-close-btn');
   if(pfzBtn){ pfzBtn.onclick=function(){ _clearCountdown(); document.getElementById('pin-overlay').classList.remove('open','frozen-mode'); PIN_STATE.pin=''; PIN_STATE.cards=[]; bridgeSend('close',{}); }; }
@@ -1692,7 +1957,13 @@ var ERR_MAP={
   target_card_limit_balance_reached:'La carte destinataire dépasse sa capacité maximale.',
   card_limit_transfer_reached:'Montant supérieur à la limite de virement de cette carte.',
   insufficient_card_funds:'Solde de la carte insuffisant.',
-  pin_auth_required:'Veuillez d\'abord valider le PIN de cette carte (bouton Ajouter une carte).'
+  pin_auth_required:'Veuillez d\'abord valider le PIN de cette carte (bouton Ajouter une carte).',
+  card_limit_reached:'Vous avez atteint le nombre maximum de cartes personnelles (3).',
+  group_owned_limit_reached:'Vous possédez déjà 3 entreprises (limite atteinte).',
+  pin_required_for_group:'Un code PIN à 4 chiffres est obligatoire pour créer une entreprise.',
+  no_card_in_inventory:'Aucune carte bancaire dans votre inventaire.',
+  invalid_amount:'Montant invalide.',
+  insufficient_funds:'Solde insuffisant.'
 };
 
 /* Success messages par action — identique à Lua */
@@ -1702,7 +1973,11 @@ var SUCCESS_MSGS={
   deposit:'Dépôt effectué.',
   withdraw:'Retrait effectué.',
   pin_change:'Code PIN modifié.',
-  card_create:'Compte créé avec succès.'
+  card_create:'Compte créé avec succès.',
+  group_create:'Entreprise créée avec succès. Vérifiez votre inventaire.',
+  group_update:'Entreprise mise à jour.',
+  domiciliation_create:'Domiciliation créée avec succès.',
+  domiciliation_action:'Action effectuée.'
 };
 
 window.GN_SetSnapshot=function(data){
@@ -1734,7 +2009,16 @@ window.GN_HandleResult=function(payload){
   var err=String(payload.error||'');
 
   /* PIN requis — ouvrir l'écran de saisie */
-  if(action==='pin_required'){ openPinPrompt(payload); return; }
+  if(action==='pin_required'){
+    var pinErr=String(payload.error||'');
+    if(pinErr==='no_card_in_inventory'){
+      notify(String(payload.message||ERR_MAP.no_card_in_inventory),'error');
+      return;
+    }
+    if(payload.force_pin_personal_only) payload.personalOnly=true;
+    openPinPrompt(payload);
+    return;
+  }
 
   /* Compte gelé côté serveur — écran frozen avec temps restant */
   if(action==='atm_locked_temp'||(action==='pin_auth'&&err==='pin_locked')){
@@ -1780,6 +2064,13 @@ window.GN_HandleResult=function(payload){
   /* PIN validé — fermer l'overlay et rafraîchir */
   if(action==='pin_auth'&&payload.ok){
     closePinPrompt();
+    /* Si c'est une carte groupe → mode groupe */
+    if(payload.is_group_card){
+      S.isGroupSession=true;
+      S.viewMode='groups';
+    } else {
+      S.isGroupSession=false;
+    }
     notify('Carte ajoutée au gestionnaire.','success');
     setTimeout(function(){ bridgeSend('refresh',{}); },200);
     return;
@@ -1799,12 +2090,36 @@ window.GN_HandleResult=function(payload){
     setTimeout(function(){ bridgeSend('refresh',{}); },300);
     return;
   }
+  /* group_create erreur explicite */
+  if(action==='group_create'&&!payload.ok){
+    notify(String(payload.message||ERR_MAP[err]||('Erreur : '+err)),'error');
+    return;
+  }
 
   /* Erreur — map ou message brut */
   notify(ERR_MAP[err]||('Erreur ATM: '+err),'error');
 };
 
 window.GN_OpenPinPrompt=function(payload){ openPinPrompt(payload||{}); };
+
+window.GN_SetDomiciliations=function(data){
+  S.domiciliations=data||{};
+  /* Si on est en mode factures, rafraîchir */
+  if(S.viewMode==='invoices'){
+    var area=document.getElementById('content-area');
+    if(area) renderInvoices(area);
+  }
+};
+
+window.GN_HandleDomiciliationResult=function(payload){
+  payload=payload||{};
+  if(payload.ok){
+    notify(SUCCESS_MSGS[payload.action||'domiciliation_action']||'Action effectuée.','success');
+    bridgeSend('domiciliation_list',{iban:S._lastDomiciliationIban||'',mode:'payer'});
+  } else {
+    notify(ERR_MAP[payload.error||'']||('Erreur domiciliation : '+(payload.error||'')),'error');
+  }
+};
 
 /* Petit helper tonumber safe pour JS */
 function tonumber_safe(v){ var n=parseFloat(v); return isNaN(n)?null:n; }
