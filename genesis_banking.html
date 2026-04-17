@@ -201,7 +201,31 @@ button { cursor:pointer; }
 .inv-cancel{background:rgba(100,100,120,0.1);color:#5a6478;border:0.5px solid rgba(100,100,120,0.15);}
 .inv-create-form{padding:4px 0;}
 
-/* ===== DOMICILIATION STYLES ===== */
+/* ===== MODAL NOUVEAU COMPTE ===== */
+.account-create-wrap{padding:4px 0 2px;}
+.account-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.account-type-card{border-radius:12px;padding:16px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.025);cursor:pointer;transition:all .18s;position:relative;overflow:hidden;}
+.account-type-card:hover{border-color:rgba(184,188,200,0.25);background:rgba(255,255,255,0.05);}
+.account-type-card.sel{border-color:rgba(184,188,200,0.4);background:rgba(184,188,200,0.07);}
+.account-type-card.sel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:#b8bcc8;border-radius:0;}
+.account-type-icon{font-size:20px;margin-bottom:8px;}
+.account-type-label{font-size:11px;font-weight:600;color:#c0c4d4;margin-bottom:3px;}
+.account-type-desc{font-size:9.5px;color:#6a7890;line-height:1.4;}
+
+/* Enterprise form multi-step */
+.ent-step{display:none;}
+.ent-step.active{display:block;}
+.ent-activity-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;}
+.ent-act-btn{padding:9px 10px;border-radius:9px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.025);color:#7a8898;font-size:10px;cursor:pointer;text-align:left;transition:all .15s;display:flex;align-items:center;gap:7px;}
+.ent-act-btn:hover,.ent-act-btn.sel{border-color:rgba(184,188,200,0.3);background:rgba(184,188,200,0.07);color:#c0c4d4;}
+.ent-act-icon{font-size:13px;flex-shrink:0;}
+.ent-size-row{display:flex;gap:6px;margin-bottom:14px;}
+.ent-size-btn{flex:1;padding:7px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.025);color:#7a8898;font-size:10px;cursor:pointer;text-align:center;transition:all .15s;}
+.ent-size-btn:hover,.ent-size-btn.sel{border-color:rgba(212,168,48,0.4);background:rgba(212,168,48,0.07);color:#d4a030;}
+.ent-step-bar{display:flex;gap:4px;margin-bottom:18px;}
+.ent-step-dot{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,0.06);transition:background .3s;}
+.ent-step-dot.done{background:#b8bcc8;}
+.ent-step-dot.active{background:#d4a030;}
 .dom-row{display:flex;align-items:center;justify-content:space-between;padding:11px 10px;margin-bottom:5px;border-radius:10px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.05);transition:background .15s;}
 .dom-row:hover{background:rgba(255,255,255,0.04);}
 .dom-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:10px;}
@@ -1525,25 +1549,236 @@ function doManageEmployees(){
   }
 }
 
-function doNewAccount(){ bridgeSend('card_create',{label:'Compte Principal',pin:1234}); }
-function doAddCard(){ bridgeSend('atm_open',{force_pin:true,refresh:true,personal_only:true}); }
+function doNewAccount(){
+  var snap=S.snap||{};
+  var maxCards=Number(snap.max_personal_cards||3);
+  var currentCards=Number(snap.personal_cards_count||0);
+  if(currentCards>=maxCards){
+    openModal(
+      mTitle('LIMITE ATTEINTE')
+      +'<div style="text-align:center;padding:16px 0 8px;">'
+        +'<div style="font-size:28px;margin-bottom:12px;">🔒</div>'
+        +'<div style="font-size:13px;font-weight:600;color:#c0c4d4;margin-bottom:6px;">Maximum de cartes atteint</div>'
+        +'<div style="font-size:11px;color:#6a7890;line-height:1.6;">Vous possédez déjà <strong style="color:#c0c4d4;">'+currentCards+'/'+maxCards+'</strong> cartes personnelles.<br>Vous devez supprimer une carte existante pour en créer une nouvelle.</div>'
+      +'</div>'
+      +mBtn('Fermer',function(){ closeModal(); })
+    );
+    return;
+  }
+
+  openModal(
+    mTitle('NOUVEAU COMPTE')
+    +'<div class="account-create-wrap">'
+      +'<div style="font-size:10.5px;color:#6a7890;margin-bottom:14px;">Choisissez le type de votre nouvelle carte :</div>'
+      +'<div class="account-type-grid" id="acct-type-grid">'
+        +'<div class="account-type-card sel" data-atype="personal">'
+          +'<div class="account-type-icon">💳</div>'
+          +'<div class="account-type-label">Carte Personnelle</div>'
+          +'<div class="account-type-desc">Compte individuel pour vos finances du quotidien, dépôts et retraits.</div>'
+        +'</div>'
+        +'<div class="account-type-card" data-atype="gold">'
+          +'<div class="account-type-icon">⭐</div>'
+          +'<div class="account-type-label">Carte Prestige</div>'
+          +'<div class="account-type-desc">Compte premium avec plafonds élevés. Évolutif vers Mastercard ou Amex.</div>'
+        +'</div>'
+      +'</div>'
+      +'<div class="mfield"><div class="mlabel">Nom personnalisé de la carte</div><input class="minput" id="acct-label" placeholder="Ex: Compte Principal, Épargne..."></div>'
+      +'<div class="mfield"><div class="mlabel" style="color:#d4a030;">Code PIN (4 chiffres)</div><input class="minput" id="acct-pin" type="password" maxlength="4" placeholder="••••" autocomplete="off"></div>'
+      +'<div class="mfield"><div class="mlabel">Confirmer le PIN</div><input class="minput" id="acct-pin2" type="password" maxlength="4" placeholder="••••" autocomplete="off"></div>'
+      +'<div style="font-size:9.5px;color:#5a6880;margin:-6px 0 14px;line-height:1.5;">'+currentCards+'/'+maxCards+' carte'+(currentCards>1?'s':'')+' utilisée'+(currentCards>1?'s':'')+'. Ce PIN vous sera demandé à chaque connexion ATM.</div>'
+    +'</div>'
+    +mBtn('Créer ma carte',function(){
+      var label=String(document.getElementById('acct-label').value||'').trim()||'Compte Personnel';
+      var pin=String(document.getElementById('acct-pin').value||'').trim();
+      var pin2=String(document.getElementById('acct-pin2').value||'').trim();
+      if(!/^\d{4}$/.test(pin)){notify('Code PIN invalide — 4 chiffres requis.','error');return;}
+      if(pin!==pin2){notify('Les codes PIN ne correspondent pas.','error');return;}
+      bridgeSend('card_create',{label:label,pin:Number(pin)});
+      closeModal();
+      notify('Création en cours...','info');
+    })
+  );
+
+  /* Sélection du type */
+  var typeBtns=document.querySelectorAll('[data-atype]');
+  for(var i=0;i<typeBtns.length;i++){
+    (function(btn){ btn.addEventListener('click',function(){
+      var all=document.querySelectorAll('[data-atype]');
+      for(var x=0;x<all.length;x++) all[x].classList.remove('sel');
+      btn.classList.add('sel');
+      var lbl=document.getElementById('acct-label');
+      if(lbl&&!lbl.value){ lbl.value=btn.getAttribute('data-atype')==='gold'?'Compte Prestige':'Compte Principal'; }
+    }); })(typeBtns[i]);
+  }
+}
+
+var _entActivity='';
+var _entSize='';
+
 function doCreateGroup(){
-  openModal(mTitle('CRÉER UNE ENTREPRISE')
-    +mField('Nom de l\'entreprise','grp-name','text','')
-    +'<div class="mfield"><div class="mlabel" style="color:#d4a030;">CODE PIN OBLIGATOIRE</div><input class="minput" id="grp-pin" type="password" maxlength="4" placeholder="4 chiffres" autocomplete="off"></div>'
-    +'<div class="mfield"><div class="mlabel">Confirmer le PIN</div><input class="minput" id="grp-pin-confirm" type="password" maxlength="4" placeholder="Répéter le PIN" autocomplete="off"></div>'
-    +'<div style="font-size:10px;color:#6a7890;margin:-8px 0 12px;">Le PIN sécurise l\'accès à votre carte entreprise à l\'ATM.</div>'
-    +mBtn('Créer l\'entreprise', function(){
+  /* Choix : Groupe simple ou Entreprise */
+  openModal(
+    mTitle('CRÉER UNE ENTITÉ')
+    +'<div style="font-size:10.5px;color:#6a7890;margin-bottom:14px;">Quel type d\'entité souhaitez-vous créer ?</div>'
+    +'<div class="account-type-grid" style="grid-template-columns:1fr 1fr;margin-bottom:20px;">'
+      +'<div class="account-type-card" data-choice="group">'
+        +'<div class="account-type-icon">👥</div>'
+        +'<div class="account-type-label">Groupe</div>'
+        +'<div class="account-type-desc">Compte commun simple pour partager des fonds avec d\'autres joueurs.</div>'
+      +'</div>'
+      +'<div class="account-type-card" data-choice="enterprise">'
+        +'<div class="account-type-icon">🏢</div>'
+        +'<div class="account-type-label">Entreprise</div>'
+        +'<div class="account-type-desc">Structure légale avec accès aux Factures, sous-groupes salariés et outils de gestion.</div>'
+      +'</div>'
+    +'</div>'
+    +'<div style="font-size:9.5px;color:#4a5870;">Max 3 entités possédées. PIN obligatoire pour la carte ATM.</div>'
+  );
+  var choiceBtns=document.querySelectorAll('[data-choice]');
+  for(var i=0;i<choiceBtns.length;i++){
+    (function(btn){ btn.addEventListener('click',function(){
+      var choice=btn.getAttribute('data-choice');
+      if(choice==='group') _openGroupForm();
+      else _openEnterpriseForm();
+    }); })(choiceBtns[i]);
+  }
+}
+
+function _openGroupForm(){
+  openModal(
+    mTitle('CRÉER UN GROUPE')
+    +'<div class="mfield"><div class="mlabel">Nom du groupe</div><input class="minput" id="grp-name" placeholder="Nom du groupe (min. 3 caractères)"></div>'
+    +'<div class="mfield"><div class="mlabel" style="color:#d4a030;">Code PIN carte — Obligatoire</div><input class="minput" id="grp-pin" type="password" maxlength="4" placeholder="4 chiffres" autocomplete="off"></div>'
+    +'<div class="mfield"><div class="mlabel">Confirmer le PIN</div><input class="minput" id="grp-pin2" type="password" maxlength="4" placeholder="Répéter le PIN" autocomplete="off"></div>'
+    +'<div style="font-size:9.5px;color:#5a6880;margin:-6px 0 14px;">Les membres utilisent ce PIN à l\'ATM pour accéder aux fonds du groupe.</div>'
+    +mBtn('Créer le groupe',function(){
       var name=String(document.getElementById('grp-name').value||'').trim();
       var pin=String(document.getElementById('grp-pin').value||'').trim();
-      var pinConfirm=String(document.getElementById('grp-pin-confirm').value||'').trim();
+      var pin2=String(document.getElementById('grp-pin2').value||'').trim();
       if(!name||name.length<3){notify('Nom trop court (3 caractères minimum).','error');return;}
       if(!/^\d{4}$/.test(pin)){notify('Code PIN invalide — 4 chiffres requis.','error');return;}
-      if(pin!==pinConfirm){notify('Les codes PIN ne correspondent pas.','error');return;}
-      bridgeSend('group_action',{action:'create_multi_group',requested_name:name,group_pin:pin});
+      if(pin!==pin2){notify('Les codes PIN ne correspondent pas.','error');return;}
+      bridgeSend('group_action',{action:'create_multi_group',requested_name:name,group_pin:pin,type:'group'});
       closeModal();
-    }));
+    })
+  );
 }
+
+var _ENT={name:'',pin:'',pin2:'',activity:'',size:1,desc:''};
+
+function _openEnterpriseForm(){
+  _entActivity=''; _entSize='';
+  var activities=[
+    {k:'commerce',icon:'🛒',l:'Commerce'},
+    {k:'securite',icon:'🔫',l:'Sécurité privée'},
+    {k:'transport',icon:'🚗',l:'Transport'},
+    {k:'immobilier',icon:'🏠',l:'Immobilier'},
+    {k:'restauration',icon:'🍽️',l:'Restauration'},
+    {k:'technologie',icon:'💻',l:'Technologie'},
+    {k:'medical',icon:'💉',l:'Services médicaux'},
+    {k:'autre',icon:'📋',l:'Autre'}
+  ];
+  var actHtml='';
+  for(var i=0;i<activities.length;i++){
+    actHtml+='<button class="ent-act-btn" data-act="'+activities[i].k+'"><span class="ent-act-icon">'+activities[i].icon+'</span>'+activities[i].l+'</button>';
+  }
+
+  openModal(
+    mTitle('CRÉER UNE ENTREPRISE')
+    /* Barre de progression */
+    +'<div class="ent-step-bar"><div class="ent-step-dot active" id="edot0"></div><div class="ent-step-dot" id="edot1"></div><div class="ent-step-dot" id="edot2"></div></div>'
+
+    /* Étape 0 — Activité */
+    +'<div class="ent-step active" id="estep0">'
+      +'<div style="font-size:10.5px;color:#6a7890;margin-bottom:12px;">Quel est le secteur d\'activité de votre entreprise ?</div>'
+      +'<div class="ent-activity-grid">'+actHtml+'</div>'
+      +mBtn('Suivant →',function(){
+        if(!_entActivity){notify('Sélectionnez un secteur d\'activité.','error');return;}
+        _entShowStep(1);
+      })
+    +'</div>'
+
+    /* Étape 1 — Informations */
+    +'<div class="ent-step" id="estep1">'
+      +'<div class="mfield"><div class="mlabel">Nom officiel de l\'entreprise</div><input class="minput" id="ent-name" placeholder="Nom (min. 3 caractères)"></div>'
+      +'<div class="mfield"><div class="mlabel">Nombre de salariés prévus</div>'
+        +'<div class="ent-size-row" id="ent-size-row">'
+          +'<button class="ent-size-btn" data-sz="1">Solo</button>'
+          +'<button class="ent-size-btn" data-sz="5">2–5</button>'
+          +'<button class="ent-size-btn" data-sz="15">6–15</button>'
+          +'<button class="ent-size-btn" data-sz="30">16–30</button>'
+          +'<button class="ent-size-btn" data-sz="99">30+</button>'
+        +'</div>'
+      +'</div>'
+      +'<div class="mfield"><div class="mlabel">Description (optionnel)</div><input class="minput" id="ent-desc" placeholder="Activité principale, objectifs..."></div>'
+      +mBtn('Suivant →',function(){
+        var name=String(document.getElementById('ent-name').value||'').trim();
+        if(!name||name.length<3){notify('Nom trop court (3 caractères minimum).','error');return;}
+        if(!_entSize){notify('Sélectionnez une taille d\'équipe.','error');return;}
+        _ENT.name=name; _ENT.desc=String(document.getElementById('ent-desc').value||'').trim();
+        _entShowStep(2);
+      })
+    +'</div>'
+
+    /* Étape 2 — Sécurité */
+    +'<div class="ent-step" id="estep2">'
+      +'<div style="font-size:10.5px;color:#6a7890;margin-bottom:14px;">Sécurisez l\'accès à votre carte entreprise :</div>'
+      +'<div class="mfield"><div class="mlabel" style="color:#d4a030;">Code PIN carte ATM — Obligatoire</div><input class="minput" id="ent-pin" type="password" maxlength="4" placeholder="4 chiffres" autocomplete="off"></div>'
+      +'<div class="mfield"><div class="mlabel">Confirmer le PIN</div><input class="minput" id="ent-pin2" type="password" maxlength="4" placeholder="Répéter le PIN" autocomplete="off"></div>'
+      +'<div style="font-size:9.5px;color:#5a6880;margin:-6px 0 14px;">Ce PIN est requis pour chaque connexion ATM avec votre carte entreprise.</div>'
+      +'<div style="display:flex;gap:8px;">'
+        +mBtn('← Retour',function(){ _entShowStep(1); })
+        +mBtn('Créer l\'entreprise',function(){
+          var pin=String(document.getElementById('ent-pin').value||'').trim();
+          var pin2=String(document.getElementById('ent-pin2').value||'').trim();
+          if(!/^\d{4}$/.test(pin)){notify('Code PIN invalide — 4 chiffres requis.','error');return;}
+          if(pin!==pin2){notify('Les codes PIN ne correspondent pas.','error');return;}
+          var meta={type:'enterprise',activity:_entActivity,size:Number(_entSize),description:_ENT.desc};
+          bridgeSend('group_action',{
+            action:'create_multi_group',
+            requested_name:_ENT.name,
+            group_pin:pin,
+            type:'enterprise',
+            metadata:meta
+          });
+          closeModal();
+        })
+      +'</div>'
+    +'</div>'
+  ,true); /* wide modal */
+
+  /* Listeners sélection activité */
+  var actBtns=document.querySelectorAll('[data-act]');
+  for(var i=0;i<actBtns.length;i++){
+    (function(btn){ btn.addEventListener('click',function(){
+      var all=document.querySelectorAll('[data-act]');
+      for(var x=0;x<all.length;x++) all[x].classList.remove('sel');
+      btn.classList.add('sel');
+      _entActivity=btn.getAttribute('data-act');
+    }); })(actBtns[i]);
+  }
+  /* Listeners taille */
+  var szBtns=document.querySelectorAll('[data-sz]');
+  for(var i=0;i<szBtns.length;i++){
+    (function(btn){ btn.addEventListener('click',function(){
+      var all=document.querySelectorAll('[data-sz]');
+      for(var x=0;x<all.length;x++) all[x].classList.remove('sel');
+      btn.classList.add('sel');
+      _entSize=btn.getAttribute('data-sz');
+    }); })(szBtns[i]);
+  }
+}
+
+function _entShowStep(n){
+  for(var i=0;i<3;i++){
+    var step=document.getElementById('estep'+i);
+    var dot=document.getElementById('edot'+i);
+    if(step) step.className='ent-step'+(i===n?' active':'');
+    if(dot) dot.className='ent-step-dot'+(i<n?' done':i===n?' active':'');
+  }
+}
+function doAddCard(){ bridgeSend('atm_open',{force_pin:true,refresh:true,personal_only:true}); }
+
 function doTheme(){
   var themes=[['genesis','Genesis Dark'],['maze','Maze Bank'],['revolut','Revolut Clair'],['gold','VIP Gold']];
   var html=mTitle('THÈMES')+'<div class="theme-grid">';
@@ -2169,13 +2404,19 @@ function _initStartOverflow(){
   document.getElementById('dashboard').style.display='none';
   document.getElementById('init-screen').classList.remove('open');
 
-  /* Bouton principal init screen → lance l'animation Overflow puis CARD_CREATE */
+  /* Bouton principal init screen → ouvre le modal de création de compte */
   var initBtn=document.getElementById('init-btn');
-  if(initBtn) initBtn.addEventListener('click',function(){ if(!_initOverflow) _initStartOverflow(); });
+  if(initBtn) initBtn.addEventListener('click',function(){
+    /* Lancer l'animation puis créer directement — le modal s'ouvre depuis le dashboard,
+       mais ici on est sur l'init screen donc on crée directement */
+    if(!_initOverflow) _initStartOverflow();
+  });
 
-  /* Lien hint */
+  /* Lien hint → même chose */
   var hintLink=document.getElementById('init-hint-link');
-  if(hintLink) hintLink.addEventListener('click',function(){ if(!_initOverflow) _initStartOverflow(); });
+  if(hintLink) hintLink.addEventListener('click',function(){
+    if(!_initOverflow) _initStartOverflow();
+  });
 })();
 </script>
 </body>
