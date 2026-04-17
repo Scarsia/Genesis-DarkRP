@@ -1464,8 +1464,15 @@ function renderAll(){
   renderCreditCard(card); renderHero(card); renderQuickActions(card); renderContent();
 }
 
-function showBlockScreen(err){ document.getElementById('block-code').textContent='CODE: '+err.toUpperCase(); document.getElementById('dashboard').style.display='none'; document.getElementById('init-screen').classList.remove('open'); document.getElementById('block-screen').classList.add('open'); }
-var BLOCK_ERRORS=['account_frozen','frozen','account_closed_doj','account_closed'];
+function showBlockScreen(err){
+  var code=document.getElementById('block-code');
+  var msg=document.getElementById('block-msg');
+  if(code) code.textContent='CODE: '+err.toUpperCase();
+  if(msg) msg.textContent=(BLOCK_MSGS&&BLOCK_MSGS[err])||'Accès refusé.';
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('init-screen').classList.remove('open');
+  document.getElementById('block-screen').classList.add('open');
+}
 
 var PIN_STATE={cards:[],idx:0,pin:'',attempts:{},frozen:{},waiting:false};
 var PIN_MAX_ATTEMPTS=3;
@@ -1666,48 +1673,190 @@ function pinKey(k){
 }
 
 function bridgeSend(action,payload){ if(window.GN&&window.GN.Receive){ try{ window.GN.Receive(action,JSON.stringify(payload)); }catch(e){} } }
-window.GN_SetSnapshot=function(data){ if(data&&data.ok===false){ if(BLOCK_ERRORS.indexOf(String(data.error||''))>=0) showBlockScreen(String(data.error)); return; } S.snap=normSnap((data && data.data) ? data.data : data); S.viewMode='cards'; S.selectedKey=null; renderAll(); };
-window.GN_SetPlayerName=function(name){ S.playerName=name; var a=document.getElementById('player-name'); var b=document.getElementById('info-player-name'); if(a)a.textContent=name; if(b)b.textContent=name; };
-window.GN_HandleResult=function(payload){
-  payload=payload||{}; var action=String(payload.action||''); var err=String(payload.error||'');
-  if(action==='pin_required'){ openPinPrompt(payload); return; }
-  if(action==='atm_locked_temp'||(action==='pin_auth'&&err==='pin_locked')){
-    /* Serveur confirme gel — afficher l'écran frozen */
-    var uid=_getPinCardUid();
-    if(!PIN_STATE.frozen[uid]) PIN_STATE.frozen[uid]=Math.floor(Date.now()/1000);
-    PIN_STATE.waiting=false;
-    /* S'assurer que l'overlay est ouvert puis passer en frozen-mode */
-    document.getElementById('pin-overlay').classList.add('open');
-    _showFrozenMode(uid);
+/* === BLOCK ERRORS (sync avec Lua) === */
+var BLOCK_ERRORS=['account_frozen','frozen','account_closed_doj','account_closed'];
+var BLOCK_MSGS={
+  account_frozen:'Votre compte a été gelé par les autorités.\nL\'accès bancaire est verrouillé.',
+  frozen:'Votre compte a été gelé par les autorités.\nL\'accès bancaire est verrouillé.',
+  account_closed_doj:'Votre compte est clôturé par le département de justice.\nL\'accès bancaire est bloqué.',
+  account_closed:'Votre compte est clôturé par le département de justice.\nL\'accès bancaire est bloqué.'
+};
+
+/* Error map pour les actions — identique à Lua */
+var ERR_MAP={
+  card_limit_balance_reached:'Capacité maximale de la carte atteinte.',
+  target_card_limit_balance_reached:'La carte destinataire dépasse sa capacité maximale.',
+  card_limit_transfer_reached:'Montant supérieur à la limite de virement de cette carte.',
+  insufficient_card_funds:'Solde de la carte insuffisant.',
+  pin_auth_required:'Veuillez d\'abord valider le PIN de cette carte (bouton Ajouter une carte).'
+};
+
+/* Success messages par action — identique à Lua */
+var SUCCESS_MSGS={
+  pin_auth:'Carte ajoutée au gestionnaire.',
+  transfer:'Virement envoyé avec succès.',
+  deposit:'Dépôt effectué.',
+  withdraw:'Retrait effectué.',
+  pin_change:'Code PIN modifié.',
+  card_create:'Compte créé avec succès.'
+};
+
+window.GN_SetSnapshot=function(data){
+  if(data&&data.ok===false){
+    var err=String(data.error||'');
+    if(BLOCK_ERRORS.indexOf(err)>=0){
+      showBlockScreen(err);
+      /* Fermer le PIN overlay si ouvert */
+      document.getElementById('pin-overlay').classList.remove('open','frozen-mode');
+    }
     return;
   }
-  if(BLOCK_ERRORS.indexOf(err)>=0){ showBlockScreen(err); return; }
+  S.snap=normSnap((data&&data.data)?data.data:data);
+  S.viewMode='cards'; S.selectedKey=null;
+  renderAll();
+};
+
+window.GN_SetPlayerName=function(name){
+  S.playerName=name;
+  var a=document.getElementById('player-name');
+  var b=document.getElementById('info-player-name');
+  if(a)a.textContent=name;
+  if(b)b.textContent=name;
+};
+
+window.GN_HandleResult=function(payload){
+  payload=payload||{};
+  var action=String(payload.action||'');
+  var err=String(payload.error||'');
+
+  /* PIN requis — ouvrir l'écran de saisie */
+  if(action==='pin_required'){ openPinPrompt(payload); return; }
+
+  /* Compte gelé côté serveur — écran frozen avec temps restant */
+  if(action==='atm_locked_temp'||(action==='pin_auth'&&err==='pin_locked')){
+    var uid=_getPinCardUid();
+    var remaining=tonumber_safe(payload.remaining)||30;
+    /* Figer localement avec le temps restant du serveur */
+    if(!PIN_STATE.frozen[uid]){
+      PIN_STATE.frozen[uid]=Math.floor(Date.now()/1000)-(PIN_FREEZE_SECONDS-remaining);
+    }
+    PIN_STATE.waiting=false;
+    document.getElementById('pin-overlay').classList.add('open');
+    _showFrozenMode(uid);
+    notify('Compte temporairement gelé (PIN). Réessayez dans '+remaining+'s.','error');
+    return;
+  }
+
+  /* PIN requis pour ajouter une carte (pin_auth_required) */
+  if(err==='pin_auth_required'){
+    notify(ERR_MAP.pin_auth_required,'error');
+    return;
+  }
+
+  /* Erreurs compte bloqué / gelé */
+  if(BLOCK_ERRORS.indexOf(err)>=0){
+    showBlockScreen(err);
+    document.getElementById('pin-overlay').classList.remove('open','frozen-mode');
+    return;
+  }
+
+  /* PIN incorrect — uses attempts_left from server if available */
   if(action==='pin_auth'&&!payload.ok){
     PIN_STATE.waiting=false;
+    var left=payload.attempts_left;
+    if(typeof left==='number'&&left>=0){
+      /* Le serveur donne le vrai nombre de tentatives restantes */
+      var uid2=_getPinCardUid();
+      PIN_STATE.attempts[uid2]=PIN_MAX_ATTEMPTS-left;
+    }
     pinAuthFailed();
     return;
   }
+
+  /* PIN validé — fermer l'overlay et rafraîchir */
   if(action==='pin_auth'&&payload.ok){
-    /* Succès — fermer l'overlay PIN */
     closePinPrompt();
+    notify('Carte ajoutée au gestionnaire.','success');
     setTimeout(function(){ bridgeSend('refresh',{}); },200);
     return;
   }
-  if(payload.ok){ notify('Action réussie.','success'); setTimeout(function(){ bridgeSend('refresh',{}); },300); return; }
-  notify('Erreur ATM: '+err,'error');
+
+  /* Actions réussies */
+  if(payload.ok){
+    /* card_config : mode spécifique */
+    if(action==='card_config'){
+      var mode=String(payload.mode||'');
+      if(mode==='upgrade') notify('Upgrade carte effectué.','success');
+      else if(mode==='rename') notify('Carte renommée.','success');
+      else notify('Limite temporaire activée (30 min).','success');
+    } else {
+      notify(SUCCESS_MSGS[action]||'Action ATM réussie.','success');
+    }
+    setTimeout(function(){ bridgeSend('refresh',{}); },300);
+    return;
+  }
+
+  /* Erreur — map ou message brut */
+  notify(ERR_MAP[err]||('Erreur ATM: '+err),'error');
 };
+
 window.GN_OpenPinPrompt=function(payload){ openPinPrompt(payload||{}); };
+
+/* Petit helper tonumber safe pour JS */
+function tonumber_safe(v){ var n=parseFloat(v); return isNaN(n)?null:n; }
+
+/* ===== INIT SCREEN — animation Stellar Drift avant création ===== */
+var _initAnimFrame=null;
+var _initOverflow=false;
+var _initOverflowStart=0;
+
+function _initStartOverflow(){
+  _initOverflow=true;
+  _initOverflowStart=Date.now()/1000;
+  var canvas=document.getElementById('stars-canvas');
+  var progress=document.getElementById('init-progress');
+  var btn=document.getElementById('init-btn');
+  var hint=document.getElementById('init-hint');
+  if(btn){ btn.disabled=true; btn.style.opacity='0.4'; }
+  if(hint) hint.style.display='none';
+  if(progress){ progress.style.display='block'; }
+
+  var steps=[
+    {p:0.1,t:'INITIALIZING...'},
+    {p:0.35,t:'CONNEXION AU RÉSEAU GENESIS...'},
+    {p:0.65,t:'ATTRIBUTION DE L\'IDENTITÉ NUMÉRIQUE...'},
+    {p:0.9,t:'SÉCURISATION DES PROTOCOLES PIN...'}
+  ];
+
+  var interval=setInterval(function(){
+    var elapsed=(Date.now()/1000)-_initOverflowStart;
+    var pct=Math.min(elapsed/6,1);
+    if(progress){
+      var stepText='INITIALISATION SÉCURISÉE : '+Math.ceil(pct*100)+'%';
+      for(var i=0;i<steps.length;i++){
+        if(pct>=steps[i].p) stepText=steps[i].t+' ('+Math.ceil(pct*100)+'%)';
+      }
+      progress.textContent=stepText;
+    }
+    if(pct>=1){
+      clearInterval(interval);
+      bridgeSend('card_create',{label:'Compte Principal',pin:1234});
+    }
+  },50);
+}
 
 (function(){
   S.snap=null; S.playerName=''; S.viewMode='cards'; S.selectedKey=null;
   document.getElementById('dashboard').style.display='none';
   document.getElementById('init-screen').classList.remove('open');
-  /* Bouton principal init screen */
+
+  /* Bouton principal init screen → lance l'animation Overflow puis CARD_CREATE */
   var initBtn=document.getElementById('init-btn');
-  if(initBtn) initBtn.addEventListener('click',function(){ bridgeSend('card_create',{label:'Compte Principal',pin:1234}); });
-  /* Lien hint "Ouvrir un compte" */
+  if(initBtn) initBtn.addEventListener('click',function(){ if(!_initOverflow) _initStartOverflow(); });
+
+  /* Lien hint */
   var hintLink=document.getElementById('init-hint-link');
-  if(hintLink) hintLink.addEventListener('click',function(){ bridgeSend('card_create',{label:'Compte Principal',pin:1234}); });
+  if(hintLink) hintLink.addEventListener('click',function(){ if(!_initOverflow) _initStartOverflow(); });
 })();
 </script>
 </body>
