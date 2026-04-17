@@ -1644,19 +1644,6 @@ function renderPinNumpad(){
   document.getElementById('pin-numpad').innerHTML=html;
 }
 
-  var frozenOv=document.getElementById('pin-frozen-overlay');
-  var frozenBadge=document.getElementById('pin-frozen-badge');
-  var isFrozen=_isCardFrozen();
-  if(frozenOv) frozenOv.className='pin-frozen-overlay'+(isFrozen?' show':'');
-  if(frozenBadge) frozenBadge.className='pin-frozen-badge'+(isFrozen?' show':'');
-  var attBar=document.getElementById('pin-attempts-bar');
-  if(attBar){
-    var left=_getAttemptsLeft(); var html='';
-    for(var i=0;i<PIN_MAX_ATTEMPTS;i++) html+='<div class="pin-att-dot '+(i<left?'ok':'used')+'"></div>';
-    attBar.innerHTML=html; attBar.style.display=isFrozen?'none':'flex';
-  }
-}
-
 function pinKey(k){
   if(k==='Annuler'){
     _clearCountdown();
