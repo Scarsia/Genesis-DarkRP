@@ -1130,16 +1130,21 @@ function selectCard(key){
 }
 
 function _refreshInvoicesForCard(){
-  var c=getSelectedCard(); if(!c) return;
+  var c=getSelectedCard();
+  /* En session groupe sans carte sélectionnée, prendre la première carte groupe dispo */
+  if(!c && S.isGroupSession && S.snap){
+    var gCards=S.snap.cards_group||[];
+    if(gCards.length) c=gCards[0];
+  }
+  if(!c) return;
   var iban=String(c.iban||'');
   var gid=Number(c.group_id||0);
-  /* Demander la liste de factures au serveur pour cette carte */
+  if(!iban) return;
+  /* Demander les factures au serveur pour cette carte */
   bridgeSend('invoice_action',{action:'list'});
-  /* Demander les domiciliations filtrées par l'IBAN de la carte */
-  if(iban){
-    S._lastDomiciliationIban=iban;
-    bridgeSend('domiciliation_list',{iban:iban,group_id:gid,mode:'both'});
-  }
+  /* Domiciliations filtrées par l'IBAN */
+  S._lastDomiciliationIban=iban;
+  bridgeSend('domiciliation_list',{iban:iban,group_id:gid,mode:'both'});
 }
 
 function renderContent(){
@@ -1196,9 +1201,17 @@ function renderTxList(area){
       } else {
         /* Carte perso : filtrer par IBAN de la carte */
         var txCardIban=String(txMeta.card_iban||tx.iban||'').toLowerCase();
-        if(txCardIban && txCardIban!==cardIban) pass=false;
-        /* Exclure les tx de groupes complètement de la vue perso */
-        if(txMeta.scope==='group') pass=false;
+        /* La tx appartient à cette carte si card_iban correspond */
+        if(txCardIban && txCardIban!==cardIban){
+          pass=false;
+        } else if(!txCardIban && txMeta.scope==='group'){
+          /* Tx de groupe sans card_iban : exclure SAUF si c'est un virement entrant
+             vers cet IBAN (ex: groupe → carte perso du même joueur) */
+          var txCounterIban=String(tx.counterparty_iban||'').toLowerCase();
+          var txTargetIban=String(txMeta.target_iban||'').toLowerCase();
+          var isIncoming=(tx.txn_type||'').indexOf('transfer_in')!==-1 || (tx.txn_type||'').indexOf('invoice_payment')!==-1;
+          if(!isIncoming) pass=false; /* Exclure uniquement les tx sortantes groupe */
+        }
       }
     }
     
@@ -2601,6 +2614,8 @@ window.GN_SetSnapshot=function(data){
       if(!found) S.selectedKey=null; /* La carte n'est plus dispo, on déselectionne */
     }
   }
+  /* Recharger les factures/domiciliations pour la carte courante après tout nouveau snapshot */
+  setTimeout(function(){ _refreshInvoicesForCard(); }, 150);
   renderAll();
 };
 
