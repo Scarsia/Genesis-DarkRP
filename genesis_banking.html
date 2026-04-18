@@ -1751,6 +1751,8 @@ function renderInvoices(area){
       +'<button class="mbtn" id="dom-submit-btn" style="margin-top:8px;">Créer la domiciliation</button></div>';
   }
 
+  area.innerHTML='<div class="inv-panel">'+tabs+'<div id="inv-list" style="overflow-y:auto;flex:1;">'+body+'</div></div>';
+
   /* Interactions gérées en délégation sur #content-area pour rester stables après plusieurs re-renders. */
 }
 
