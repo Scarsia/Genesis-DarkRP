@@ -841,16 +841,92 @@ function escapeHtml(raw){
 }
 function asNumber(v){ v=Number(v||0); return isNaN(v)?0:v; }
 function isNegativeBalance(v){ return asNumber(v)<0; }
+function fmtBalance(v){ return (isNegativeBalance(v)?'-':'') + fmt(v); }
+function toKey(v){ return String(v==null?'':v).trim().toLowerCase(); }
+function pushUniqueValue(arr, value){
+  value=toKey(value);
+  if(!value) return;
+  for(var i=0;i<arr.length;i++){ if(arr[i]===value) return; }
+  arr.push(value);
+}
+function listHasValue(arr, value){
+  value=toKey(value);
+  if(!value) return false;
+  for(var i=0;i<arr.length;i++){ if(arr[i]===value) return true; }
+  return false;
+}
+function getTxIbanCandidates(tx){
+  var out=[]; var meta=(tx&&tx.metadata)||{};
+  pushUniqueValue(out, tx&&tx.iban);
+  pushUniqueValue(out, tx&&tx.counterparty_iban);
+  pushUniqueValue(out, meta.card_iban);
+  pushUniqueValue(out, meta.group_iban);
+  pushUniqueValue(out, meta.target_iban);
+  pushUniqueValue(out, meta.source_iban);
+  pushUniqueValue(out, meta.sender_iban);
+  pushUniqueValue(out, meta.beneficiary_iban);
+  pushUniqueValue(out, meta.issuer_iban);
+  pushUniqueValue(out, meta.creator_iban);
+  pushUniqueValue(out, meta.source_group_iban);
+  pushUniqueValue(out, meta.target_group_iban);
+  return out;
+}
+function txMatchesCardIban(tx, cardIban){
+  if(!cardIban) return false;
+  return listHasValue(getTxIbanCandidates(tx), cardIban);
+}
+function txBelongsToCard(tx, card){
+  if(!card) return true;
+  var meta=(tx&&tx.metadata)||{};
+  var scope=String(card.scope||'personal');
+  var cardIban=toKey(card.iban);
+  var cardGroupId=Number(card.group_id||0);
+  var cardSubgroupId=Number(card.subgroup_id||0);
+  var txScope=String(meta.scope||'').toLowerCase();
+
+  if(scope==='subgroup'){
+    var subgroupIds=[Number(meta.subgroup_id||0), Number(meta.source_subgroup_id||0), Number(meta.target_subgroup_id||0)];
+    var hasSubgroupId=false;
+    for(var si=0;si<subgroupIds.length;si++){
+      if(subgroupIds[si]>0){
+        hasSubgroupId=true;
+        if(subgroupIds[si]===cardSubgroupId) return true;
+      }
+    }
+    if(hasSubgroupId) return false;
+    return txMatchesCardIban(tx, cardIban);
+  }
+
+  if(scope==='group'){
+    var groupIds=[Number(meta.group_id||0), Number(meta.source_group_id||0), Number(meta.target_group_id||0)];
+    var hasGroupId=false;
+    for(var gi=0;gi<groupIds.length;gi++){
+      if(groupIds[gi]>0){
+        hasGroupId=true;
+        if(groupIds[gi]===cardGroupId){
+          if(txScope==='personal' && !txMatchesCardIban(tx, cardIban) && Number(meta.group_id||0)!==cardGroupId){
+            return false;
+          }
+          return true;
+        }
+      }
+    }
+    if(hasGroupId) return false;
+    return txMatchesCardIban(tx, cardIban);
+  }
+
+  return txMatchesCardIban(tx, cardIban);
+}
 function toggleClass(el, cls, enabled){ if(!el) return; if(enabled) el.classList.add(cls); else el.classList.remove(cls); }
 function setBalanceText(el, amount, suffix, negClass){
   if(!el) return;
-  el.textContent=fmt(amount)+(suffix||'');
+  el.textContent=fmtBalance(amount)+(suffix||'');
   toggleClass(el, negClass||'bal-neg', isNegativeBalance(amount));
 }
 function balanceHtml(amount, className, negativeClass, suffix){
   var cls=className||'';
   if(isNegativeBalance(amount) && negativeClass) cls+=(cls?' ':'')+negativeClass;
-  return '<span'+(cls?' class="'+cls+'"':'')+'>'+fmt(amount)+(suffix||'')+'</span>';
+  return '<span'+(cls?' class="'+cls+'"':'')+'>'+fmtBalance(amount)+(suffix||'')+'</span>';
 }
 function renderActionPills(container, buttons){
   if(!container) return;
@@ -880,7 +956,7 @@ function buildSidebarStandardRow(card, key, isSel, meta){
     +'</div>'
     +'<div style="display:flex;justify-content:space-between;align-items:center;">'
       +'<div><div class="cr-iban">'+escapeHtml(String(card.iban||''))+'</div><div class="cr-label">'+escapeHtml(name)+'</div></div>'
-      +'<div class="cr-bal'+(isSel?' sel-bal':'')+(negative?' neg-bal':'')+'">'+fmt(card.balance||0)+'</div>'
+      +'<div class="cr-bal'+(isSel?' sel-bal':'')+(negative?' neg-bal':'')+'">'+fmtBalance(card.balance||0)+'</div>'
     +'</div>'
   +'</div>';
 }
@@ -897,7 +973,7 @@ function buildSidebarSubgroupRow(card, key, isSel, meta){
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">'
       +'<div class="cr-label" style="font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;">'+escapeHtml(sgName)+'</div>'
       +'<div style="text-align:right;flex-shrink:0;margin-left:8px;">'
-        +'<div class="cr-bal'+(isSel?' sel-bal':'')+(negative?' neg-bal':'')+'">'+fmt(card.balance||0)+'</div>'
+        +'<div class="cr-bal'+(isSel?' sel-bal':'')+(negative?' neg-bal':'')+'">'+fmtBalance(card.balance||0)+'</div>'
         +'<div style="font-size:9px;color:#5a6880;">'+memberCount+' salarié'+(memberCount>1?'s':'')+'</div>'
       +'</div>'
     +'</div>'
@@ -905,7 +981,7 @@ function buildSidebarSubgroupRow(card, key, isSel, meta){
 }
 function buildTransferSourceRow(card, key, isSel){
   var negative=isNegativeBalance(card.balance);
-  return '<div class="csel-row'+(isSel?' on':'')+(negative?' neg':'')+'" data-ckey="'+escapeHtml(key)+'"><div><div style="font-size:10px;font-weight:500;color:#c0c4d4;">'+escapeHtml(card.iban||'')+'</div><div style="font-size:9px;color:#6a7890;">'+escapeHtml(card.label||card.group_name||'')+'</div></div><div class="csel-balance'+(negative?' neg':'')+'" style="font-size:10px;color:#8892a8;">'+fmt(card.balance||0)+'</div></div>';
+  return '<div class="csel-row'+(isSel?' on':'')+(negative?' neg':'')+'" data-ckey="'+escapeHtml(key)+'"><div><div style="font-size:10px;font-weight:500;color:#c0c4d4;">'+escapeHtml(card.iban||'')+'</div><div style="font-size:9px;color:#6a7890;">'+escapeHtml(card.label||card.group_name||'')+'</div></div><div class="csel-balance'+(negative?' neg':'')+'" style="font-size:10px;color:#8892a8;">'+fmtBalance(card.balance||0)+'</div></div>';
 }
 
 function normTx(tx){
@@ -1228,42 +1304,9 @@ function renderTxList(area){
       else if(S.activeFilter==='transfer') pass=type.indexOf('transfer')!==-1;
     }
 
-    /* Filtre par carte sélectionnée */
-    if(pass && cardIban){
-      var txMeta = tx.metadata || {};
-      if(cardScope==='subgroup' && cardSubgroupId>0){
-        /* Sous-groupe : filtrer strictement par subgroup_id */
-        var txSubId=Number(txMeta.subgroup_id||0);
-        if(txSubId!==cardSubgroupId){
-          /* Fallback : si pas de subgroup_id, on accepte les tx du groupe parent */
-          var txGrpId=Number(txMeta.group_id||0);
-          if(txGrpId!==cardGroupId) pass=false;
-        }
-      } else if(cardScope==='group' && cardGroupId>0){
-        /* Carte groupe : filtrer UNIQUEMENT par group_id (pas source_group_id pour éviter
-           les tx perso du payeur d'une facture qui ont source_group_id dans leurs métadonnées) */
-        var txGroupId=Number(txMeta.group_id||0);
-        var txGroupIban=String(txMeta.group_iban||'').toLowerCase();
-        var txScope=String(txMeta.scope||'');
-        /* Exclure les tx de scope perso même si elles ont une référence groupe */
-        if(txScope==='personal') pass=false;
-        else if(txGroupId>0 && txGroupId!==cardGroupId) pass=false;
-        else if(!txGroupId && txGroupIban && txGroupIban!==cardIban) pass=false;
-      } else {
-        /* Carte perso : filtrer par IBAN de la carte */
-        var txCardIban=String(txMeta.card_iban||tx.iban||'').toLowerCase();
-        /* La tx appartient à cette carte si card_iban correspond */
-        if(txCardIban && txCardIban!==cardIban){
-          pass=false;
-        } else if(!txCardIban && txMeta.scope==='group'){
-          /* Tx de groupe sans card_iban : exclure SAUF si c'est un virement entrant
-             vers cet IBAN (ex: groupe → carte perso du même joueur) */
-          var txCounterIban=String(tx.counterparty_iban||'').toLowerCase();
-          var txTargetIban=String(txMeta.target_iban||'').toLowerCase();
-          var isIncoming=(tx.txn_type||'').indexOf('transfer_in')!==-1 || (tx.txn_type||'').indexOf('invoice_payment')!==-1;
-          if(!isIncoming) pass=false; /* Exclure uniquement les tx sortantes groupe */
-        }
-      }
+    /* Filtre par carte sélectionnée : strict par identifiants de la carte active */
+    if(pass && selectedCard){
+      pass=txBelongsToCard(tx, selectedCard);
     }
     
     if(pass){txs.push(tx);txIndices.push(i);}
@@ -1292,7 +1335,7 @@ function renderTxList(area){
         }
       }
       else if(type==='deposit'){title='Dépôt';sub='Espèces';} else if(type==='withdraw'){title='Retrait';sub='Espèces';}
-      rows+='<div class="tx-row" data-txidx="'+realIdx+'"><div class="tx-left"><div class="tx-datebox"><div class="tx-day">'+tx.date+'</div><div class="tx-mon">'+tx.month+'</div></div><div><div class="tx-title">'+escapeHtml(title)+'</div><div class="tx-sub">'+escapeHtml(sub)+'</div></div></div><div class="tx-right"><div style="text-align:right;"><div class="tx-amt '+(pos?'pos':'neg')+'">'+(pos?'+':'-')+' '+fmt(tx.amount)+'</div><div class="tx-bal'+(isNegativeBalance(tx.balance_after)?' neg':'')+'">Solde: '+fmt(tx.balance_after||0)+'</div></div><svg class="tx-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div></div>';
+      rows+='<div class="tx-row" data-txidx="'+realIdx+'"><div class="tx-left"><div class="tx-datebox"><div class="tx-day">'+tx.date+'</div><div class="tx-mon">'+tx.month+'</div></div><div><div class="tx-title">'+escapeHtml(title)+'</div><div class="tx-sub">'+escapeHtml(sub)+'</div></div></div><div class="tx-right"><div style="text-align:right;"><div class="tx-amt '+(pos?'pos':'neg')+'">'+(pos?'+':'-')+' '+fmt(tx.amount)+'</div><div class="tx-bal'+(isNegativeBalance(tx.balance_after)?' neg':'')+'">Solde: '+fmtBalance(tx.balance_after||0)+'</div></div><svg class="tx-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div></div>';
     }
   }
   area.innerHTML='<div class="tx-panel"><div class="tx-hdr"><span class="lxs">HISTORIQUE DES TRANSACTIONS</span><button class="tx-refresh" id="tx-refresh-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>Actualiser</button></div><div id="tx-list">'+rows+'</div></div>';
@@ -1652,7 +1695,7 @@ function openTxModal(idx){
   var txid = String(tx.id || idx);
   while(txid.length < 6) txid = '0' + txid;
 
-  var details=[{k:'Date',v:fmtDate(tx.created_at)||(tx.date+' '+tx.month)},{k:'Type',v:tx.txn_type||'—'},{k:pos?'De':'Vers', v:pos?(meta.sender_name||meta.source_group_name||'—'):(meta.beneficiary_name||meta.target_name||'—')},{k:'Référence',v:'#TX-'+txid},{k:'Solde après',v:fmt(tx.balance_after||0)+'.00'}];
+  var details=[{k:'Date',v:fmtDate(tx.created_at)||(tx.date+' '+tx.month)},{k:'Type',v:tx.txn_type||'—'},{k:pos?'De':'Vers', v:pos?(meta.sender_name||meta.source_group_name||'—'):(meta.beneficiary_name||meta.target_name||'—')},{k:'Référence',v:'#TX-'+txid},{k:'Solde après',v:fmtBalance(tx.balance_after||0)+'.00'}];
   if(meta.comment) details.push({k:'Motif',v:meta.comment});
   
   var dHtml = '';
@@ -1827,7 +1870,7 @@ function doGroupInfo(){
   if(c) openModal(mTitle('INFOS ENTREPRISE')
     +'<div class="mrow"><span class="k">Groupe</span><span class="v">'+escapeHtml(c.group_name||'—')+'</span></div>'
     +'<div class="mrow"><span class="k">IBAN</span><span class="v">'+escapeHtml(c.iban||'—')+'</span></div>'
-    +'<div class="mrow"><span class="k">Solde</span><span class="v'+(isNegativeBalance(c.balance)?' neg':'')+'">'+fmt(c.balance||0)+'</span></div>');
+    +'<div class="mrow"><span class="k">Solde</span><span class="v'+(isNegativeBalance(c.balance)?' neg':'')+'">'+fmtBalance(c.balance||0)+'</span></div>');
 }
 function doManageMembers(){
   var c=getSelectedCard(); var m=(c?getMeta(c).members||[]:[]); var html='';
@@ -2216,7 +2259,6 @@ function doCardSettings(){
 
   /* Historique d'activité à partir des transactions */
   var txs=(S.snap?S.snap.transactions||[]:[]);
-  var cardIban=String(card.iban||'').toLowerCase();
   var events=[];
   var now=Math.floor(Date.now()/1000);
 
@@ -2226,8 +2268,7 @@ function doCardSettings(){
   /* Filtrer les transactions de cette carte pour extraire les événements pertinents */
   for(var i=0;i<txs.length&&events.length<8;i++){
     var tx=txs[i]; var type=String(tx.txn_type||'').toLowerCase();
-    var txIban=String(tx.iban||'').toLowerCase();
-    if(cardIban&&txIban&&txIban!==cardIban) continue;
+    if(!txBelongsToCard(tx, card)) continue;
     var ts=tx.created_at||0;
     if(type.indexOf('pin')!==-1||type==='pin_change'){
       events.push({dot:'pin',label:'Modification du PIN',sub:'Code d\'accès modifié',ts:ts,badge:'warn'});
