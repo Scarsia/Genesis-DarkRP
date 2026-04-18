@@ -893,25 +893,24 @@ function renderSidebar(){
   var btnNew=document.getElementById('btn-new-account');
   if(btnNew){ if(!canNew) btnNew.classList.add('disabled'); else btnNew.classList.remove('disabled'); }
 
-  /* Tabs dynamiques selon le mode session */
+  /* Tabs : STRICT selon la session en cours */
   var hasGroups=(snap.cards_group||[]).length>0;
   var hasSubgroups=(snap.cards_subgroups||[]).length>0;
-  var hasInvoices=((snap.invoices_received||[]).length+(snap.invoices_sent||[]).length)>0||hasGroups;
   var tabs;
   if(S.isGroupSession){
-    /* Session carte groupe : uniquement onglets groupe */
+    /* Session carte groupe : UNIQUEMENT onglets groupe, jamais Mes Cartes */
     tabs=[];
     if(hasGroups)    tabs.push({k:'groups',    l:'Groupes'});
     if(hasSubgroups) tabs.push({k:'subgroups', l:'Sous-Groupes'});
     tabs.push({k:'invoices',l:'Factures'});
-    /* Forcer le viewMode sur groupes si on est encore sur cards */
     if(S.viewMode==='cards') S.viewMode='groups';
   } else {
-    /* Session carte personnelle : onglets selon contenu */
-    tabs=[{k:'cards',l:'Mes Cartes',show:true}];
-    if(hasGroups)               tabs.push({k:'groups',    l:'Groupes'});
-    if(hasSubgroups)            tabs.push({k:'subgroups', l:'Sous-Groupes'});
-    if(hasInvoices||hasGroups)  tabs.push({k:'invoices',  l:'Factures'});
+    /* Session carte personnelle : UNIQUEMENT Mes Cartes + Factures reçues perso
+       On n'affiche PAS les onglets groupe même si le joueur possède des groupes */
+    tabs=[{k:'cards',l:'Mes Cartes'}];
+    /* Factures : uniquement si le joueur a des factures reçues/envoyées sur sa carte */
+    var hasPersonalInvoices=((snap.invoices_received||[]).length+(snap.invoices_sent||[]).length)>0;
+    if(hasPersonalInvoices) tabs.push({k:'invoices',l:'Factures'});
   }
   var tabHtml='';
   for(var t=0;t<tabs.length;t++){
@@ -928,12 +927,49 @@ function renderSidebar(){
 
   var html='';
   for(var i=0;i<shown.length;i++){
-    var c=shown[i]; var k=cardKey(c); var isSel=k===S.selectedKey; var scope=c.scope||'personal'; var meta=getMeta(c); var isVerif=meta.is_verified;
-    var tier=getCardTier(c.card_number||''); var tierLabel=tier.toUpperCase(); var scopeLabel=scope==='group'?(isVerif?'ENTREPRISE':'GROUPE'):scope==='subgroup'?'DÉPARTEMENT':'PERSONNEL';
-    var name=scope==='group'?c.group_name:scope==='subgroup'?c.subgroup_name:(c.label||'');
-    var subIbans=meta.subgroup_ibans||[];
-    var balOrCount=scope==='subgroup'?subIbans.length+' salarié'+(subIbans.length>1?'s':''):fmt(c.balance||0);
-    html+='<div class="card-row'+(isSel?' sel':'')+'" data-ckey="'+k+'"><div class="cr-top"><span class="cr-scope'+(isSel?' on':'')+'">'+tierLabel+' · '+scopeLabel+'</span>'+(isVerif?'<span class="cr-verified">✔ VÉRIFIÉ</span>':'')+'</div><div style="display:flex;justify-content:space-between;align-items:center;"><div><div class="cr-iban">'+c.iban+'</div><div class="cr-label">'+name+'</div></div><div class="cr-bal'+(isSel?' sel-bal':'')+'">'+balOrCount+'</div></div></div>';
+    var c=shown[i]; var k=cardKey(c); var isSel=k===S.selectedKey;
+    var scope=c.scope||'personal'; var meta=getMeta(c); var isVerif=meta.is_verified;
+    var tier=getCardTier(c.card_number||'',meta);
+    var tierLabel=tier.toUpperCase();
+    var scopeLabel=scope==='group'?(isVerif?'ENTREPRISE':'GROUPE'):scope==='subgroup'?'DÉPARTEMENT':'PERSONNEL';
+    
+    if(scope==='subgroup'){
+      /* Layout spécial sous-groupe : nom département + groupe parent + nb salariés */
+      var sgName=String(c.subgroup_name||c.label||'Département');
+      var parentName=String(c.group_name||meta.group_name||'');
+      var subIbans=meta.subgroup_ibans||[];
+      var memberCount=subIbans.length;
+      var solde=fmt(c.balance||0);
+      html+='<div class="card-row'+(isSel?' sel':'')+'" data-ckey="'+k+'">'
+        +'<div class="cr-top">'
+          +'<span class="cr-scope'+(isSel?' on':'')+'">'+tierLabel+' · DÉPARTEMENT</span>'
+          +(isVerif?'<span class="cr-verified">✔</span>':'')
+        +'</div>'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-top:2px;">'
+          +'<div style="min-width:0;flex:1;">'
+            +'<div class="cr-label" style="font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+sgName+'</div>'
+            +'<div style="font-size:9.5px;color:#5a6880;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+parentName+'</div>'
+          +'</div>'
+          +'<div style="text-align:right;flex-shrink:0;margin-left:8px;">'
+            +'<div class="cr-bal'+(isSel?' sel-bal':'')+'">'+solde+'</div>'
+            +'<div style="font-size:9px;color:#5a6880;">'+memberCount+' salarié'+(memberCount>1?'s':'')+'</div>'
+          +'</div>'
+        +'</div>'
+      +'</div>';
+    } else {
+      var name=scope==='group'?c.group_name:(c.label||'');
+      var ibanShort=String(c.iban||'');
+      html+='<div class="card-row'+(isSel?' sel':'')+'" data-ckey="'+k+'">'
+        +'<div class="cr-top">'
+          +'<span class="cr-scope'+(isSel?' on':'')+'">'+tierLabel+' · '+scopeLabel+'</span>'
+          +(isVerif?'<span class="cr-verified">✔ VÉRIFIÉ</span>':'')
+        +'</div>'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;">'
+          +'<div><div class="cr-iban">'+ibanShort+'</div><div class="cr-label">'+name+'</div></div>'
+          +'<div class="cr-bal'+(isSel?' sel-bal':'')+'">'+fmt(c.balance||0)+'</div>'
+        +'</div>'
+      +'</div>';
+    }
   }
   list.innerHTML=html;
   var rows=document.querySelectorAll('[data-ckey]');
@@ -1059,7 +1095,9 @@ function renderTxList(area){
   var txs=[]; var txIndices=[];
   
   var selectedCard = getSelectedCard();
-  var cardIban = selectedCard ? String(selectedCard.iban || '').toLowerCase() : '';
+  var cardScope = selectedCard ? String(selectedCard.scope||'personal') : 'personal';
+  var cardIban = selectedCard ? String(selectedCard.iban||'').toLowerCase() : '';
+  var cardGroupId = selectedCard ? Number(selectedCard.group_id||0) : 0;
   
   for(var i=0; i<allTxs.length; i++){
     var tx = allTxs[i];
@@ -1067,10 +1105,27 @@ function renderTxList(area){
     if(S.activeFilter==='deposit') pass=type==='deposit'; 
     else if(S.activeFilter==='withdraw') pass=type==='withdraw'; 
     else if(S.activeFilter==='transfer') pass=type.indexOf('transfer')!==-1;
-    
-    // FILTRE STRICT : On ne montre que les transactions liées à la carte active (si IBAN dispo)
-    if (cardIban && tx.iban && String(tx.iban).toLowerCase() !== cardIban) {
-        pass = false;
+
+    /* Filtre par carte sélectionnée */
+    if(pass && cardIban){
+      var txMeta = tx.metadata || {};
+      if(cardScope==='group' && cardGroupId>0){
+        /* Carte groupe : on filtre par group_id dans les métadonnées */
+        var txGroupId=Number(txMeta.group_id||txMeta.source_group_id||0);
+        if(txGroupId!==cardGroupId){
+          /* Fallback IBAN groupe */
+          var txGroupIban=String(txMeta.group_iban||txMeta.source_group_iban||'').toLowerCase();
+          if(txGroupIban!==cardIban) pass=false;
+        }
+      } else {
+        /* Carte perso : filtrer par IBAN de la carte OU metadata.card_iban */
+        var txCardIban=String(txMeta.card_iban||tx.iban||'').toLowerCase();
+        var txCounterIban=String(tx.counterparty_iban||'').toLowerCase();
+        /* On accepte si la tx appartient à cette carte */
+        if(txCardIban && txCardIban!==cardIban) pass=false;
+        /* Exclure les tx de groupes complètement */
+        if(txMeta.scope==='group') pass=false;
+      }
     }
     
     if(pass){txs.push(tx);txIndices.push(i);}
@@ -1083,7 +1138,21 @@ function renderTxList(area){
       var realIdx=txIndices[fi]; var pos=(tx.amount||0)>=0; var type=String(tx.txn_type||'').toLowerCase();
       var isNeg=!pos||type==='withdraw'||type==='transfer_out'||type.indexOf('fee')!==-1||type.indexOf('payment')!==-1; if(isNeg) pos=false;
       var meta=tx.metadata||{}; var title=tx.description||type; var sub='Transaction';
-      if(type.indexOf('transfer')!==-1){ sub='Virement instantané'; if(isNeg) title=meta.beneficiary_name||meta.target_name||tx.counterparty_iban||title; else title=meta.source_group_name||meta.sender_name||title; if(meta.source_group_name&&meta.source_group_verified) title+=' LLC.'; }
+      if(type.indexOf('transfer')!==-1){
+        sub='Virement instantané';
+        if(isNeg){
+          /* Virement sortant : afficher le destinataire */
+          title=meta.beneficiary_name||meta.target_name||tx.counterparty_iban||title;
+        } else {
+          /* Virement entrant : afficher l'émetteur */
+          var senderName=meta.source_group_name||meta.sender_name||title;
+          /* LLC. uniquement si l'émetteur EST une entreprise vérifiée (scope group) */
+          if(meta.source_group_name&&meta.source_group_verified&&meta.source_scope==='group'){
+            senderName+=meta.source_group_tier==='amex'?' Inc.':meta.source_group_tier==='mastercard'?' LLC.':' Co.';
+          }
+          title=senderName;
+        }
+      }
       else if(type==='deposit'){title='Dépôt';sub='Espèces';} else if(type==='withdraw'){title='Retrait';sub='Espèces';}
       rows+='<div class="tx-row" data-txidx="'+realIdx+'"><div class="tx-left"><div class="tx-datebox"><div class="tx-day">'+tx.date+'</div><div class="tx-mon">'+tx.month+'</div></div><div><div class="tx-title">'+title+'</div><div class="tx-sub">'+sub+'</div></div></div><div class="tx-right"><div style="text-align:right;"><div class="tx-amt '+(pos?'pos':'neg')+'">'+(pos?'+':'-')+' '+fmt(tx.amount)+'</div><div class="tx-bal">Solde: '+fmt(tx.balance_after||0)+'</div></div><svg class="tx-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div></div>';
     }
@@ -1980,12 +2049,30 @@ function doCardSettings(){
 }
 
 function doCreateInvoice(){
-  var iban=String(document.getElementById('inv-iban').value||'').trim(); var amt=Math.floor(Number(document.getElementById('inv-amount').value||0)); var desc=String(document.getElementById('inv-desc').value||'').trim(); var grp=document.getElementById('inv-group');
-  var gid=null;
+  var iban=String(document.getElementById('inv-iban').value||'').trim();
+  var amt=Math.floor(Number(document.getElementById('inv-amount').value||0));
+  var desc=String(document.getElementById('inv-desc').value||'').trim();
+  var grp=document.getElementById('inv-group');
+  var gid=0;
+  var giban='';
   if(grp&&S.snap&&S.snap.cards_group&&S.snap.cards_group[Number(grp.value)]){
     gid=S.snap.cards_group[Number(grp.value)].group_id;
+    giban=S.snap.cards_group[Number(grp.value)].iban||'';
   }
-  if(iban&&amt>0&&desc){ bridgeSend('invoice_create',{target_iban:iban,amount:amt,description:desc,group_id:gid}); document.getElementById('inv-iban').value=''; document.getElementById('inv-amount').value=''; document.getElementById('inv-desc').value=''; }
+  if(!iban||iban.length<4){notify('IBAN destinataire requis.','error');return;}
+  if(amt<=0){notify('Montant invalide.','error');return;}
+  if(!desc){notify('Description requise.','error');return;}
+  /* Émetteur : groupe ou carte perso sélectionnée */
+  var creatorIban=giban;
+  if(!creatorIban){
+    var sel=getSelectedCard();
+    creatorIban=sel?String(sel.iban||''):'';
+  }
+  bridgeSend('invoice_create',{target_iban:iban,amount:amt,description:desc,group_id:gid,creator_iban:creatorIban,issuer_iban:creatorIban});
+  document.getElementById('inv-iban').value='';
+  document.getElementById('inv-amount').value='';
+  if(document.getElementById('inv-desc')) document.getElementById('inv-desc').value='';
+  notify('Facture en cours d\'émission…','info');
 }
 function doInvoiceAction(idx,mode){
   var list=(mode==='received'?(S.snap?S.snap.invoices_received:[]):(S.snap?S.snap.invoices_sent:[]));
@@ -2288,13 +2375,21 @@ window.GN_SetSnapshot=function(data){
     var err=String(data.error||'');
     if(BLOCK_ERRORS.indexOf(err)>=0){
       showBlockScreen(err);
-      /* Fermer le PIN overlay si ouvert */
       document.getElementById('pin-overlay').classList.remove('open','frozen-mode');
     }
     return;
   }
   S.snap=normSnap((data&&data.data)?data.data:data);
-  S.viewMode='cards'; S.selectedKey=null;
+  /* Réinitialiser la session — les onglets sont recalculés selon les cartes dispo */
+  /* isGroupSession n'est mis à true QUE par pin_auth avec is_group_card=true */
+  /* Si le snapshot arrive sans carte groupe sélectionnée, on repasse en mode perso */
+  if(!S.isGroupSession){
+    S.viewMode='cards';
+    S.selectedKey=null;
+  } else {
+    /* En session groupe, garder le viewMode courant sauf si on est sur 'cards' */
+    if(S.viewMode==='cards') S.viewMode='groups';
+  }
   renderAll();
 };
 
