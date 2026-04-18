@@ -115,7 +115,7 @@ button { cursor:pointer; }
 .main{display:flex;flex-direction:column;gap:8px;height:100%;overflow:hidden;min-height:0;}
 
 .hero{padding:16px;flex-shrink:0; z-index:10;}
-.hero-grid{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;}
+.hero-grid{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:flex-start;}
 
 .cc{width:200px;height:126px;border-radius:12px;position:relative;overflow:hidden;flex-shrink:0;}
 .cc-visa{background:linear-gradient(145deg,#0c1830 0%,#152060 55%,#080e24 100%);}
@@ -142,13 +142,13 @@ button { cursor:pointer; }
 .cc-verified-badge{font-size:8px;color:#22b960;letter-spacing:.5px;margin-top:1px;}
 .cc-expiry{font-size:7px;color:rgba(255,255,255,0.35);}
 
-.info-panel{display:flex;flex-direction:column;justify-content:space-between;height:126px; z-index:10;}
+.info-panel{display:flex;flex-direction:column;justify-content:space-between;min-height:118px;z-index:10;}
 .info-greet{font-size:11px;color:#6a7890;letter-spacing:1.5px;text-transform:uppercase;}
 .info-name{font-size:15px;font-weight:700;color:#e8eaf0;margin-top:2px;}
 .info-iban{font-size:10px;color:#5a6880;font-family:'Courier New',monospace;margin-top:2px;}
 .info-bal-lbl{font-size:10px;color:#6a7890;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;}
 .info-bal{font-size:22px;font-weight:900;color:#fff;line-height:1;letter-spacing:-.5px;}
-.cfg-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
+.cfg-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;max-width:100%;}
 .cfg-pill{padding:4px 10px;font-size:10.5px;border-radius:20px;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.07);color:#7a8498;transition:all .18s;cursor:pointer;}
 .cfg-pill:hover{background:rgba(255,255,255,0.06);color:#c0c4d0;border-color:rgba(255,255,255,0.12);}
 .cfg-pill.danger{color:#a04848;border-color:rgba(180,60,60,0.2);}
@@ -894,7 +894,10 @@ function renderSidebar(){
 
   var labels={cards:'PATRIMOINE PERSONNEL',groups:'TRÉSORERIE DES GROUPES',subgroups:'FONDS DÉPARTEMENTS',invoices:'FACTURES'};
   document.getElementById('bal-label').textContent=labels[S.viewMode]||'';
-  document.getElementById('sidebar-total').textContent=fmt(total);
+  /* Cacher le solde sur l'onglet Factures (pas de sens d'afficher un montant) */
+  var totalEl=document.getElementById('sidebar-total');
+  if(totalEl) totalEl.style.display=(S.viewMode==='invoices'?'none':'');
+  if(S.viewMode!=='invoices') document.getElementById('sidebar-total').textContent=fmt(total);
   document.getElementById('stat-cards').textContent=(snap.personal_cards_count||0)+'/'+(snap.max_personal_cards||3);
   document.getElementById('stat-groups').textContent=(snap.cards_group||[]).length;
   document.getElementById('stat-sub').textContent=(snap.cards_subgroups||[]).length;
@@ -1263,9 +1266,10 @@ function renderInvoices(area){
     +'<button class="itb'+(mode==='received'?' on':'')+'" data-invtab="received">Reçues <span style="font-size:9px;opacity:.5;">('+received.length+')</span></button>'
     +'<button class="itb'+(mode==='sent'?' on':'')+'" data-invtab="sent">Envoyées <span style="font-size:9px;opacity:.5;">('+sent.length+')</span></button>'
     +'<button class="itb'+(mode==='domiciliations'?' on':'')+'" data-invtab="domiciliations">Domiciliations <span style="font-size:9px;opacity:.5;">('+domPayer.length+')</span></button>'
+    /* Onglets entreprise uniquement en session groupe */
     +(isGroup?'<button class="itb'+(mode==='issuer'?' on':'')+'" data-invtab="issuer">Entreprise</button>':'')
-    +'<button class="itb'+(mode==='create'?' on':'')+'" data-invtab="create">+ Facture</button>'
-    +'<button class="itb'+(mode==='dom_create'?' on':'')+'" data-invtab="dom_create">+ Domiciliation</button>'
+    +(isGroup?'<button class="itb'+(mode==='create'?' on':'')+'" data-invtab="create">+ Facture</button>':'')
+    +(isGroup?'<button class="itb'+(mode==='dom_create'?' on':'')+'" data-invtab="dom_create">+ Domiciliation</button>':'')
   +'</div>';
 
   var body='';
@@ -2301,14 +2305,22 @@ function renderPinCard(){
   document.getElementById('pin-cc-number').textContent=c.card_number||'•••• •••• •••• ••••';
   document.getElementById('pin-cc-name').textContent=(c.label||c.group_name||'').toUpperCase();
   var scope=c.scope||'personal';
-  document.getElementById('pin-cc-type').textContent=scope==='group'?'GROUPE':scope==='subgroup'?'DÉPARTEMENT':'PERSONNEL';
+  var isGroup=c.is_group_card||scope==='group'||scope==='subgroup';
+  var typeLabel=isGroup?(c.is_verified?'ENTREPRISE':'GROUPE'):'PERSONNEL';
+  document.getElementById('pin-cc-type').textContent=typeLabel;
   var meta=c.metadata||{}; if(typeof meta==='string'){try{meta=JSON.parse(meta);}catch(e){meta={};}}
   var badge=document.getElementById('pin-cc-badge');
-  if(badge) badge.style.display=(meta.is_verified?'block':'none');
+  if(badge) badge.style.display=((c.is_verified||meta.is_verified)?'block':'none');
   var lbl=document.getElementById('pin-card-label');
   if(lbl) lbl.textContent=(c.label||c.group_name||c.iban||'Carte');
 
-  var tier=getCardTier(c.card_number||'');
+  /* Tier : utiliser group_tier pour cartes groupe, sinon déduire du numéro */
+  var tier=getCardTier(c.card_number||'', meta);
+  /* Pour cartes groupe sans numéro formaté, forcer depuis group_tier */
+  if(isGroup && (!c.card_number || c.card_number.indexOf('GR')===0)){
+    var gt=String(meta.group_tier||c.card_tier||'visa');
+    if(gt==='mastercard'||gt==='amex') tier=gt;
+  }
   var pinCc=document.getElementById('pin-cc');
   if(pinCc){
     pinCc.className='pin-cc pin-cc-'+tier+(_isCardFrozen()?' frozen':'');
