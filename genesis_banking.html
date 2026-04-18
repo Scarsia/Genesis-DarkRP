@@ -1188,16 +1188,19 @@ function renderTxList(area){
         var txSubId=Number(txMeta.subgroup_id||0);
         if(txSubId!==cardSubgroupId){
           /* Fallback : si pas de subgroup_id, on accepte les tx du groupe parent */
-          var txGrpId=Number(txMeta.group_id||txMeta.source_group_id||0);
+          var txGrpId=Number(txMeta.group_id||0);
           if(txGrpId!==cardGroupId) pass=false;
         }
       } else if(cardScope==='group' && cardGroupId>0){
-        /* Carte groupe : filtrer par group_id */
-        var txGroupId=Number(txMeta.group_id||txMeta.source_group_id||0);
-        if(txGroupId!==cardGroupId){
-          var txGroupIban=String(txMeta.group_iban||txMeta.source_group_iban||'').toLowerCase();
-          if(txGroupIban!==cardIban) pass=false;
-        }
+        /* Carte groupe : filtrer UNIQUEMENT par group_id (pas source_group_id pour éviter
+           les tx perso du payeur d'une facture qui ont source_group_id dans leurs métadonnées) */
+        var txGroupId=Number(txMeta.group_id||0);
+        var txGroupIban=String(txMeta.group_iban||'').toLowerCase();
+        var txScope=String(txMeta.scope||'');
+        /* Exclure les tx de scope perso même si elles ont une référence groupe */
+        if(txScope==='personal') pass=false;
+        else if(txGroupId>0 && txGroupId!==cardGroupId) pass=false;
+        else if(!txGroupId && txGroupIban && txGroupIban!==cardIban) pass=false;
       } else {
         /* Carte perso : filtrer par IBAN de la carte */
         var txCardIban=String(txMeta.card_iban||tx.iban||'').toLowerCase();
@@ -1408,14 +1411,19 @@ function renderInvoices(area){
   /* ── Panel entreprise (issuer) — toutes factures et domiciliations émises ── */
   if(mode==='issuer'){
     var selCard2=getSelectedCard();
-    var selGroupIban2=selCard2?String(selCard2.iban||'').toUpperCase():'';
-    /* Toutes les factures envoyées (pas de filtre de statut) */
+    var selGroupIban2=selCard2?String(selCard2.iban||'').toUpperCase().replace(/\s/g,''):'';
+    /* Toutes les factures envoyées : filtrer par IBAN normalisé */
     var issuerFactures=[];
     for(var fi2=0;fi2<sent.length;fi2++){
       var si=sent[fi2];
-      var siIban=String(si.creator_iban||'').toUpperCase();
-      if(!selGroupIban2||siIban===selGroupIban2) issuerFactures.push(si);
+      var siIban=String(si.creator_iban||'').toUpperCase().replace(/\s/g,'');
+      /* Si pas d'IBAN de carte sélectionnée ou si ça correspond → inclure */
+      if(!selGroupIban2||siIban===selGroupIban2||siIban.indexOf(selGroupIban2)!==-1||selGroupIban2.indexOf(siIban)!==-1){
+        issuerFactures.push(si);
+      }
     }
+    /* Fallback : si aucune facture trouvée avec le filtre, montrer tout */
+    if(!issuerFactures.length && sent.length>0) issuerFactures=sent;
     /* Toutes les domiciliations émises */
     var issuerDoms=domIssuer;
 
