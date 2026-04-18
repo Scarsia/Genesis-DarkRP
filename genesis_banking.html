@@ -1117,9 +1117,29 @@ function renderQuickActions(card){
 }
 
 function selectCard(key){
-  S.selectedKey=key; var cards=getCards(S.snap);
-  for(var i=0;i<cards.length;i++){ if(cardKey(cards[i])===key&&(cards[i].scope||'personal')==='group'){ S.activeGroupID=cards[i].group_id; break; } }
+  S.selectedKey=key;
+  var cards=getCards(S.snap);
+  for(var i=0;i<cards.length;i++){
+    if(cardKey(cards[i])===key&&(cards[i].scope||'personal')==='group'){
+      S.activeGroupID=cards[i].group_id; break;
+    }
+  }
+  /* Recharger les factures et domiciliations pour la nouvelle carte */
+  _refreshInvoicesForCard();
   renderAll();
+}
+
+function _refreshInvoicesForCard(){
+  var c=getSelectedCard(); if(!c) return;
+  var iban=String(c.iban||'');
+  var gid=Number(c.group_id||0);
+  /* Demander la liste de factures au serveur pour cette carte */
+  bridgeSend('invoice_action',{action:'list'});
+  /* Demander les domiciliations filtrées par l'IBAN de la carte */
+  if(iban){
+    S._lastDomiciliationIban=iban;
+    bridgeSend('domiciliation_list',{iban:iban,group_id:gid,mode:'both'});
+  }
 }
 
 function renderContent(){
@@ -1136,12 +1156,13 @@ function renderTxList(area){
   var cardScope = selectedCard ? String(selectedCard.scope||'personal') : 'personal';
   var cardIban = selectedCard ? String(selectedCard.iban||'').toLowerCase() : '';
   var cardGroupId = selectedCard ? Number(selectedCard.group_id||0) : 0;
+  var cardSubgroupId = selectedCard ? Number(selectedCard.subgroup_id||0) : 0;
   
   for(var i=0; i<allTxs.length; i++){
     var tx = allTxs[i];
     var type=String(tx.txn_type||'').toLowerCase(); var pass=true;
 
-    /* Masquer les transactions techniques (création/suppression de carte) */
+    /* Masquer les transactions techniques */
     if(type==='card_create'||type==='card_delete'||type==='admin_card_delete'||
        type.indexOf('card_creat')!==-1||type.indexOf('card_delet')!==-1||
        type.indexOf('admin_adjust')!==-1){
@@ -1157,8 +1178,16 @@ function renderTxList(area){
     /* Filtre par carte sélectionnée */
     if(pass && cardIban){
       var txMeta = tx.metadata || {};
-      if((cardScope==='group' || cardScope==='subgroup') && cardGroupId>0){
-        /* Cartes groupe / sous-groupe : filtrer par group_id dans les métadonnées */
+      if(cardScope==='subgroup' && cardSubgroupId>0){
+        /* Sous-groupe : filtrer strictement par subgroup_id */
+        var txSubId=Number(txMeta.subgroup_id||0);
+        if(txSubId!==cardSubgroupId){
+          /* Fallback : si pas de subgroup_id, on accepte les tx du groupe parent */
+          var txGrpId=Number(txMeta.group_id||txMeta.source_group_id||0);
+          if(txGrpId!==cardGroupId) pass=false;
+        }
+      } else if(cardScope==='group' && cardGroupId>0){
+        /* Carte groupe : filtrer par group_id */
         var txGroupId=Number(txMeta.group_id||txMeta.source_group_id||0);
         if(txGroupId!==cardGroupId){
           var txGroupIban=String(txMeta.group_iban||txMeta.source_group_iban||'').toLowerCase();
@@ -1278,18 +1307,23 @@ function renderInvoices(area){
   var domPayer=doms.payer||[];
   var domIssuer=doms.issuer||[];
 
-  /* Onglets */
+  /* Onglets : simplifiés selon session */
   var isGroup=S.isGroupSession||(getSelectedCard()&&(getSelectedCard().scope||'personal')==='group');
-  /* Bug5: Envoyées uniquement en session groupe */
+  /* En session groupe, basculer automatiquement sur Entreprise */
+  if(isGroup && (mode==='received'||mode==='sent'||mode==='domiciliations')){
+    S.invSubMode=mode='issuer';
+  }
   if(mode==='sent'&&!isGroup) S.invSubMode=mode='received';
-  var tabs='<div class="inv-tabs">'
-    +'<button class="itb'+(mode==='received'?' on':'')+' " data-invtab="received">Reçues <span style="font-size:9px;opacity:.5;">('+received.length+')</span></button>'
-    +(isGroup?'<button class="itb'+(mode==='sent'?' on':'')+' " data-invtab="sent">Envoyées <span style="font-size:9px;opacity:.5;">('+sent.length+')</span></button>':'')
-    +'<button class="itb'+(mode==='domiciliations'?' on':'')+' " data-invtab="domiciliations">Domiciliations <span style="font-size:9px;opacity:.5;">('+domPayer.length+')</span></button>'
-    +(isGroup?'<button class="itb'+(mode==='issuer'?' on':'')+' " data-invtab="issuer">Entreprise</button>':'')
-    +(isGroup?'<button class="itb'+(mode==='create'?' on':'')+' " data-invtab="create">+ Facture</button>':'')
-    +(isGroup?'<button class="itb'+(mode==='dom_create'?' on':'')+' " data-invtab="dom_create">+ Domiciliation</button>':'')
-  +'</div>';
+  var tabs='<div class="inv-tabs">';
+  if(!isGroup){
+    tabs+='<button class="itb'+(mode==='received'?' on':'')+' " data-invtab="received">Reçues <span style="font-size:9px;opacity:.5;">('+received.length+')</span></button>';
+    tabs+='<button class="itb'+(mode==='domiciliations'?' on':'')+' " data-invtab="domiciliations">Domiciliations <span style="font-size:9px;opacity:.5;">('+domPayer.length+')</span></button>';
+  } else {
+    tabs+='<button class="itb'+(mode==='issuer'?' on':'')+' " data-invtab="issuer">Factures & Domiciliations</button>';
+    tabs+='<button class="itb'+(mode==='create'?' on':'')+' " data-invtab="create">+ Facture</button>';
+    tabs+='<button class="itb'+(mode==='dom_create'?' on':'')+' " data-invtab="dom_create">+ Domiciliation</button>';
+  }
+  tabs+='</div>';
 
   var body='';
 
@@ -1358,28 +1392,57 @@ function renderInvoices(area){
     }
   }
 
-  /* ── Panel entreprise (issuer) ── */
+  /* ── Panel entreprise (issuer) — toutes factures et domiciliations émises ── */
   if(mode==='issuer'){
-    var issuerHtml='<div style="margin-bottom:14px;"><div class="lxs" style="margin-bottom:8px;">FACTURES EN COURS</div>';
-    var pendingSent=[];
-    for(var i=0;i<sent.length;i++){ if(sent[i].status==='pending') pendingSent.push(sent[i]); }
-    if(!pendingSent.length) issuerHtml+='<div class="tx-empty">Aucune facture en cours.</div>';
-    else for(var i=0;i<pendingSent.length;i++){
-      var inv=pendingSent[i];
-      issuerHtml+='<div class="dom-row" style="cursor:default;">'
-        +'<div class="dom-dot active"></div>'
-        +'<div class="dom-info">'
-          +'<div class="dom-iban">'+String(inv.target_iban||'')+'</div>'
-          +'<div class="dom-desc">'+String(inv.description||'')+'</div>'
-          +'<div class="dom-meta">'+fmtDate(inv.created_at)+' · #'+String(inv.id||i+1)+'</div>'
-        +'</div>'
-        +'<div class="dom-right"><div class="dom-amt" style="color:#22b960;">+ '+fmt(inv.amount||0)+'</div>'
-        +'<span class="inv-status inv-pending">EN ATTENTE</span></div></div>';
+    var selCard2=getSelectedCard();
+    var selGroupIban2=selCard2?String(selCard2.iban||'').toUpperCase():'';
+    /* Toutes les factures envoyées (pas de filtre de statut) */
+    var issuerFactures=[];
+    for(var fi2=0;fi2<sent.length;fi2++){
+      var si=sent[fi2];
+      var siIban=String(si.creator_iban||'').toUpperCase();
+      if(!selGroupIban2||siIban===selGroupIban2) issuerFactures.push(si);
+    }
+    /* Toutes les domiciliations émises */
+    var issuerDoms=domIssuer;
+
+    var issuerHtml='';
+    /* Section factures */
+    issuerHtml+='<div style="margin-bottom:16px;"><div class="lxs" style="margin-bottom:8px;">FACTURES ('+issuerFactures.length+')</div>';
+    if(!issuerFactures.length){
+      issuerHtml+='<div class="tx-empty">Aucune facture émise.</div>';
+    } else {
+      for(var ifi=0;ifi<issuerFactures.length;ifi++){
+        var inv2=issuerFactures[ifi];
+        var sc2=inv2.status||'pending';
+        var scCls2=sc2==='paid'?'inv-paid':sc2==='refused'||sc2==='cancelled'?'inv-refused':'inv-pending';
+        var scLbl2=sc2==='paid'?'PAYÉE':sc2==='refused'?'REFUSÉE':sc2==='cancelled'?'ANNULÉE':'EN ATTENTE';
+        var im2=inv2.metadata||{};if(typeof im2==='string'){try{im2=JSON.parse(im2);}catch(e){im2={};}}
+        var tName=String(inv2.target_iban||'');
+        var clickFact=sc2==='pending';
+        issuerHtml+='<div class="dom-row" style="'+(clickFact?'cursor:pointer;':'cursor:default;')+'" data-fact-idx="'+ifi+'">'
+          +'<div class="dom-dot '+(sc2==='paid'?'active':sc2==='refused'||sc2==='cancelled'?'cancelled':'blocked')+'"></div>'
+          +'<div class="dom-info">'
+            +'<div class="dom-iban">'+tName+'</div>'
+            +'<div class="dom-desc">'+String(inv2.description||'')+'</div>'
+            +'<div class="dom-meta">'+fmtDate(inv2.created_at)+' · #'+String(inv2.id||ifi+1)+'</div>'
+          +'</div>'
+          +'<div class="dom-right">'
+            +'<div class="dom-amt" style="color:#22b960;">+ '+fmt(inv2.amount||0)+'</div>'
+            +'<span class="inv-status '+scCls2+'">'+scLbl2+'</span>'
+            +(clickFact?'<div class="dom-actions"><button class="dom-btn cancel" data-fact-cancel-idx="'+ifi+'">Annuler</button></div>':'')
+          +'</div>'
+        +'</div>';
+      }
     }
     issuerHtml+='</div>';
-    issuerHtml+='<div style="margin-bottom:14px;"><div class="lxs" style="margin-bottom:8px;">DOMICILIATIONS ÉMISES</div>';
-    if(!domIssuer.length) issuerHtml+='<div class="tx-empty">Aucune domiciliation émise.</div>';
-    else for(var i=0;i<domIssuer.length;i++) issuerHtml+=_buildDomRow(domIssuer[i],i,true);
+    /* Section domiciliations */
+    issuerHtml+='<div><div class="lxs" style="margin-bottom:8px;">DOMICILIATIONS ÉMISES ('+issuerDoms.length+')</div>';
+    if(!issuerDoms.length){
+      issuerHtml+='<div class="tx-empty">Aucune domiciliation émise.</div>';
+    } else {
+      for(var idi=0;idi<issuerDoms.length;idi++) issuerHtml+=_buildDomRow(issuerDoms[idi],idi,true);
+    }
     issuerHtml+='</div>';
     body=issuerHtml;
   }
@@ -1418,6 +1481,20 @@ function renderInvoices(area){
       +'<input class="minput" id="dom-interval-hours" type="number" min="1" value="720" style="margin-top:6px;" placeholder="Heures">'
       +'</div>'
       +'<button class="mbtn" id="dom-submit-btn" style="margin-top:8px;">Créer la domiciliation</button></div>';
+  }
+
+  /* Listeners annulation facture dans panel issuer */
+  var factCancelBtns=area.querySelectorAll('[data-fact-cancel-idx]');
+  for(var fc=0;fc<factCancelBtns.length;fc++){
+    (function(btn){ btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      var idx=Number(btn.getAttribute('data-fact-cancel-idx'));
+      var selC=getSelectedCard(); var selGIban=selC?String(selC.iban||'').toUpperCase():'';
+      var sents2=(S.snap&&S.snap.invoices_sent)||[];
+      var filtered2=sents2.filter(function(x){ return !selGIban||String(x.creator_iban||'').toUpperCase()===selGIban; });
+      var inv2=filtered2[idx];
+      if(inv2) bridgeSend('invoice_action',{action:'cancel',invoice_id:inv2.id});
+    }); })(factCancelBtns[fc]);
   }
 
   area.innerHTML='<div class="inv-panel">'+tabs+'<div id="inv-list" style="overflow-y:auto;flex:1;">'+body+'</div></div>';
