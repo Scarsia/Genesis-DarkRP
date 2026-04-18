@@ -827,7 +827,7 @@ button { cursor:pointer; }
   /* Notif stack position stays correct regardless of zoom */
   window._uiZoom = zoom;
 })();
-var S = { snap: null, selectedKey: null, viewMode: 'cards', activeGroupID: null, playerName: '', isAdmin: false, transferSourceKey: null, activeFilter: 'all', invSubMode: 'received', isGroupSession: false, groupSessionCards: [] };
+var S = { snap: null, selectedKey: null, viewMode: 'cards', activeGroupID: null, playerName: '', isAdmin: false, transferSourceKey: null, activeFilter: 'all', invSubMode: 'received', isGroupSession: false, groupSessionCards: [], sessionGroupID: null };
 
 function fmt(v){ return '$' + Math.round(Math.abs(v)).toLocaleString('fr-FR'); }
 
@@ -1050,16 +1050,61 @@ function cardKey(card){
   if(scope==='subgroup') return 'subgroup:'+(card.group_id||0)+':'+(card.subgroup_id||0);
   return 'personal:'+(card.card_uid||card.card_id||card.id||0);
 }
+function getSessionGroupID(){
+  var gid=Number(S.sessionGroupID||0);
+  if(gid>0) return gid;
+  if(!S.isGroupSession) return 0;
+  var c=null;
+  if(S.snap){
+    var scopedGroups=getScopedGroupCards(S.snap);
+    if(scopedGroups.length) c=scopedGroups[0];
+    if(!c){
+      var scopedSubgroups=getScopedSubgroupCards(S.snap);
+      if(scopedSubgroups.length) c=scopedSubgroups[0];
+    }
+  }
+  return c?Number(c.group_id||0):0;
+}
+function cardVisibleInSession(card){
+  if(!card) return false;
+  var scope=String(card.scope||'personal');
+  if(!S.isGroupSession) return true;
+  if(scope!=='group' && scope!=='subgroup') return false;
+  var sessionGroupID=Number(S.sessionGroupID||0);
+  if(sessionGroupID<=0) return true;
+  return Number(card.group_id||0)===sessionGroupID;
+}
+function getScopedGroupCards(snap){
+  var groups=(snap&&snap.cards_group)||[];
+  if(!S.isGroupSession) return groups;
+  var out=[]; var sessionGroupID=Number(S.sessionGroupID||0);
+  if(sessionGroupID<=0) return groups;
+  for(var i=0;i<groups.length;i++){ if(Number(groups[i].group_id||0)===sessionGroupID) out.push(groups[i]); }
+  return out;
+}
+function getScopedSubgroupCards(snap){
+  var subgroups=(snap&&snap.cards_subgroups)||[];
+  if(!S.isGroupSession) return subgroups;
+  var out=[]; var sessionGroupID=Number(S.sessionGroupID||0);
+  if(sessionGroupID<=0) return subgroups;
+  for(var i=0;i<subgroups.length;i++){ if(Number(subgroups[i].group_id||0)===sessionGroupID) out.push(subgroups[i]); }
+  return out;
+}
 function getCards(snap){
   var out=[], seen={};
   function pushArr(arr){ 
       if(!arr) return; 
       for(var i=0; i<arr.length; i++) { 
+          if(!cardVisibleInSession(arr[i])) continue;
           var k=cardKey(arr[i]); 
           if(k && !seen[k]) { seen[k]=true; out.push(arr[i]); } 
       } 
   }
-  pushArr(snap.cards_personal); pushArr(snap.cards_group); pushArr(snap.cards_subgroups);
+  if(S.isGroupSession){
+    pushArr(getScopedGroupCards(snap)); pushArr(getScopedSubgroupCards(snap));
+  } else {
+    pushArr(snap.cards_personal); pushArr(snap.cards_group); pushArr(snap.cards_subgroups);
+  }
   return out;
 }
 function cardPassesView(card){
@@ -1087,7 +1132,11 @@ function notify(msg, level){
 
 function renderSidebar(){
   var snap=S.snap; var cards=getCards(snap);
+  var groupCards=getScopedGroupCards(snap);
+  var subgroupCards=getScopedSubgroupCards(snap);
+  var sessionGroupID=getSessionGroupID();
   var shown=[]; var total=0;
+  if(S.isGroupSession && sessionGroupID>0) S.activeGroupID=sessionGroupID;
   for(var i=0;i<cards.length;i++){
     if(cardPassesView(cards[i])){ shown.push(cards[i]); total+=(cards[i].balance||0); }
   }
@@ -1099,8 +1148,8 @@ function renderSidebar(){
   if(totalEl) totalEl.style.display=(S.viewMode==='invoices'?'none':'');
   if(S.viewMode!=='invoices') setBalanceText(document.getElementById('sidebar-total'), total, '', 'bal-neg');
   document.getElementById('stat-cards').textContent=(snap.personal_cards_count||0)+'/'+(snap.max_personal_cards||3);
-  document.getElementById('stat-groups').textContent=(snap.cards_group||[]).length;
-  document.getElementById('stat-sub').textContent=(snap.cards_subgroups||[]).length;
+  document.getElementById('stat-groups').textContent=groupCards.length;
+  document.getElementById('stat-sub').textContent=subgroupCards.length;
 
   var canNew=(Number(snap.personal_cards_count||0)<Number(snap.max_personal_cards||3));
   var btnNew=document.getElementById('btn-new-account');
@@ -1121,8 +1170,8 @@ function renderSidebar(){
   }
 
   /* Tabs : STRICT selon la session en cours */
-  var hasGroups=(snap.cards_group||[]).length>0;
-  var hasSubgroups=(snap.cards_subgroups||[]).length>0;
+  var hasGroups=groupCards.length>0;
+  var hasSubgroups=subgroupCards.length>0;
   var tabs;
   if(S.isGroupSession){
     /* Session carte groupe : UNIQUEMENT onglets groupe, jamais Mes Cartes */
@@ -1292,7 +1341,7 @@ function _refreshInvoicesForCard(){
   var c=getSelectedCard();
   /* En session groupe sans carte sélectionnée, prendre la première carte groupe dispo */
   if(!c && S.isGroupSession && S.snap){
-    var gCards=S.snap.cards_group||[];
+    var gCards=getScopedGroupCards(S.snap);
     if(gCards.length) c=gCards[0];
   }
   if(!c) return;
@@ -1596,7 +1645,7 @@ function renderInvoices(area){
 
   /* ── Créer une facture ── */
   if(mode==='create'){
-    var groupCards=snap.cards_group||[]; var groupOpts='';
+    var groupCards=getScopedGroupCards(snap); var groupOpts='';
     if(groupCards.length){ for(var i=0;i<groupCards.length;i++) groupOpts+='<option value="'+i+'">'+String(groupCards[i].group_name||'')+'</option>'; }
     else { groupOpts='<option value="">Aucun groupe disponible</option>'; }
     body='<div class="inv-create-form">'
@@ -1610,7 +1659,7 @@ function renderInvoices(area){
   /* ── Créer une domiciliation ── */
   if(mode==='dom_create'){
     var card=getSelectedCard(); var cardIban=card?String(card.iban||''):'';
-    var groupCards2=snap.cards_group||[]; var gOpts='';
+    var groupCards2=getScopedGroupCards(snap); var gOpts='';
     if(groupCards2.length){ for(var i=0;i<groupCards2.length;i++) gOpts+='<option value="'+i+'">'+String(groupCards2[i].group_name||'')+'</option>'; }
     body='<div class="dom-create-form">'
       +'<div class="mfield"><div class="mlabel">IBAN du payeur (à prélever)</div><input class="minput mono" id="dom-payer-iban" placeholder="GN-XXXX-XXXX" autocomplete="off"></div>'
@@ -1704,7 +1753,7 @@ function renderInvoices(area){
     var desc=String((document.getElementById('dom-desc')||{}).value||'').trim();
     var hours=Number((document.getElementById('dom-interval-hours')||{}).value||720);
     var grpEl=document.getElementById('dom-issuer-group');
-    var grpCards=snap.cards_group||[];
+    var grpCards=getScopedGroupCards(snap);
     var issuerIban=''; var issuerGid=0;
     if(grpEl&&grpCards[Number(grpEl.value)]){
       issuerIban=grpCards[Number(grpEl.value)].iban||'';
@@ -2401,9 +2450,10 @@ function doCreateInvoice(){
   var grp=document.getElementById('inv-group');
   var gid=0;
   var giban='';
-  if(grp&&S.snap&&S.snap.cards_group&&S.snap.cards_group[Number(grp.value)]){
-    gid=S.snap.cards_group[Number(grp.value)].group_id;
-    giban=S.snap.cards_group[Number(grp.value)].iban||'';
+  var scopedGroupCards=(S.snap?getScopedGroupCards(S.snap):[]);
+  if(grp&&scopedGroupCards[Number(grp.value)]){
+    gid=scopedGroupCards[Number(grp.value)].group_id;
+    giban=scopedGroupCards[Number(grp.value)].iban||'';
   }
   if(!iban||iban.length<4){notify('IBAN destinataire requis.','error');return;}
   if(amt<=0){notify('Montant invalide.','error');return;}
@@ -2453,7 +2503,10 @@ document.getElementById('tab-bar').addEventListener('click',function(e){
     for(var i=0; i<tbs.length; i++) tbs[i].classList.remove('on');
     btn.classList.add('on'); 
     S.viewMode=btn.dataset.mode; 
-    if(S.viewMode==='subgroups'&&!S.activeGroupID&&S.snap&&S.snap.cards_group&&S.snap.cards_group.length) S.activeGroupID=S.snap.cards_group[0].group_id; 
+    if(S.viewMode==='subgroups'&&!S.activeGroupID&&S.snap){
+      var scopedGroupCards=getScopedGroupCards(S.snap);
+      if(scopedGroupCards.length) S.activeGroupID=scopedGroupCards[0].group_id;
+    } 
     S.selectedKey=null; 
     renderAll(); 
 });
@@ -2761,16 +2814,23 @@ window.GN_SetSnapshot=function(data){
   if(!S.snap.invoices_sent||!S.snap.invoices_sent.length)         S.snap.invoices_sent=prevInvSent;
 
   if(!S.isGroupSession){
+    S.sessionGroupID=null;
+    S.activeGroupID=null;
     S.viewMode='cards';
     S.selectedKey=null;
   } else {
     /* Session groupe : garder viewMode et selectedKey — l'utilisateur ne doit pas perdre sa navigation */
     if(S.viewMode==='cards') S.viewMode='groups';
+    if(Number(S.sessionGroupID||0)>0) S.activeGroupID=Number(S.sessionGroupID||0);
     /* Tenter de réappliquer la carte sélectionnée si elle est toujours dans les nouvelles cartes */
     if(prevKey){
       var cards=getCards(S.snap); var found=false;
       for(var i=0;i<cards.length;i++){ if(cardKey(cards[i])===prevKey){ found=true; break; } }
       if(!found) S.selectedKey=null; /* La carte n'est plus dispo, on déselectionne */
+    }
+    if(!S.selectedKey){
+      var scopedCards=getCards(S.snap);
+      if(scopedCards.length) S.selectedKey=cardKey(scopedCards[0]);
     }
   }
   /* Recharger les factures/domiciliations pour la carte courante après tout nouveau snapshot */
@@ -2847,12 +2907,19 @@ window.GN_HandleResult=function(payload){
   /* PIN validé — fermer l'overlay et rafraîchir */
   if(action==='pin_auth'&&payload.ok){
     closePinPrompt();
+    var pinCard=PIN_STATE.cards[PIN_STATE.idx]||null;
     /* Si c'est une carte groupe → mode groupe */
     if(payload.is_group_card){
+      var sessionGroupID=Number(payload.group_id||((payload.card||{}).group_id||((pinCard&&pinCard.group_id)||0))||0);
       S.isGroupSession=true;
+      S.sessionGroupID=sessionGroupID>0?sessionGroupID:null;
+      S.activeGroupID=S.sessionGroupID;
       S.viewMode='groups';
+      if(pinCard) S.selectedKey=cardKey(pinCard);
     } else {
       S.isGroupSession=false;
+      S.sessionGroupID=null;
+      S.activeGroupID=null;
     }
     notify('Carte ajoutée au gestionnaire.','success');
     setTimeout(function(){ bridgeSend('refresh',{}); },200);
