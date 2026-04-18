@@ -1277,7 +1277,7 @@ function renderSidebar(){
     html+=scope==='subgroup' ? buildSidebarSubgroupRow(c, k, isSel, meta) : buildSidebarStandardRow(c, k, isSel, meta);
   }
   list.innerHTML=html;
-  var rows=document.querySelectorAll('[data-ckey]');
+  var rows=list.querySelectorAll('[data-ckey]');
   for(var r=0;r<rows.length;r++){
     (function(row){ row.addEventListener('click',function(){ selectCard(row.getAttribute('data-ckey')); }); })(rows[r]);
   }
@@ -1751,97 +1751,9 @@ function renderInvoices(area){
       +'<button class="mbtn" id="dom-submit-btn" style="margin-top:8px;">Créer la domiciliation</button></div>';
   }
 
-  /* Listeners annulation facture dans panel issuer */
-  var factCancelBtns=area.querySelectorAll('[data-fact-cancel-idx]');
-  for(var fc=0;fc<factCancelBtns.length;fc++){
-    (function(btn){ btn.addEventListener('click',function(e){
-      e.stopPropagation();
-      var idx=Number(btn.getAttribute('data-fact-cancel-idx'));
-      var selC=getSelectedCard(); var selGIban=selC?String(selC.iban||'').toUpperCase():'';
-      var sents2=(S.snap&&S.snap.invoices_sent)||[];
-      var filtered2=sents2.filter(function(x){ return !selGIban||String(x.creator_iban||'').toUpperCase()===selGIban; });
-      var inv2=filtered2[idx];
-      if(inv2) bridgeSend('invoice_action',{action:'cancel',invoice_id:inv2.id});
-    }); })(factCancelBtns[fc]);
-  }
-
-  area.innerHTML='<div class="inv-panel">'+tabs+'<div id="inv-list" style="overflow-y:auto;flex:1;">'+body+'</div></div>';
-
-  /* Listeners tabs */
-  var itbs=area.querySelectorAll('[data-invtab]');
-  for(var t=0;t<itbs.length;t++){
-    (function(btn){ btn.addEventListener('click',function(){
-      var m=btn.getAttribute('data-invtab');
-      if(m==='domiciliations'||m==='issuer'){
-        var c=getSelectedCard();
-        if(c){ S._lastDomiciliationIban=c.iban||''; bridgeSend('domiciliation_list',{iban:c.iban||'',group_id:c.group_id||0,mode:'both'}); }
-      }
-      setInvTab(m);
-    }); })(itbs[t]);
-  }
-
-  /* Listeners invoice rows */
-  var invRows=area.querySelectorAll('[data-inv-idx]');
-  for(var r=0;r<invRows.length;r++){
-    (function(row){ 
-      if(row.classList.contains('inv-row-done')) return;
-      row.addEventListener('click',function(){ doInvoiceAction(Number(row.getAttribute('data-inv-idx')),mode); });
-    })(invRows[r]);
-  }
-
-  /* Listener invoice submit */
-  var subBtn=document.getElementById('inv-submit-btn');
-  if(subBtn) subBtn.addEventListener('click',doCreateInvoice);
-
-  /* Listeners domiciliation actions */
-  var domBtns=area.querySelectorAll('[data-dom-act]');
-  for(var d=0;d<domBtns.length;d++){
-    (function(btn){ btn.addEventListener('click',function(){
-      var idx=Number(btn.getAttribute('data-dom-idx'));
-      var act=String(btn.getAttribute('data-dom-act'));
-      var list=(mode==='issuer')?domIssuer:domPayer;
-      var dom=list[idx]; if(!dom) return;
-      bridgeSend('domiciliation_action',{domiciliation_id:dom.id||0,action:act});
-    }); })(domBtns[d]);
-  }
-
-  /* Interval buttons for dom_create */
-  var intBtns=area.querySelectorAll('[data-hours]');
-  for(var b=0;b<intBtns.length;b++){
-    (function(btn){ btn.addEventListener('click',function(){
-      var all=area.querySelectorAll('[data-hours]');
-      for(var x=0;x<all.length;x++) all[x].classList.remove('sel');
-      btn.classList.add('sel');
-      var el=document.getElementById('dom-interval-hours');
-      if(el) el.value=btn.getAttribute('data-hours');
-    }); })(intBtns[b]);
-  }
-
-  /* Submit domiciliation */
-  var domSubmit=document.getElementById('dom-submit-btn');
-  if(domSubmit) domSubmit.addEventListener('click',function(){
-    var payerIban=String((document.getElementById('dom-payer-iban')||{}).value||'').trim();
-    var amount=Math.floor(Number((document.getElementById('dom-amount')||{}).value||0));
-    var desc=String((document.getElementById('dom-desc')||{}).value||'').trim();
-    var hours=Number((document.getElementById('dom-interval-hours')||{}).value||720);
-    var grpEl=document.getElementById('dom-issuer-group');
-    var grpCards=getScopedGroupCards(snap);
-    var issuerIban=''; var issuerGid=0;
-    if(grpEl&&grpCards[Number(grpEl.value)]){
-      issuerIban=grpCards[Number(grpEl.value)].iban||'';
-      issuerGid=grpCards[Number(grpEl.value)].group_id||0;
-    }
-    if(!payerIban){notify('IBAN du payeur requis.','error');return;}
-    if(amount<=0){notify('Montant invalide.','error');return;}
-    if(!desc){notify('Description requise.','error');return;}
-    if(hours<1){notify('Intervalle invalide.','error');return;}
-    bridgeSend('domiciliation_create',{
-      issuer_iban:issuerIban,issuer_group_id:issuerGid,
-      payer_iban:payerIban,amount:amount,description:desc,interval_hours:hours
-    });
-    notify('Domiciliation en cours de création...','info');
-  });
+  /* Interactions gérées en délégation sur #content-area pour rester stables après plusieurs re-renders. */
 }
+
 function openTxModal(idx){
   var tx=(S.snap.transactions||[])[idx]; if(!tx) return;
   var pos=(tx.amount||0)>=0; var type=String(tx.txn_type||'').toLowerCase(); if(type==='withdraw'||type==='transfer_out') pos=false; var meta=tx.metadata||{};
@@ -1963,7 +1875,7 @@ function doTransfer(){
       closeModal();
     }), true);
   /* Attach csel click after modal open */
-  var rows=document.querySelectorAll('[data-ckey]');
+  var rows=list.querySelectorAll('[data-ckey]');
   for(var r=0;r<rows.length;r++){
     (function(row){ row.addEventListener('click',function(){
       if(row.getAttribute('data-locked')==='1'){ notify(getSpendBlockedMessage('effectuer un virement depuis ce compte'),'error'); return; }
@@ -2564,6 +2476,113 @@ function doInvoiceAction(idx,mode){
 }
 
 function setFilter(f){ S.activeFilter=f; renderQuickActions(getSelectedCard()); renderContent(); }
+
+function _findActionTarget(startEl, attrName, stopEl){
+  var el=startEl;
+  while(el && el!==stopEl){
+    if(el.getAttribute && el.getAttribute(attrName)!==null) return el;
+    el=el.parentNode;
+  }
+  return null;
+}
+
+document.getElementById('content-area').addEventListener('click',function(e){
+  var area=this;
+  var t=e.target||e.srcElement;
+  if(!t) return;
+
+  if(t.id==='inv-submit-btn'){
+    e.preventDefault();
+    doCreateInvoice();
+    return;
+  }
+
+  if(t.id==='dom-submit-btn'){
+    e.preventDefault();
+    var payerIban=String((document.getElementById('dom-payer-iban')||{}).value||'').trim();
+    var amount=Math.floor(Number((document.getElementById('dom-amount')||{}).value||0));
+    var desc=String((document.getElementById('dom-desc')||{}).value||'').trim();
+    var hours=Number((document.getElementById('dom-interval-hours')||{}).value||720);
+    var grpEl=document.getElementById('dom-issuer-group');
+    var grpCards=getScopedGroupCards(S.snap||{});
+    var issuerIban=''; var issuerGid=0;
+    if(grpEl&&grpCards[Number(grpEl.value)]){
+      issuerIban=grpCards[Number(grpEl.value)].iban||'';
+      issuerGid=grpCards[Number(grpEl.value)].group_id||0;
+    }
+    if(!payerIban){notify('IBAN du payeur requis.','error');return;}
+    if(amount<=0){notify('Montant invalide.','error');return;}
+    if(!desc){notify('Description requise.','error');return;}
+    if(hours<1){notify('Intervalle invalide.','error');return;}
+    bridgeSend('domiciliation_create',{
+      issuer_iban:issuerIban,issuer_group_id:issuerGid,
+      payer_iban:payerIban,amount:amount,description:desc,interval_hours:hours
+    });
+    notify('Domiciliation en cours de création...','info');
+    return;
+  }
+
+  var invTabBtn=_findActionTarget(t,'data-invtab',area);
+  if(invTabBtn){
+    var m=String(invTabBtn.getAttribute('data-invtab')||'');
+    if(m==='domiciliations'||m==='issuer'){
+      var c=getSelectedCard();
+      if(c){
+        S._lastDomiciliationIban=c.iban||'';
+        bridgeSend('domiciliation_list',{iban:c.iban||'',group_id:c.group_id||0,mode:'both'});
+      }
+    }
+    setInvTab(m);
+    return;
+  }
+
+  var factCancelBtn=_findActionTarget(t,'data-fact-cancel-idx',area);
+  if(factCancelBtn){
+    e.preventDefault();
+    e.stopPropagation();
+    var idx=Number(factCancelBtn.getAttribute('data-fact-cancel-idx'));
+    var selC=getSelectedCard();
+    var selGIban=selC?String(selC.iban||'').toUpperCase().replace(/\s/g,''):'';
+    var sents2=(S.snap&&S.snap.invoices_sent)||[];
+    var filtered2=[];
+    for(var si=0; si<sents2.length; si++){
+      var creatorIban=String(sents2[si].creator_iban||'').toUpperCase().replace(/\s/g,'');
+      if(!selGIban || creatorIban===selGIban) filtered2.push(sents2[si]);
+    }
+    var inv2=filtered2[idx];
+    if(inv2) bridgeSend('invoice_action',{action:'cancel',invoice_id:inv2.id});
+    return;
+  }
+
+  var domBtn=_findActionTarget(t,'data-dom-act',area);
+  if(domBtn){
+    e.preventDefault();
+    e.stopPropagation();
+    var idx2=Number(domBtn.getAttribute('data-dom-idx'));
+    var act=String(domBtn.getAttribute('data-dom-act')||'');
+    var list=(S.invSubMode==='issuer')?((S.domiciliations&&S.domiciliations.issuer)||[]):((S.domiciliations&&S.domiciliations.payer)||[]);
+    var dom=list[idx2];
+    if(dom) bridgeSend('domiciliation_action',{domiciliation_id:dom.id||0,action:act});
+    return;
+  }
+
+  var intervalBtn=_findActionTarget(t,'data-hours',area);
+  if(intervalBtn){
+    e.preventDefault();
+    var all=area.querySelectorAll('[data-hours]');
+    for(var x=0; x<all.length; x++) all[x].classList.remove('sel');
+    intervalBtn.classList.add('sel');
+    var hoursEl=document.getElementById('dom-interval-hours');
+    if(hoursEl) hoursEl.value=intervalBtn.getAttribute('data-hours');
+    return;
+  }
+
+  var invRow=_findActionTarget(t,'data-inv-idx',area);
+  if(invRow){
+    doInvoiceAction(Number(invRow.getAttribute('data-inv-idx')), S.invSubMode);
+    return;
+  }
+});
 
 document.getElementById('tab-bar').addEventListener('click',function(e){ 
     var btn = e.target;
