@@ -54,6 +54,8 @@ button { cursor:pointer; }
 .tb{flex:1;padding:6px 4px;font-size:10.5px;font-weight:500;color:#7a8898;background:transparent;border:0.5px solid transparent;border-radius:6px;transition:all .18s;letter-spacing:.03em;}
 .tb:hover{color:#a0aab8;}
 .tb.on{background:rgba(255,255,255,0.08);color:#e0e4ef;border-color:rgba(255,255,255,0.1);}
+.tb-label{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:0;}
+.tb-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 5px;border-radius:999px;background:rgba(212,168,48,0.16);border:0.5px solid rgba(212,168,48,0.34);color:#f0cf74;font-size:9px;font-weight:700;line-height:1;box-shadow:0 0 18px rgba(212,168,48,0.12);}
 
 .card-list{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:6px;min-height:0;}
 .card-row{background:rgba(255,255,255,0.025);border:0.5px solid rgba(255,255,255,0.05);border-radius:9px;padding:8px 10px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;flex-shrink:0;}
@@ -1121,6 +1123,49 @@ function getSelectedCard(){
   return null;
 }
 
+function getInvoiceBadgeTargetCards(snap){
+  var out=[], seen={};
+  function add(arr){
+    if(!arr) return;
+    for(var i=0;i<arr.length;i++){
+      var c=arr[i];
+      var k=cardKey(c);
+      if(k && !seen[k]){ seen[k]=true; out.push(c); }
+    }
+  }
+  if(S.isGroupSession){
+    add(getScopedGroupCards(snap));
+    add(getScopedSubgroupCards(snap));
+  } else {
+    add((snap&&snap.cards_personal)||[]);
+  }
+  return out;
+}
+function getPendingInvoiceBadgeCount(){
+  var snap=S.snap||{};
+  var received=snap.invoices_received||[];
+  if(!received||!received.length) return 0;
+  var cards=getInvoiceBadgeTargetCards(snap);
+  if(!cards.length) return 0;
+  var ibans={}, i, j;
+  for(i=0;i<cards.length;i++){
+    var iban=String((cards[i]&&cards[i].iban)||'').toUpperCase();
+    if(iban) ibans[iban]=true;
+  }
+  var count=0, seen={};
+  for(j=0;j<received.length;j++){
+    var inv=received[j]||{};
+    if(String(inv.status||'pending')!=='pending') continue;
+    var targetIban=String(inv.target_iban||'').toUpperCase();
+    if(!targetIban || !ibans[targetIban]) continue;
+    var invKey=String(inv.id||('pending:'+targetIban+':'+String(inv.amount||0)+':'+String(inv.created_at||j)));
+    if(seen[invKey]) continue;
+    seen[invKey]=true;
+    count++;
+  }
+  return count;
+}
+
 function notify(msg, level){
   level=level||'info';
   var stack=document.getElementById('notif-stack'); var el=document.createElement('div'); el.className='notif '+level;
@@ -1185,9 +1230,16 @@ function renderSidebar(){
     tabs=[{k:'cards',l:'Mes Cartes'}];
     tabs.push({k:'invoices',l:'Factures'});
   }
+  var invoiceBadgeCount=getPendingInvoiceBadgeCount();
   var tabHtml='';
   for(var t=0;t<tabs.length;t++){
-    tabHtml+='<button class="tb'+(S.viewMode===tabs[t].k?' on':'')+'" data-mode="'+tabs[t].k+'">'+tabs[t].l+'</button>';
+    var tab=tabs[t];
+    var labelHtml='<span class="tb-label">'+tab.l;
+    if(tab.k==='invoices' && invoiceBadgeCount>0){
+      labelHtml+=' <span class="tb-badge">'+invoiceBadgeCount+'</span>';
+    }
+    labelHtml+='</span>';
+    tabHtml+='<button class="tb'+(S.viewMode===tab.k?' on':'')+'" data-mode="'+tab.k+'">'+labelHtml+'</button>';
   }
   document.getElementById('tab-bar').innerHTML=tabHtml;
 
