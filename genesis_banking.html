@@ -532,10 +532,10 @@ button { cursor:pointer; }
         <div class="glass" style="padding:13px;flex-shrink:0;">
           <div class="lxs" id="bal-label"></div>
           <div class="bal-lg" id="sidebar-total"></div>
-          <div class="stats-row">
-            <div class="stat-item"><div class="stat-val" id="stat-cards"></div><div class="stat-label">Cartes</div></div>
-            <div class="stat-item"><div class="stat-val" id="stat-groups"></div><div class="stat-label">Groupes</div></div>
-            <div class="stat-item"><div class="stat-val" id="stat-sub"></div><div class="stat-label">Sous-groupes</div></div>
+          <div class="stats-row" id="stats-row">
+            <div class="stat-item" id="stat-item-cards"><div class="stat-val" id="stat-cards"></div><div class="stat-label">Cartes</div></div>
+            <div class="stat-item" id="stat-item-groups"><div class="stat-val" id="stat-groups"></div><div class="stat-label">Groupes</div></div>
+            <div class="stat-item" id="stat-item-sub"><div class="stat-val" id="stat-sub"></div><div class="stat-label">Sous-groupes</div></div>
           </div>
         </div>
 
@@ -628,9 +628,19 @@ button { cursor:pointer; }
                 <div class="info-greet">BIENVENUE,</div>
                 <div class="info-name" id="info-player-name"></div>
                 <div class="info-iban" id="info-iban"></div>
+                <!-- Infos groupe parent (visible seulement carte groupe/sous-groupe) -->
+                <div id="group-parent-info" style="display:none;margin-top:6px;padding:7px 10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;font-size:0;">
+                  <div id="gpi-label" style="font-size:9px;color:#5a6880;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px;"></div>
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <span id="gpi-name" style="font-size:11.5px;font-weight:600;color:#c0c4d4;"></span>
+                    <span id="gpi-iban" style="font-size:9.5px;color:#5a6880;font-family:'Courier New',monospace;"></span>
+                    <span id="gpi-members" style="font-size:9.5px;color:#6a7890;"></span>
+                    <span id="gpi-verified" style="display:none;font-size:9px;color:#22b960;border:1px solid rgba(34,185,96,0.3);border-radius:4px;padding:1px 6px;">✔ Vérifié</span>
+                  </div>
+                </div>
               </div>
               <div>
-                <div class="info-bal-lbl">SOLDE DISPONIBLE</div>
+                <div class="info-bal-lbl" id="info-bal-lbl">SOLDE DISPONIBLE</div>
                 <div class="info-bal" id="info-bal"></div>
                 <div class="cfg-pills" id="cfg-pills"></div>
               </div>
@@ -893,6 +903,20 @@ function renderSidebar(){
   var btnNew=document.getElementById('btn-new-account');
   if(btnNew){ if(!canNew) btnNew.classList.add('disabled'); else btnNew.classList.remove('disabled'); }
 
+  /* Stats sidebar : perso → cartes seulement ; groupe → groupes + sous-groupes */
+  var siCards=document.getElementById('stat-item-cards');
+  var siGroups=document.getElementById('stat-item-groups');
+  var siSub=document.getElementById('stat-item-sub');
+  if(S.isGroupSession){
+    if(siCards)  siCards.style.display='none';
+    if(siGroups) siGroups.style.display='';
+    if(siSub)    siSub.style.display='';
+  } else {
+    if(siCards)  siCards.style.display='';
+    if(siGroups) siGroups.style.display='none';
+    if(siSub)    siSub.style.display='none';
+  }
+
   /* Tabs : STRICT selon la session en cours */
   var hasGroups=(snap.cards_group||[]).length>0;
   var hasSubgroups=(snap.cards_subgroups||[]).length>0;
@@ -905,12 +929,9 @@ function renderSidebar(){
     tabs.push({k:'invoices',l:'Factures'});
     if(S.viewMode==='cards') S.viewMode='groups';
   } else {
-    /* Session carte personnelle : UNIQUEMENT Mes Cartes + Factures reçues perso
-       On n'affiche PAS les onglets groupe même si le joueur possède des groupes */
+    /* Session carte personnelle : Mes Cartes + Factures toujours disponible */
     tabs=[{k:'cards',l:'Mes Cartes'}];
-    /* Factures : uniquement si le joueur a des factures reçues/envoyées sur sa carte */
-    var hasPersonalInvoices=((snap.invoices_received||[]).length+(snap.invoices_sent||[]).length)>0;
-    if(hasPersonalInvoices) tabs.push({k:'invoices',l:'Factures'});
+    tabs.push({k:'invoices',l:'Factures'});
   }
   var tabHtml='';
   for(var t=0;t<tabs.length;t++){
@@ -998,44 +1019,61 @@ function renderCreditCard(card){
   else brandArea.innerHTML='<span class="cc-brand-text cc-vis">VISA</span>';
 }
 
+function _updateGroupParentInfo(show, label, name, iban, memberCount, isVerified, balLabel){
+  var gpi=document.getElementById('group-parent-info');
+  var balLbl=document.getElementById('info-bal-lbl');
+  if(!gpi) return;
+  if(!show){ gpi.style.display='none'; if(balLbl) balLbl.textContent='SOLDE DISPONIBLE'; return; }
+  gpi.style.display='';
+  var el=function(id){ return document.getElementById(id); };
+  if(el('gpi-label'))   el('gpi-label').textContent=label||'';
+  if(el('gpi-name'))    el('gpi-name').textContent=name||'';
+  if(el('gpi-iban'))    el('gpi-iban').textContent=iban||'';
+  if(el('gpi-members')) el('gpi-members').textContent=memberCount>0?memberCount+' salarié'+(memberCount>1?'s':''):'';
+  if(el('gpi-verified')) el('gpi-verified').style.display=isVerified?'':'none';
+  if(balLbl) balLbl.textContent=balLabel||'SOLDE DU GROUPE';
+}
+
 function renderHero(card){
   if(!card) return; var meta=getMeta(card); var scope=card.scope||'personal';
   var tier=getCardTier(card.card_number||'',meta);
 
   if(scope==='subgroup'){
-    /* SOUS-GROUPE : afficher informations utiles pour la gestion */
-    var memberCount=0;
-    if(meta.subgroup_ibans) memberCount=meta.subgroup_ibans.length;
-    else if(meta.subgroup_count) memberCount=Number(meta.subgroup_count)||0;
-    document.getElementById('info-iban').textContent=(meta.group_iban||card.iban||'');
+    var memberCount=meta.subgroup_ibans?meta.subgroup_ibans.length:Number(meta.subgroup_count||0);
+    var parentName=String(meta.group_name||card.group_name||'');
+    var parentIban=String(meta.group_iban||card.iban||'');
+    _updateGroupParentInfo(true,'GROUPE PARENT',parentName,parentIban,memberCount,meta.is_verified,'SOLDE DU GROUPE');
+    document.getElementById('info-iban').textContent=String(card.subgroup_name||card.label||'Département');
     document.getElementById('info-bal').textContent=fmt(card.balance||0)+'.00';
     var pills=document.getElementById('cfg-pills');
-    /* Infos groupe parent dans les pills */
-    pills.innerHTML=''
-      +'<div style="width:100%;display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;">'
-      +'<div style="font-size:9px;color:#6a7890;letter-spacing:.1em;">GROUPE PARENT</div>'
-      +'<div style="width:100%;font-size:11px;font-weight:600;color:#c0c4d4;margin-bottom:4px;">'+(meta.group_name||card.group_name||'—')+'</div>'
-      +'<span class="cfg-pill">'+memberCount+' salarié'+(memberCount>1?'s':'')+'</span>'
-      +'<span class="cfg-pill">'+String(meta.group_account_number||'').split('-')[0]+'</span>'
-      +(meta.is_verified?'<span class="cfg-pill" style="color:#22b960;border-color:rgba(34,185,96,0.3);">✔ Vérifié</span>':'')
-      +'</div>';
-    /* Actions sous-groupe */
-    var btns=[];
-    btns.push({l:'Ajouter un salarié',fn:doAddEmployee});
-    btns.push({l:'Gérer les salariés',fn:doManageEmployees});
-    btns.push({l:'Paramètres',fn:doCardSettings});
-    btns.push({l:'Quitter',fn:doLeaveGroup,danger:true});
+    var btns=[
+      {l:'Ajouter un salarié',fn:doAddEmployee},
+      {l:'Gérer les salariés',fn:doManageEmployees},
+      {l:'Paramètres',fn:doCardSettings},
+      {l:'Quitter',fn:doLeaveGroup,danger:true}
+    ];
     var bhtml='';
     for(var i=0;i<btns.length;i++) bhtml+='<button class="cfg-pill'+(btns[i].danger?' danger':'')+'" data-pill="'+i+'">'+(btns[i].l)+'</button>';
-    pills.innerHTML+=bhtml;
-    var pillEls=pills.querySelectorAll('[data-pill]');
-    for(var p=0;p<pillEls.length;p++){
-      (function(el,b){ el.addEventListener('click',function(){ b.fn(); }); })(pillEls[p],btns[p]);
+    pills.innerHTML=bhtml;
+    var pellEls=pills.querySelectorAll('[data-pill]');
+    for(var p=0;p<pellEls.length;p++){
+      (function(el,b){ el.addEventListener('click',function(){ b.fn(); }); })(pellEls[p],btns[p]);
     }
     return;
   }
 
-  document.getElementById('info-iban').textContent=card.iban||'';
+  if(scope==='group'){
+    var gMemberCount=0;
+    var members=meta.members||{};
+    if(typeof members==='object') gMemberCount=Object.keys(members).length;
+    _updateGroupParentInfo(false);
+    /* Afficher IBAN groupe + label groupe dans le champ iban */
+    document.getElementById('info-iban').textContent=String(card.iban||'');
+  } else {
+    _updateGroupParentInfo(false);
+    document.getElementById('info-iban').textContent=card.iban||'';
+  }
+
   document.getElementById('info-bal').textContent=fmt(card.balance||0)+'.00';
   var pills=document.getElementById('cfg-pills');
   var btns=[];
@@ -1102,9 +1140,19 @@ function renderTxList(area){
   for(var i=0; i<allTxs.length; i++){
     var tx = allTxs[i];
     var type=String(tx.txn_type||'').toLowerCase(); var pass=true;
-    if(S.activeFilter==='deposit') pass=type==='deposit'; 
-    else if(S.activeFilter==='withdraw') pass=type==='withdraw'; 
-    else if(S.activeFilter==='transfer') pass=type.indexOf('transfer')!==-1;
+
+    /* Masquer les transactions techniques (création/suppression de carte) */
+    if(type==='card_create'||type==='card_delete'||type==='admin_card_delete'||
+       type.indexOf('card_creat')!==-1||type.indexOf('card_delet')!==-1||
+       type.indexOf('admin_adjust')!==-1){
+      pass=false;
+    }
+
+    if(pass){
+      if(S.activeFilter==='deposit') pass=type==='deposit'; 
+      else if(S.activeFilter==='withdraw') pass=type==='withdraw'; 
+      else if(S.activeFilter==='transfer') pass=type.indexOf('transfer')!==-1;
+    }
 
     /* Filtre par carte sélectionnée */
     if(pass && cardIban){
