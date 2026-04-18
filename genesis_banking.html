@@ -54,8 +54,8 @@ button { cursor:pointer; }
 .tb{flex:1;padding:6px 4px;font-size:10.5px;font-weight:500;color:#7a8898;background:transparent;border:0.5px solid transparent;border-radius:6px;transition:all .18s;letter-spacing:.03em;}
 .tb:hover{color:#a0aab8;}
 .tb.on{background:rgba(255,255,255,0.08);color:#e0e4ef;border-color:rgba(255,255,255,0.1);}
-.tb-label{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:0;}
-.tb-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 5px;border-radius:999px;background:rgba(212,168,48,0.16);border:0.5px solid rgba(212,168,48,0.34);color:#f0cf74;font-size:9px;font-weight:700;line-height:1;box-shadow:0 0 18px rgba(212,168,48,0.12);}
+.tb-label{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:0;pointer-events:none;}
+.tb-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 5px;border-radius:999px;background:rgba(212,168,48,0.16);border:0.5px solid rgba(212,168,48,0.34);color:#f0cf74;font-size:9px;font-weight:700;line-height:1;box-shadow:0 0 18px rgba(212,168,48,0.12);pointer-events:none;}
 
 .card-list{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:6px;min-height:0;}
 .card-row{background:rgba(255,255,255,0.025);border:0.5px solid rgba(255,255,255,0.05);border-radius:9px;padding:8px 10px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;flex-shrink:0;}
@@ -2587,15 +2587,15 @@ document.getElementById('content-area').addEventListener('click',function(e){
 document.getElementById('tab-bar').addEventListener('click',function(e){ 
     var btn = e.target;
     while(btn && btn !== this) {
-        if(btn.className && btn.className.indexOf('tb') !== -1) break;
+        if(btn.nodeType===1 && String(btn.tagName||'').toUpperCase()==='BUTTON' && btn.getAttribute('data-mode')) break;
         btn = btn.parentNode;
     }
-    if(!btn || !btn.className || btn.className.indexOf('tb') === -1) return;
-    
-    var tbs = document.querySelectorAll('.tb');
+    if(!btn || btn===this || String(btn.tagName||'').toUpperCase()!=='BUTTON' || !btn.getAttribute('data-mode')) return;
+
+    var tbs = document.querySelectorAll('#tab-bar .tb');
     for(var i=0; i<tbs.length; i++) tbs[i].classList.remove('on');
     btn.classList.add('on'); 
-    S.viewMode=btn.dataset.mode; 
+    S.viewMode=btn.getAttribute('data-mode') || 'cards'; 
     if(S.viewMode==='subgroups'&&!S.activeGroupID&&S.snap){
       var scopedGroupCards=getScopedGroupCards(S.snap);
       if(scopedGroupCards.length) S.activeGroupID=scopedGroupCards[0].group_id;
