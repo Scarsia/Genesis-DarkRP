@@ -172,6 +172,7 @@ button { cursor:pointer; }
 .qbtn.accent{background:rgba(184,188,200,0.08);border-color:rgba(184,188,200,0.28);color:#b8bcc8;}
 .qbtn.accent:hover{background:rgba(184,188,200,0.14);border-color:rgba(184,188,200,0.4);}
 .qbtn.on{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.12);color:#d8dce8;}
+.qbtn.disabled,.mbtn.disabled{opacity:.38;pointer-events:none;filter:saturate(.55);cursor:not-allowed;}
 .qsep{flex:1;min-width:8px;}
 
 #content-area{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;}
@@ -304,6 +305,7 @@ button { cursor:pointer; }
 .mbtn.danger:hover{background:rgba(180,50,50,0.13);}
 .mbtn.bill{background:rgba(34,185,96,0.1); border-color:rgba(34,185,96,0.2); color:#22b960; margin-top:0; font-size:14px; font-weight:700;}
 .mbtn.bill:hover{background:rgba(34,185,96,0.18);}
+.mbtn.bill.disabled{background:rgba(180,50,50,0.08);border-color:rgba(180,50,50,0.18);color:#c57474;filter:none;}
 
 .mrow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px;}
 .mrow .k{color:#6a7890;}
@@ -328,6 +330,9 @@ button { cursor:pointer; }
 .csel-row.neg{border-color:rgba(180,50,50,0.15);background:rgba(180,50,50,0.05);}
 .csel-row.neg:hover,.csel-row.neg.on{background:rgba(180,50,50,0.08);border-color:rgba(208,80,80,0.22);}
 .csel-row.neg.on::before{background:#c05050;}
+.csel-row.locked{opacity:.52;cursor:not-allowed;}
+.csel-row.locked:hover{background:rgba(255,255,255,0.025);border-color:rgba(255,255,255,0.05);}
+.csel-row.neg.locked:hover{background:rgba(180,50,50,0.05);border-color:rgba(180,50,50,0.15);}
 .csel-balance.neg{color:#ff9a9a;}
 .mrow .v.neg{color:#ff9a9a;}
 
@@ -928,6 +933,27 @@ function balanceHtml(amount, className, negativeClass, suffix){
   if(isNegativeBalance(amount) && negativeClass) cls+=(cls?' ':'')+negativeClass;
   return '<span'+(cls?' class="'+cls+'"':'')+'>'+fmtBalance(amount)+(suffix||'')+'</span>';
 }
+function canSpendFromCard(card){ return !!card && !isNegativeBalance(card.balance); }
+function getSpendBlockedMessage(actionLabel){
+  return 'Action impossible : le compte sélectionné est à découvert. Régularisez le solde avant de ' + String(actionLabel||'continuer') + '.';
+}
+function ensureCardCanSpend(card, actionLabel){
+  if(canSpendFromCard(card)) return true;
+  notify(getSpendBlockedMessage(actionLabel),'error');
+  return false;
+}
+function getFirstSpendableCard(cards){
+  cards=cards||[];
+  for(var i=0;i<cards.length;i++){ if(canSpendFromCard(cards[i])) return cards[i]; }
+  return null;
+}
+function hasSpendableTransferSource(){
+  var cards=getCards(S.snap||{});
+  for(var i=0;i<cards.length;i++){
+    if(cards[i] && cards[i].scope!=='subgroup' && canSpendFromCard(cards[i])) return true;
+  }
+  return false;
+}
 function renderActionPills(container, buttons){
   if(!container) return;
   var html='';
@@ -981,7 +1007,8 @@ function buildSidebarSubgroupRow(card, key, isSel, meta){
 }
 function buildTransferSourceRow(card, key, isSel){
   var negative=isNegativeBalance(card.balance);
-  return '<div class="csel-row'+(isSel?' on':'')+(negative?' neg':'')+'" data-ckey="'+escapeHtml(key)+'"><div><div style="font-size:10px;font-weight:500;color:#c0c4d4;">'+escapeHtml(card.iban||'')+'</div><div style="font-size:9px;color:#6a7890;">'+escapeHtml(card.label||card.group_name||'')+'</div></div><div class="csel-balance'+(negative?' neg':'')+'" style="font-size:10px;color:#8892a8;">'+fmtBalance(card.balance||0)+'</div></div>';
+  var locked=!canSpendFromCard(card);
+  return '<div class="csel-row'+(isSel?' on':'')+(negative?' neg':'')+(locked?' locked':'')+'" data-ckey="'+escapeHtml(key)+'"'+(locked?' data-locked="1"':'')+'><div><div style="font-size:10px;font-weight:500;color:#c0c4d4;">'+escapeHtml(card.iban||'')+'</div><div style="font-size:9px;color:#6a7890;">'+escapeHtml(card.label||card.group_name||'')+(locked?' · compte à découvert':'')+'</div></div><div class="csel-balance'+(negative?' neg':'')+'" style="font-size:10px;color:#8892a8;">'+fmtBalance(card.balance||0)+'</div></div>';
 }
 
 function normTx(tx){
@@ -1231,8 +1258,16 @@ function renderHero(card){
 
 function renderQuickActions(card){
   var qa=document.getElementById('quick-actions'); var scope=(card&&card.scope)||'personal'; var html='';
-  if(scope!=='subgroup'){ html+='<button class="qbtn" onclick="doDeposit()">Déposer</button><button class="qbtn" onclick="doWithdraw()">Retirer</button><button class="qbtn accent" onclick="doTransfer()">Virement</button>'; }
-  else { html+='<button class="qbtn accent" onclick="doBatchTransfer()">Virement Groupé</button>'; }
+  var canWithdraw=canSpendFromCard(card);
+  var canTransfer=scope==='subgroup'?canSpendFromCard(card):hasSpendableTransferSource();
+  if(scope!=='subgroup'){
+    html+='<button class="qbtn" onclick="doDeposit()">Déposer</button>';
+    html+='<button class="qbtn'+(canWithdraw?'':' disabled')+'"'+(canWithdraw?' onclick="doWithdraw()"':'')+'>Retirer</button>';
+    html+='<button class="qbtn accent'+(canTransfer?'':' disabled')+'"'+(canTransfer?' onclick="doTransfer()"':'')+'>Virement</button>';
+  }
+  else {
+    html+='<button class="qbtn accent'+(canTransfer?'':' disabled')+'"'+(canTransfer?' onclick="doBatchTransfer()"':'')+'>Virement Groupé</button>';
+  }
   html+='<div style="width:1px;height:18px;background:rgba(255,255,255,0.06);margin:0 4px;flex-shrink:0;"></div>';
   var filters=[{k:'all',l:'Tout'},{k:'deposit',l:'Dépôts'},{k:'withdraw',l:'Retraits'},{k:'transfer',l:'Virements'}];
   for(var i=0; i<filters.length; i++) { html+='<button class="qbtn'+(S.activeFilter===filters[i].k?' on':'')+'" onclick="setFilter(\''+filters[i].k+'\')">'+(filters[i].l)+'</button>'; }
@@ -1737,6 +1772,7 @@ function mBtn(label, fn, danger){
    ============================================================ */
 function doWithdraw(){
   var c = getSelectedCard();
+  if(!ensureCardCanSpend(c,'effectuer un retrait')) return;
   var balance = c ? c.balance : 0;
   var html = mTitle('RETRAIT D\'ESPÈCES')
     +'<div class="mbalance-line">Solde disponible: '+balanceHtml(balance, 'value', 'neg', '')+'</div>'
@@ -1752,8 +1788,10 @@ function doWithdraw(){
     +'</div>'
     +mBtn('Confirmer le retrait', function(){
       var amt=Number(document.getElementById('wit-amount').value||0);
+      var activeCard=getSelectedCard();
       if(amt<=0){notify('Montant invalide.','error');return;}
-      bridgeSend('withdraw',{amount:amt,selection:selPay(getSelectedCard())}); closeModal();
+      if(!ensureCardCanSpend(activeCard,'effectuer un retrait')) return;
+      bridgeSend('withdraw',{amount:amt,selection:selPay(activeCard)}); closeModal();
     });
   openModal(html);
 }
@@ -1774,7 +1812,11 @@ function doTransfer(){
   var cardsList=getCards(S.snap);
   var validCards = [];
   for(var j=0; j<cardsList.length; j++) { if(cardsList[j].scope !== 'subgroup') validCards.push(cardsList[j]); }
-  S.transferSourceKey=getSelectedCard()?cardKey(getSelectedCard()):'';
+  if(!validCards.length){ notify('Aucun compte disponible pour effectuer un virement.','error'); return; }
+  var selectedCard=getSelectedCard();
+  var selectedSpendable=selectedCard&&selectedCard.scope!=='subgroup'&&canSpendFromCard(selectedCard)?selectedCard:null;
+  var fallbackCard=getFirstSpendableCard(validCards);
+  S.transferSourceKey=cardKey(selectedSpendable||fallbackCard||selectedCard||validCards[0]);
   var cardRows = '';
   for(var i=0; i<validCards.length; i++) {
     var c = validCards[i]; var k=cardKey(c); var isSel=k===S.transferSourceKey;
@@ -1795,13 +1837,16 @@ function doTransfer(){
       if(!iban||amt<=0){notify('Informations invalides.','error');return;}
       var cardsList2=getCards(S.snap); var src=null;
       for(var i=0;i<cardsList2.length;i++){ if(cardKey(cardsList2[i])===S.transferSourceKey){src=cardsList2[i];break;} }
-      bridgeSend('transfer',{iban:iban,amount:amt,beneficiary_name:benef,comment:comment,selection:selPay(src||getSelectedCard())});
+      src=src||selectedCard||validCards[0];
+      if(!ensureCardCanSpend(src,'effectuer un virement')) return;
+      bridgeSend('transfer',{iban:iban,amount:amt,beneficiary_name:benef,comment:comment,selection:selPay(src)});
       closeModal();
     }), true);
   /* Attach csel click after modal open */
   var rows=document.querySelectorAll('[data-ckey]');
   for(var r=0;r<rows.length;r++){
     (function(row){ row.addEventListener('click',function(){
+      if(row.getAttribute('data-locked')==='1'){ notify(getSpendBlockedMessage('effectuer un virement depuis ce compte'),'error'); return; }
       S.transferSourceKey=row.getAttribute('data-ckey');
       var all=document.querySelectorAll('.csel-row');
       for(var a=0;a<all.length;a++) all[a].classList.remove('on');
@@ -1812,12 +1857,14 @@ function doTransfer(){
 
 function doBatchTransfer(){
   var c=getSelectedCard();
+  if(!ensureCardCanSpend(c,'effectuer un virement groupé')) return;
   openModal(mTitle('VIREMENT GROUPÉ')
     +'<div style="font-size:11px;color:#6a7890;margin-bottom:14px;">Virement aux salariés du département.</div>'
     +mField('Montant par bénéficiaire','batch-amount','number','0')
     +mBtn('Envoyer', function(){
       var amt=Number(document.getElementById('batch-amount').value||0); if(amt<=0)return;
       var c2=getSelectedCard();
+      if(!ensureCardCanSpend(c2,'effectuer un virement groupé')) return;
       bridgeSend('batch_transfer',{group_id:c2?c2.group_id:0,subgroup_id:c2?c2.subgroup_id:0,amount:amt,comment:'Virement groupe'});
       closeModal();
       notify('Virement groupé envoyé…','info');
@@ -2377,9 +2424,13 @@ function doInvoiceAction(idx,mode){
   var list=(mode==='received'?(S.snap?S.snap.invoices_received:[]):(S.snap?S.snap.invoices_sent:[]));
   var inv=list[idx]; if(!inv||inv.status!=='pending') return;
   if(mode==='received'){
+    var payCard=getSelectedCard();
+    var canPay=canSpendFromCard(payCard);
     openModal(mTitle('FACTURE REÇUE')
       +'<div class="mamount-box"><div class="mamount neg">- '+fmt(inv.amount)+'</div></div>'
-      +mBtn('Payer', function(){ bridgeSend('invoice_action',{action:'pay',invoice_id:inv.id}); closeModal(); })
+      +(canPay
+        ? mBtn('Payer', function(){ if(!ensureCardCanSpend(getSelectedCard(),'payer une facture')) return; bridgeSend('invoice_action',{action:'pay',invoice_id:inv.id}); closeModal(); })
+        : '<button class="mbtn bill disabled">Paiement bloqué · compte à découvert</button><div style="font-size:10px;color:#8b5b5b;margin-top:8px;line-height:1.45;">Régularisez le solde du compte sélectionné avant de payer cette facture.</div>')
       +'<br>'
       +mBtn('Refuser', function(){ bridgeSend('invoice_action',{action:'refuse',invoice_id:inv.id}); closeModal(); }, true));
   } else {
