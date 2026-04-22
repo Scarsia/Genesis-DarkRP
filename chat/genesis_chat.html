@@ -2,571 +2,350 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Genesis Chat</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-
-/* nuke GMod's gross default scrollbar */
-::-webkit-scrollbar{width:0;height:0;}
-html{scrollbar-width:none;}
-
-html,body{
-  width:100%;height:100%;
-  overflow:hidden;
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --font-ui:   'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --accent:    #c8cbd6;
+  --muted:     rgba(200,203,214,0.4);
+  --shadow:    0 1px 3px rgba(0,0,0,0.75);
+  --c-say:    #d6d9e0;
+  --c-me:     #7eb8d4;
+  --c-it:     #b09fd4;
+  --c-do:     #7ec4a0;
+  --c-ooc:    #c4b87e;
+  --c-w:      #c47e7e;
+  --c-advert: #c4a07e;
+  --c-system: #888a8f;
+}
+html, body {
+  width:100%; height:100%;
   background:transparent;
-  color:#e8eaf0;
-  font-family:'Segoe UI',system-ui,sans-serif;
+  font-family:var(--font-ui);
   -webkit-font-smoothing:antialiased;
-  pointer-events:none; /* seul le shell ouvert reçoit les events */
+  overflow:hidden;
 }
 
-/* ======================================================
-   CHAT FRAME — top-left, taille fixe 660x420, transparent
-   ====================================================== */
-#gx-root{
-  position:absolute;
-  top:18px;left:18px;
-  width:660px;
-  height:420px;
-}
-.gx-shell{
-  position:relative;
-  width:100%;height:100%;
-  border-radius:14px;
-  padding:12px 14px;
-  background:transparent;
-  border:0.5px solid transparent;
-  transition:background 140ms ease,border-color 140ms ease;
-}
-
-/* état OUVERT : glass panel */
-body.gx-open .gx-shell{
-  background:rgba(8,10,14,0.82);
-  border-color:rgba(255,255,255,0.08);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  pointer-events:auto;
-}
-body.gx-open .gx-shell::before{
-  content:'';
-  position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.14) 50%,transparent);
-  border-radius:14px 14px 0 0;
+/* ── FEED messages flottants ── */
+#feed {
+  position:fixed;
+  top:14px; left:14px;
+  width:460px;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
   pointer-events:none;
 }
 
-/* ======================================================
-   TABS
-   ====================================================== */
-.gx-tabs{
-  display:flex;gap:6px;height:30px;margin-bottom:10px;
-  transition:opacity 140ms;
+.msg {
+  display:flex;
+  align-items:baseline;
+  gap:0;
+  opacity:1;
+  transition:opacity 1.2s ease;
+  line-height:1.5;
 }
-body:not(.gx-open) .gx-tabs{opacity:0;pointer-events:none;}
-.gx-tab{
-  flex:0 0 96px;height:30px;border-radius:8px;
-  background:rgba(255,255,255,0.04);
-  border:0.5px solid rgba(255,255,255,0.08);
-  color:#7a8898;font-size:12px;font-weight:600;letter-spacing:0.02em;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:all 140ms;position:relative;font-family:inherit;outline:none;
+.msg.fade { opacity:0; }
+.msg * { text-shadow:var(--shadow); }
+
+.mt   { font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-right:8px;flex-shrink:0; }
+.mbadge { font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+          padding:1px 5px;border-radius:2px;margin-right:6px;flex-shrink:0;text-shadow:none; }
+.mname  { font-size:13px;font-weight:600;color:var(--accent);margin-right:4px;flex-shrink:0; }
+.msep   { font-size:13px;color:rgba(200,203,214,0.3);margin-right:5px;flex-shrink:0; }
+.mtext  { font-size:13px;font-weight:400;color:var(--c-say);flex:1;min-width:0;word-break:break-word; }
+
+.t-me .mbadge { background:rgba(126,184,212,.18);color:var(--c-me); }
+.t-me .mname  { color:var(--c-me); }
+.t-me .mtext  { color:var(--c-me);font-style:italic; }
+
+.t-it .mname,.t-it .msep { display:none; }
+.t-it .mbadge { background:rgba(176,159,212,.18);color:var(--c-it); }
+.t-it .mtext  { color:var(--c-it);font-style:italic; }
+
+.t-do .mbadge { background:rgba(126,196,160,.18);color:var(--c-do); }
+.t-do .mname  { color:var(--c-do); }
+.t-do .mtext  { color:var(--c-do); }
+
+.t-ooc .mbadge { background:rgba(196,184,126,.18);color:var(--c-ooc); }
+.t-ooc .mname  { color:var(--c-ooc); }
+.t-ooc .mtext  { color:var(--c-ooc); }
+
+.t-w .mbadge { background:rgba(196,126,126,.18);color:var(--c-w); }
+.t-w .mname  { color:var(--c-w); }
+.t-w .mtext  { color:var(--c-w);font-style:italic; }
+
+.t-advert .mbadge { background:rgba(196,160,126,.18);color:var(--c-advert); }
+.t-advert .mname  { color:var(--c-advert); }
+.t-advert .mtext  { color:var(--c-advert);font-weight:500; }
+
+.t-system .mbadge,.t-system .mname,.t-system .msep { display:none; }
+.t-system .mtext { color:var(--c-system);font-style:italic;font-size:11px; }
+
+/* ── INPUT BAR (cachée par défaut, visible en mode chat) ── */
+#input-area {
+  position:fixed;
+  bottom:14px; left:14px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  width:460px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .15s;
 }
-.gx-tab:hover{background:rgba(255,255,255,0.07);color:#9aa4b4;}
-.gx-tab.gx-on{
-  background:rgba(184,188,200,0.12);
-  border-color:rgba(184,188,200,0.28);
-  color:#e0e4ef;
-}
-.gx-tab.gx-on::before{
-  content:'';position:absolute;top:0;left:18%;right:18%;height:1px;
-  background:rgba(184,188,200,0.7);
+#input-area.visible {
+  opacity:1;
+  pointer-events:auto;
 }
 
-/* ======================================================
-   HISTORY
-   ====================================================== */
-.gx-history{
-  height:calc(100% - 90px);
-  overflow-y:auto;overflow-x:hidden;
-  padding-right:6px;margin-bottom:8px;
+#type-pill {
+  display:flex;align-items:center;gap:5px;padding:0 12px;height:34px;
+  background:rgba(8,10,14,0.82);border:1px solid rgba(200,203,214,0.13);
+  border-radius:17px;font-family:var(--font-mono);font-size:11px;font-weight:500;
+  color:var(--accent);cursor:pointer;white-space:nowrap;flex-shrink:0;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:background .15s;letter-spacing:.02em;border:none;
 }
-body:not(.gx-open) .gx-history{
-  height:100%;margin-bottom:0;
-  mask-image:linear-gradient(to bottom,rgba(0,0,0,0.15) 0%,rgba(0,0,0,1) 15%,rgba(0,0,0,1) 100%);
-  -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,0.15) 0%,rgba(0,0,0,1) 15%,rgba(0,0,0,1) 100%);
-}
+#type-pill:hover { background:rgba(16,20,28,0.9); }
+.pd { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
 
-.gx-line{
-  margin:0 0 7px 0;
-  font-size:13.5px;line-height:1.42;color:#c8ccd8;
-  word-break:break-word;
-  transition:opacity 480ms ease, max-height 480ms ease, margin 480ms ease, padding 480ms ease;
-  max-height:120px;overflow:hidden;
+#inp-wrap {
+  flex:1;height:34px;background:rgba(8,10,14,0.82);
+  border:1px solid rgba(200,203,214,0.13);border-radius:17px;
+  display:flex;align-items:center;padding:0 14px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:border-color .15s;
 }
-body:not(.gx-open) .gx-line{
-  text-shadow:0 1px 2px rgba(0,0,0,0.92),0 0 6px rgba(0,0,0,0.6);
-}
-/* fade-out automatique des vieux messages quand le chat est fermé */
-body:not(.gx-open) .gx-line.gx-faded{
-  opacity:0;max-height:0;margin:0;padding:0;
-  overflow:hidden;pointer-events:none;
-}
+#inp-wrap:focus-within { border-color:rgba(200,203,214,0.26); }
 
-.gx-prefix{
-  margin-right:8px;font-size:10.5px;font-weight:700;
-  text-transform:uppercase;letter-spacing:0.14em;
+#inp {
+  flex:1;background:transparent;border:none;outline:none;
+  font-family:var(--font-ui);font-size:13px;font-weight:400;
+  color:var(--accent);min-width:0;
 }
-.gx-name{font-weight:600;color:#e8eaf0;}
-.gx-colon{color:#4a5870;margin:0 2px;}
-.gx-msg{color:#c8ccd8;}
-.gx-time{
-  margin-left:8px;font-size:10px;letter-spacing:0.06em;
-  color:#4a5870;font-variant-numeric:tabular-nums;
-}
+#inp::placeholder { color:var(--muted); }
 
-/* action /me + scene /it */
-.gx-line.gx-action,.gx-line.gx-scene-line{margin:4px 0 10px 0;}
-.gx-action-text,.gx-scene-text{
-  font-size:14.5px;font-style:italic;color:#e8eaf0;letter-spacing:0.01em;
+#send {
+  width:34px;height:34px;border-radius:50%;background:rgba(8,10,14,0.82);
+  border:1px solid rgba(200,203,214,0.13);display:flex;align-items:center;
+  justify-content:center;cursor:pointer;flex-shrink:0;color:var(--muted);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:color .15s;
 }
-.gx-scene-text{opacity:0.92;}
-.gx-meta{
-  display:flex;align-items:center;gap:8px;margin-top:3px;
-  font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.18em;
-  color:#6a7890;
-}
-.gx-meta .gx-dot{display:inline-block;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0.7;}
-.gx-meta .gx-who{color:#c8ccd8;text-transform:none;letter-spacing:0;font-weight:500;font-size:10px;}
-.gx-meta .gx-mt{margin-left:auto;color:#4a5870;letter-spacing:0.06em;font-variant-numeric:tabular-nums;font-size:9.5px;font-weight:500;}
+#send:hover { color:var(--accent); }
+#send svg { width:13px;height:13px;fill:currentColor; }
 
-/* blocs colorés pour advert / admin / pm / system */
-.gx-tone-advert.gx-normal{
-  padding:6px 10px;border-left:1.5px solid rgba(212,168,48,0.6);
-  background:linear-gradient(90deg,rgba(212,168,48,0.06),rgba(212,168,48,0.015) 60%,transparent);
-  border-radius:0 6px 6px 0;margin-bottom:8px;
+/* ── DROPDOWN type ── */
+#dd {
+  position:fixed;bottom:56px;left:14px;width:218px;
+  background:rgba(8,10,14,0.96);border:1px solid rgba(200,203,214,0.17);
+  border-radius:8px;overflow:hidden;display:none;flex-direction:column;
+  z-index:100;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:0 8px 32px rgba(0,0,0,.65);
 }
-.gx-tone-admin.gx-normal{
-  padding:5px 10px;border-left:1.5px solid rgba(192,80,112,0.55);
-  background:linear-gradient(90deg,rgba(192,80,112,0.05),transparent 75%);
-  border-radius:0 6px 6px 0;
-}
-.gx-tone-pm.gx-normal{
-  padding:5px 10px;border-left:1.5px solid rgba(168,120,192,0.5);
-  background:linear-gradient(90deg,rgba(168,120,192,0.04),transparent 75%);
-  border-radius:0 6px 6px 0;
-}
-.gx-tone-system.gx-normal{
-  padding:5px 10px;border-left:1.5px solid rgba(208,80,80,0.5);
-  background:linear-gradient(90deg,rgba(208,80,80,0.05),transparent 75%);
-  border-radius:0 6px 6px 0;
-}
-
-/* tones — prefix colors */
-.gx-tone-local   .gx-prefix{color:rgba(184,188,200,0.85);}
-.gx-tone-team    .gx-prefix{color:#8aaccf;}
-.gx-tone-radio   .gx-prefix{color:#8aaccf;}
-.gx-tone-system  .gx-prefix{color:#e06060;}
-.gx-tone-info    .gx-prefix{color:rgba(212,168,48,0.9);}
-.gx-tone-dead    .gx-prefix{color:#a85e5e;}
-.gx-tone-ooc     .gx-prefix{color:#7090b8;}
-.gx-tone-advert  .gx-prefix{color:#e8c050;}
-.gx-tone-admin   .gx-prefix{color:#d86888;}
-.gx-tone-pm      .gx-prefix{color:#c090d8;}
-
-/* tones — message tint */
-.gx-tone-team    .gx-msg,.gx-tone-radio .gx-msg{color:rgba(170,198,226,0.92);}
-.gx-tone-system  .gx-msg{color:rgba(232,158,158,0.95);}
-.gx-tone-info    .gx-msg{color:rgba(216,192,136,0.88);}
-.gx-tone-ooc     .gx-msg{color:rgba(160,180,208,0.88);}
-.gx-tone-advert  .gx-msg{color:rgba(232,216,168,0.95);font-weight:500;}
-.gx-tone-admin   .gx-msg{color:rgba(224,184,200,0.92);}
-.gx-tone-pm      .gx-msg{color:rgba(216,192,232,0.92);}
-.gx-tone-dead    .gx-msg{color:rgba(200,156,156,0.88);}
-
-/* ======================================================
-   BOTTOM BAR (chip + input + send)
-   ====================================================== */
-.gx-bar{
-  display:flex;gap:6px;height:42px;margin-bottom:8px;
-  transition:opacity 140ms;
-}
-body:not(.gx-open) .gx-bar{opacity:0;pointer-events:none;}
-
-.gx-chip{
-  width:96px;height:42px;border-radius:10px;
-  background:rgba(255,255,255,0.08);
-  border:0.5px solid rgba(184,188,200,0.28);
-  display:flex;align-items:center;justify-content:center;
-  position:relative;
-  font-size:12px;font-weight:600;letter-spacing:0.04em;color:#b8bcc8;
-  text-transform:uppercase;
-  transition:color 140ms,border-color 140ms;
-  user-select:none;
-}
-.gx-chip::before{
-  content:'';position:absolute;top:0;bottom:0;left:0;width:2px;
-  border-radius:10px 0 0 10px;background:currentColor;opacity:0.85;
-}
-
-.gx-input{
-  flex:1;min-width:0;height:42px;border-radius:10px;
-  background:rgba(255,255,255,0.05);
-  border:0.5px solid rgba(255,255,255,0.1);
-  color:#e8eaf0;font-family:inherit;font-size:15px;
-  padding:0 14px;outline:none;transition:all 140ms;
-}
-.gx-input:focus{
-  background:rgba(255,255,255,0.08);
-  border-color:rgba(184,188,200,0.45);
-}
-.gx-input::placeholder{color:rgba(90,104,128,0.9);}
-
-.gx-send{
-  width:42px;height:42px;border-radius:10px;
-  background:rgba(184,188,200,0.1);
-  border:0.5px solid rgba(184,188,200,0.3);
-  color:#e8eaf0;font-size:22px;line-height:1;
-  cursor:pointer;transition:all 140ms;font-family:inherit;
-}
-.gx-send:hover{background:rgba(184,188,200,0.2);border-color:rgba(184,188,200,0.55);}
-
-/* ======================================================
-   HINTS (bas)
-   ====================================================== */
-.gx-hints{
-  display:flex;gap:6px;height:20px;
-  transition:opacity 140ms;
-}
-body:not(.gx-open) .gx-hints{opacity:0;pointer-events:none;}
-.gx-hint{
-  padding:0 10px;height:20px;border-radius:6px;
-  background:rgba(255,255,255,0.03);
-  border:0.5px solid rgba(255,255,255,0.06);
-  font-size:10px;color:rgba(106,120,144,0.9);
-  letter-spacing:0.12em;text-transform:uppercase;font-weight:500;
-  display:flex;align-items:center;
-}
+#dd.open { display:flex; }
+.ddt { padding:7px 12px;font-size:9px;font-weight:600;letter-spacing:.14em;
+       text-transform:uppercase;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.05); }
+.ddo { display:flex;align-items:center;gap:9px;padding:7px 12px;cursor:pointer;
+       transition:background .1s;border-bottom:1px solid rgba(255,255,255,.04); }
+.ddo:last-child { border-bottom:none; }
+.ddo:hover { background:rgba(255,255,255,.05); }
+.ddo.sel  { background:rgba(200,203,214,.07); }
+.ddot { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
+.ddoc { font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--accent);min-width:54px; }
+.ddod { font-size:11px;color:var(--muted); }
 </style>
 </head>
 <body>
 
-<div id="gx-root">
-  <div class="gx-shell" id="gxShell">
-    <div class="gx-tabs" id="gxTabs">
-      <button class="gx-tab gx-on" data-tab="global">Global</button>
-      <button class="gx-tab" data-tab="team">Équipe</button>
-      <button class="gx-tab" data-tab="pm">Privé</button>
-    </div>
+<div id="feed"></div>
 
-    <div class="gx-history" id="gxHist"></div>
+<div id="dd">
+  <div class="ddt">Type de message</div>
+</div>
 
-    <div class="gx-bar">
-      <div class="gx-chip" id="gxChip">Message</div>
-      <input class="gx-input" id="gxInput" placeholder="Envoyez un message ..." autocomplete="off" spellcheck="false" />
-      <button class="gx-send" id="gxSend" title="Envoyer" tabindex="-1">›</button>
-    </div>
-
-    <div class="gx-hints">
-      <div class="gx-hint">Enter · Envoyer</div>
-      <div class="gx-hint">Tab · Onglet</div>
-      <div class="gx-hint">Échap · Fermer</div>
-    </div>
+<div id="input-area">
+  <button id="type-pill" onclick="togDD()">
+    <span class="pd" id="pdot"></span>
+    <span id="plabel">/say</span>
+  </button>
+  <div id="inp-wrap">
+    <input id="inp" placeholder="Envoyez un message ..."
+      maxlength="250" onkeydown="onKey(event)" oninput="onInput(event)" />
   </div>
+  <button id="send" onclick="doSend()">
+    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+  </button>
 </div>
 
 <script>
-(function(){
-  var shell  = document.getElementById('gxShell');
-  var tabsEl = document.getElementById('gxTabs');
-  var histEl = document.getElementById('gxHist');
-  var chipEl = document.getElementById('gxChip');
-  var inputEl= document.getElementById('gxInput');
-  var sendEl = document.getElementById('gxSend');
+// ── Types disponibles
+var TYPES = [
+  {id:'say',    cmd:'/say',    label:'/say',    desc:'Dialogue normal',   color:'#c8cbd6'},
+  {id:'me',     cmd:'/me',     label:'/me',     desc:'Action (3e pers.)', color:'#7eb8d4'},
+  {id:'it',     cmd:'/it',     label:'/it',     desc:'Narration',         color:'#b09fd4'},
+  {id:'do',     cmd:'/do',     label:'/do',     desc:'Description',       color:'#7ec4a0'},
+  {id:'ooc',    cmd:'/ooc',    label:'/ooc',    desc:'Hors personnage',   color:'#c4b87e'},
+  {id:'w',      cmd:'/w',      label:'/w',      desc:'Chuchotement',      color:'#c47e7e'},
+  {id:'advert', cmd:'/advert', label:'/advert', desc:'Publicité',         color:'#c4a07e'},
+];
+var BADGES = {say:'SAY',me:'ME',it:'IT','do':'DO',ooc:'OOC',w:'MURMURE',advert:'ANNONCE'};
+var MSG_LIFETIME = 14000;
+var MSG_MAX = 20;
 
-  var MAX_LINES = 160;
-  var FADE_AFTER_MS = 10000; // en mode fermé, les messages > 10s fade out
+var currentType = TYPES[0];
+var ddOpen = false;
+var chatOpen = false;
 
-  var state = {
-    open:false,
-    tab:'global',
-    lines:[] // [{id, prefix, name, message, tone, kind, time, ts}]
-  };
+// ── Build dropdown
+var ddEl = document.getElementById('dd');
+TYPES.forEach(function(t) {
+  var el = document.createElement('div');
+  el.className = 'ddo' + (t.id === 'say' ? ' sel' : '');
+  el.dataset.id = t.id;
+  el.innerHTML = '<span class="ddot" style="background:' + t.color + '"></span>'
+               + '<span class="ddoc">' + t.label + '</span>'
+               + '<span class="ddod">' + t.desc + '</span>';
+  el.onclick = function() { selType(t); };
+  ddEl.appendChild(el);
+});
 
-  var idCounter = 0;
-
-  // ========= Bridge Lua <-> JS =========
-  function toLua(method, payload){
-    try{
-      if (window.genesis_chat && typeof window.genesis_chat[method] === 'function'){
-        window.genesis_chat[method](typeof payload === 'string' ? payload : JSON.stringify(payload || {}));
-      }
-    }catch(e){}
-  }
-
-  // ========= Helpers =========
-  function esc(s){
-    return String(s==null?'':s)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-  }
-
-  // ========= Chip =========
-  function chipFor(tab, text){
-    var v = String(text||'').trim();
-    var low = v.toLowerCase();
-    if (tab==='team'){
-      if (low.indexOf('/radio')===0) return { t:'/radio', c:'#8aaccf' };
-      return { t:'/team', c:'#8aaccf' };
-    }
-    if (tab==='pm'){
-      if (low.indexOf('/reply')===0) return { t:'/reply', c:'#c090d8' };
-      return { t:'/pm', c:'#c090d8' };
-    }
-    if (low==='/me'     || low.indexOf('/me ')    ===0) return { t:'/me',     c:'#c8ccd8' };
-    if (low==='/it'     || low.indexOf('/it ')    ===0) return { t:'/it',     c:'#d8c088' };
-    if (low==='/advert' || low.indexOf('/advert ')===0) return { t:'/advert', c:'#d4a830' };
-    if (v.indexOf('@')===0)   return { t:'@',   c:'#d86888' };
-    if (v.indexOf('///')===0) return { t:'///', c:'#d86888' };
-    if (low.indexOf('//')===0) return { t:'//', c:'#7090b8' };
-    if (low==='/ooc' || low.indexOf('/ooc ')===0) return { t:'/ooc', c:'#7090b8' };
-    return { t:'Message', c:'#b8bcc8' };
-  }
-
-  function placeholderFor(tab){
-    if (tab==='team') return 'Envoyez un message équipe ...';
-    if (tab==='pm')   return 'Utilisez /pm ou /reply ...';
-    return 'Envoyez un message ...';
-  }
-
-  function updateChip(){
-    var c = chipFor(state.tab, inputEl.value);
-    chipEl.textContent = c.t;
-    chipEl.style.color = c.c;
-    chipEl.style.borderColor = hexToRgba(c.c, 0.35);
-  }
-
-  function hexToRgba(hex, a){
-    var h = hex.replace('#','');
-    var r = parseInt(h.substring(0,2),16);
-    var g = parseInt(h.substring(2,4),16);
-    var b = parseInt(h.substring(4,6),16);
-    return 'rgba('+r+','+g+','+b+','+a+')';
-  }
-
-  // ========= Render =========
-  function renderLine(l){
-    var cls = 'gx-line gx-tone-' + esc(l.tone||'local');
-    if (l.kind === 'action'){
-      return '<div class="'+cls+' gx-action" data-id="'+l.id+'" data-ts="'+l.ts+'">'
-        + '<div class="gx-action-text">'+esc(l.message)+'</div>'
-        + '<div class="gx-meta"><span class="gx-dot"></span><span>/'+esc((l.prefix||'me').toLowerCase())+'</span>'
-        +   (l.name?'<span class="gx-who">'+esc(l.name)+'</span>':'')
-        +   '<span class="gx-mt">'+esc(l.time||'')+'</span></div>'
-        + '</div>';
-    }
-    if (l.kind === 'scene'){
-      return '<div class="'+cls+' gx-scene-line" data-id="'+l.id+'" data-ts="'+l.ts+'">'
-        + '<div class="gx-scene-text">'+esc(l.message)+'</div>'
-        + '<div class="gx-meta"><span class="gx-dot"></span><span>/'+esc((l.prefix||'it').toLowerCase())+'</span>'
-        +   (l.name?'<span class="gx-who">'+esc(l.name)+'</span>':'')
-        +   '<span class="gx-mt">'+esc(l.time||'')+'</span></div>'
-        + '</div>';
-    }
-    return '<div class="'+cls+' gx-normal" data-id="'+l.id+'" data-ts="'+l.ts+'">'
-      + (l.prefix?'<span class="gx-prefix">'+esc(l.prefix)+'</span>':'')
-      + (l.name?'<span class="gx-name">'+esc(l.name)+'</span>':'')
-      + (l.name?'<span class="gx-colon">:</span>':'')
-      + '<span class="gx-msg">'+esc(l.message)+'</span>'
-      + '<span class="gx-time">'+esc(l.time||'')+'</span>'
-      + '</div>';
-  }
-
-  function fullRender(){
-    var out = '';
-    for (var i=0;i<state.lines.length;i++) out += renderLine(state.lines[i]);
-    histEl.innerHTML = out;
-    applyFade();
-    scrollBottom();
-  }
-
-  function appendLine(line){
-    histEl.insertAdjacentHTML('beforeend', renderLine(line));
-    applyFade();
-    scrollBottom();
-  }
-
-  function scrollBottom(){
-    histEl.scrollTop = histEl.scrollHeight;
-  }
-
-  // ========= Fade-out en mode fermé =========
-  function applyFade(){
-    var now = Date.now();
-    var nodes = histEl.querySelectorAll('.gx-line');
-    for (var i=0;i<nodes.length;i++){
-      var ts = parseInt(nodes[i].getAttribute('data-ts')||'0',10);
-      if (!state.open && (now - ts) > FADE_AFTER_MS){
-        nodes[i].classList.add('gx-faded');
-      } else {
-        nodes[i].classList.remove('gx-faded');
-      }
-    }
-  }
-  setInterval(applyFade, 500);
-
-  // ========= Tabs =========
-  function setTab(t, silent){
-    if (t!=='global' && t!=='team' && t!=='pm') t='global';
-    state.tab = t;
-    var btns = tabsEl.querySelectorAll('.gx-tab');
-    for (var i=0;i<btns.length;i++){
-      if (btns[i].getAttribute('data-tab')===t) btns[i].classList.add('gx-on');
-      else btns[i].classList.remove('gx-on');
-    }
-    inputEl.placeholder = placeholderFor(t);
-    updateChip();
-    if (!silent && state.open) inputEl.focus();
-  }
-
-  // ========= Open / Close =========
-  function doOpen(tab){
-    state.open = true;
-    document.body.classList.add('gx-open');
-    setTab(tab || state.tab || 'global', true);
-    inputEl.value = '';
-    updateChip();
-    applyFade();
-    setTimeout(function(){ try{ inputEl.focus(); }catch(e){} }, 10);
-    scrollBottom();
-  }
-
-  function doClose(){
-    state.open = false;
-    document.body.classList.remove('gx-open');
-    inputEl.value = '';
-    try{ inputEl.blur(); }catch(e){}
-    updateChip();
-    applyFade();
-    toLua('close');
-  }
-
-  // ========= Submit =========
-  function submit(){
-    var v = inputEl.value; // garde les espaces internes mais trim aux bords
-    v = v.replace(/^\s+|\s+$/g,'');
-    if (v === ''){
-      doClose();
-      return;
-    }
-    toLua('send', { tab: state.tab, text: v });
-    inputEl.value = '';
-    // Le Lua fera un doClose via genesisChatClose() ; on reste prudent :
-    doClose();
-  }
-
-  // ========= Wire UI =========
-  var tabs = tabsEl.querySelectorAll('.gx-tab');
-  for (var i=0;i<tabs.length;i++){
-    (function(b){
-      b.addEventListener('click', function(){ setTab(b.getAttribute('data-tab')); });
-    })(tabs[i]);
-  }
-
-  inputEl.addEventListener('input', updateChip);
-  inputEl.addEventListener('keydown', function(e){
-    if (e.key === 'Enter'){
-      e.preventDefault();
-      submit();
-    } else if (e.key === 'Tab'){
-      e.preventDefault();
-      var order = ['global','team','pm'];
-      var idx = order.indexOf(state.tab);
-      setTab(order[(idx+1)%order.length]);
-    } else if (e.key === 'Escape'){
-      e.preventDefault();
-      doClose();
-    }
+function selType(t) {
+  currentType = t;
+  document.getElementById('pdot').style.background = t.color;
+  document.getElementById('plabel').textContent = t.label;
+  document.querySelectorAll('.ddo').forEach(function(e) {
+    e.classList.toggle('sel', e.dataset.id === t.id);
   });
-  sendEl.addEventListener('click', submit);
+  closDD();
+  document.getElementById('inp').focus();
+}
 
-  // ========= API exposée à Lua =========
+function togDD() { ddOpen ? closDD() : openDD(); }
+function openDD() { ddOpen = true; ddEl.classList.add('open'); }
+function closDD() { ddOpen = false; ddEl.classList.remove('open'); }
 
-  // Ajouter un message (appelé par Lua à chaque ligne reçue)
-  window.genesisChatAdd = function(json){
-    try{
-      var data = (typeof json === 'string') ? JSON.parse(json) : json;
-      if (!data) return;
-      var line = {
-        id: ++idCounter,
-        prefix:  String(data.prefix  || ''),
-        name:    String(data.name    || ''),
-        message: String(data.message || ''),
-        tone:    String(data.tone    || 'local'),
-        kind:    String(data.kind    || 'normal'),
-        time:    String(data.time    || ''),
-        ts:      Date.now()
-      };
-      state.lines.push(line);
-      while (state.lines.length > MAX_LINES) state.lines.shift();
-      // On ré-render partiellement : append + purge DOM si dépassement
-      appendLine(line);
-      var domLines = histEl.querySelectorAll('.gx-line');
-      while (domLines.length > MAX_LINES){
-        histEl.removeChild(domLines[0]);
-        domLines = histEl.querySelectorAll('.gx-line');
-      }
-    }catch(e){}
-  };
+document.addEventListener('click', function(e) {
+  if (ddOpen && !e.target.closest('#type-pill') && !e.target.closest('#dd')) closDD();
+});
 
-  // Remplacer tout l'état (utile au démarrage ou pour un clear)
-  window.genesisChatSetState = function(json){
-    try{
-      var data = (typeof json === 'string') ? JSON.parse(json) : json;
-      if (!data) return;
-      if (Array.isArray(data.lines)){
-        state.lines = [];
-        for (var i=0;i<data.lines.length;i++){
-          var l = data.lines[i];
-          state.lines.push({
-            id: ++idCounter,
-            prefix:  String(l.prefix  || ''),
-            name:    String(l.name    || ''),
-            message: String(l.message || ''),
-            tone:    String(l.tone    || 'local'),
-            kind:    String(l.kind    || 'normal'),
-            time:    String(l.time    || ''),
-            ts:      Date.now()
-          });
-        }
-        fullRender();
-      }
-      if (typeof data.open === 'boolean'){
-        if (data.open) doOpen(data.tab);
-        else doClose();
-      }
-    }catch(e){}
-  };
+// ── Chat open/close (appelé par Lua via RunJavaScript)
+function openChat() {
+  chatOpen = true;
+  document.getElementById('input-area').classList.add('visible');
+  document.getElementById('inp').focus();
+}
 
-  window.genesisChatClear = function(){
-    state.lines = [];
-    fullRender();
-  };
+function closeChat() {
+  chatOpen = false;
+  closDD();
+  document.getElementById('input-area').classList.remove('visible');
+  document.getElementById('inp').value = '';
+}
 
-  window.genesisChatOpen = function(tab){
-    doOpen(tab || 'global');
-  };
+// ── Feed
+var feed = document.getElementById('feed');
 
-  window.genesisChatClose = function(){
-    doClose();
-  };
+function gTime() {
+  var n = new Date();
+  return String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+}
 
-  // Initial : signale à Lua qu'on est prêt
-  updateChip();
-  applyFade();
-  setTimeout(function(){ toLua('ready'); }, 30);
+// Appelé par Lua : add({type, name, time, text})
+function add(m) {
+  var d = document.createElement('div');
+  d.className = 'msg t-' + (m.type || 'say');
 
-})();
+  var tm = document.createElement('span');
+  tm.className = 'mt';
+  tm.textContent = m.time || gTime();
+  d.appendChild(tm);
+
+  var tp = m.type || 'say';
+  if (tp !== 'say' && tp !== 'system') {
+    var badge = document.createElement('span');
+    badge.className = 'mbadge';
+    badge.textContent = BADGES[tp] || tp.toUpperCase();
+    d.appendChild(badge);
+  }
+
+  if (m.name && tp !== 'it' && tp !== 'system') {
+    var nm = document.createElement('span');
+    nm.className = 'mname';
+    nm.textContent = m.name;
+    d.appendChild(nm);
+    var sep = document.createElement('span');
+    sep.className = 'msep';
+    sep.textContent = tp === 'say' ? ':' : '';
+    d.appendChild(sep);
+  }
+
+  var tx = document.createElement('span');
+  tx.className = 'mtext';
+  tx.textContent = m.text;
+  d.appendChild(tx);
+
+  feed.appendChild(d);
+
+  // Limite le nombre de messages affichés
+  while (feed.children.length > MSG_MAX) {
+    feed.removeChild(feed.children[0]);
+  }
+
+  // Auto-fade
+  setTimeout(function() {
+    d.classList.add('fade');
+    setTimeout(function() { if (d.parentNode) feed.removeChild(d); }, 1200);
+  }, MSG_LIFETIME);
+}
+
+// ── Envoi
+function doSend() {
+  var inp = document.getElementById('inp');
+  var txt = inp.value.trim();
+  if (!txt) { closeChat(); return; }
+
+  // Bridge GMod (window.GChat injecté par le DHTML Lua)
+  if (window.GChat && typeof window.GChat.Send === 'function') {
+    window.GChat.Send(currentType.id, txt);
+  } else {
+    // Fallback hors GMod (prévisualisation)
+    add({ type: currentType.id, name: 'Vous', time: gTime(), text: txt });
+  }
+
+  inp.value = '';
+  closeChat();
+}
+
+function onKey(e) {
+  if (e.key === 'Enter') { doSend(); }
+  if (e.key === 'Escape') {
+    closDD();
+    closeChat();
+    // Notifie Lua qu'on ferme
+    if (window.GChat && typeof window.GChat.Close === 'function') {
+      window.GChat.Close();
+    }
+  }
+}
+
+function onInput(e) {
+  var v = e.target.value;
+  if (v.startsWith('/')) {
+    var cmd = v.split(' ')[0].toLowerCase();
+    var found = TYPES.find(function(t) { return t.cmd.toLowerCase() === cmd; });
+    if (found) {
+      e.target.value = v.slice(cmd.length).trimStart();
+      selType(found);
+    }
+  }
+}
+
+// Init
+selType(TYPES[0]);
 </script>
 </body>
 </html>
