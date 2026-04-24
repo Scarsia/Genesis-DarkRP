@@ -5,12 +5,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
+
 :root {
   --font-ui:   'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --accent:    #c8cbd6;
   --muted:     rgba(200,203,214,0.4);
-  --shadow:    0 1px 3px rgba(0,0,0,0.75);
+  --shadow:    0 1px 3px rgba(0,0,0,0.7);
   --c-say:    #d6d9e0;
   --c-me:     #7eb8d4;
   --c-it:     #b09fd4;
@@ -20,143 +21,249 @@
   --c-advert: #c4a07e;
   --c-system: #888a8f;
 }
+
 html, body {
-  width:100%; height:100%;
-  background:transparent;
-  font-family:var(--font-ui);
-  -webkit-font-smoothing:antialiased;
-  overflow:hidden;
+  width: 100%; height: 100%;
+  background: transparent;
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ── FEED messages flottants ── */
+/* ── FEED : messages flottants top-left ── */
 #feed {
-  position:fixed;
-  top:14px; left:14px;
-  width:460px;
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-  pointer-events:none;
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  width: 460px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
 }
 
 .msg {
-  display:flex;
-  align-items:baseline;
-  gap:0;
-  opacity:1;
-  transition:opacity 1.2s ease;
-  line-height:1.5;
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  opacity: 1;
+  transition: opacity 1.2s ease;
+  line-height: 1.45;
+  padding: 1px 0;
 }
-.msg.fade { opacity:0; }
-.msg * { text-shadow:var(--shadow); }
 
-.mt   { font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-right:8px;flex-shrink:0; }
-.mbadge { font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
-          padding:1px 5px;border-radius:2px;margin-right:6px;flex-shrink:0;text-shadow:none; }
-.mname  { font-size:13px;font-weight:600;color:var(--accent);margin-right:4px;flex-shrink:0; }
-.msep   { font-size:13px;color:rgba(200,203,214,0.3);margin-right:5px;flex-shrink:0; }
-.mtext  { font-size:13px;font-weight:400;color:var(--c-say);flex:1;min-width:0;word-break:break-word; }
+.msg.fade { opacity: 0; }
 
-.t-me .mbadge { background:rgba(126,184,212,.18);color:var(--c-me); }
-.t-me .mname  { color:var(--c-me); }
-.t-me .mtext  { color:var(--c-me);font-style:italic; }
+/* texte avec ombre portée pour lisibilité sur fond de jeu */
+.msg * { text-shadow: var(--shadow); }
 
-.t-it .mname,.t-it .msep { display:none; }
-.t-it .mbadge { background:rgba(176,159,212,.18);color:var(--c-it); }
-.t-it .mtext  { color:var(--c-it);font-style:italic; }
+.msg-time {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-right: 8px;
+  flex-shrink: 0;
+  letter-spacing: 0;
+}
 
-.t-do .mbadge { background:rgba(126,196,160,.18);color:var(--c-do); }
-.t-do .mname  { color:var(--c-do); }
-.t-do .mtext  { color:var(--c-do); }
+.msg-tag {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 2px;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
 
-.t-ooc .mbadge { background:rgba(196,184,126,.18);color:var(--c-ooc); }
-.t-ooc .mname  { color:var(--c-ooc); }
-.t-ooc .mtext  { color:var(--c-ooc); }
+.msg-name {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-right: 5px;
+  flex-shrink: 0;
+}
 
-.t-w .mbadge { background:rgba(196,126,126,.18);color:var(--c-w); }
-.t-w .mname  { color:var(--c-w); }
-.t-w .mtext  { color:var(--c-w);font-style:italic; }
+.msg-sep {
+  font-size: 13px;
+  color: var(--muted);
+  margin-right: 5px;
+  flex-shrink: 0;
+}
 
-.t-advert .mbadge { background:rgba(196,160,126,.18);color:var(--c-advert); }
-.t-advert .mname  { color:var(--c-advert); }
-.t-advert .mtext  { color:var(--c-advert);font-weight:500; }
+.msg-text {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--c-say);
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
 
-.t-system .mbadge,.t-system .mname,.t-system .msep { display:none; }
-.t-system .mtext { color:var(--c-system);font-style:italic;font-size:11px; }
+/* types */
+.t-me   .msg-tag  { background: rgba(126,184,212,0.18); color: var(--c-me); }
+.t-me   .msg-name { color: var(--c-me); }
+.t-me   .msg-text { color: var(--c-me); font-style: italic; }
 
-/* ── INPUT BAR (cachée par défaut, visible en mode chat) ── */
+.t-it   .msg-name { display:none; }
+.t-it   .msg-sep  { display:none; }
+.t-it   .msg-tag  { background: rgba(176,159,212,0.18); color: var(--c-it); }
+.t-it   .msg-text { color: var(--c-it); font-style: italic; }
+
+.t-do   .msg-tag  { background: rgba(126,196,160,0.18); color: var(--c-do); }
+.t-do   .msg-name { color: var(--c-do); }
+.t-do   .msg-text { color: var(--c-do); }
+
+.t-ooc  .msg-tag  { background: rgba(196,184,126,0.18); color: var(--c-ooc); }
+.t-ooc  .msg-name { color: var(--c-ooc); }
+.t-ooc  .msg-text { color: var(--c-ooc); }
+
+.t-w    .msg-tag  { background: rgba(196,126,126,0.18); color: var(--c-w); }
+.t-w    .msg-name { color: var(--c-w); }
+.t-w    .msg-text { color: var(--c-w); font-style: italic; }
+
+.t-advert .msg-tag  { background: rgba(196,160,126,0.18); color: var(--c-advert); }
+.t-advert .msg-name { color: var(--c-advert); }
+.t-advert .msg-text { color: var(--c-advert); font-weight: 500; }
+
+.t-system .msg-tag  { display:none; }
+.t-system .msg-name { display:none; }
+.t-system .msg-sep  { display:none; }
+.t-system .msg-text { color: var(--c-system); font-style: italic; font-size: 11px; }
+.t-system .msg-time { opacity: 0.6; }
+
+/* ── INPUT BAR ── */
 #input-area {
-  position:fixed;
-  bottom:14px; left:14px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  width:460px;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .15s;
-}
-#input-area.visible {
-  opacity:1;
-  pointer-events:auto;
+  position: fixed;
+  bottom: 18px;
+  left: 14px;
+  width: 460px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 #type-pill {
-  display:flex;align-items:center;gap:5px;padding:0 12px;height:34px;
-  background:rgba(8,10,14,0.82);border:1px solid rgba(200,203,214,0.13);
-  border-radius:17px;font-family:var(--font-mono);font-size:11px;font-weight:500;
-  color:var(--accent);cursor:pointer;white-space:nowrap;flex-shrink:0;
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  transition:background .15s;letter-spacing:.02em;border:none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 11px;
+  height: 42px;
+  background: rgba(10,12,16,0.82);
+  border: 1px solid rgba(200,203,214,0.14);
+  border-radius: 21px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background .15s, border-color .15s;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
-#type-pill:hover { background:rgba(16,20,28,0.9); }
-.pd { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
+#type-pill:hover { background: rgba(20,24,30,0.9); border-color: rgba(200,203,214,0.25); }
+.pdot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
 #inp-wrap {
-  flex:1;height:34px;background:rgba(8,10,14,0.82);
-  border:1px solid rgba(200,203,214,0.13);border-radius:17px;
-  display:flex;align-items:center;padding:0 14px;
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  transition:border-color .15s;
+  flex: 1;
+  height: 42px;
+  background: rgba(10,12,16,0.82);
+  border: 1px solid rgba(200,203,214,0.14);
+  border-radius: 21px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  transition: border-color .15s;
 }
-#inp-wrap:focus-within { border-color:rgba(200,203,214,0.26); }
+#inp-wrap:focus-within { border-color: rgba(200,203,214,0.28); }
 
 #inp {
-  flex:1;background:transparent;border:none;outline:none;
-  font-family:var(--font-ui);font-size:13px;font-weight:400;
-  color:var(--accent);min-width:0;
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--accent);
+  min-width: 0;
 }
-#inp::placeholder { color:var(--muted); }
+#inp::placeholder { color: var(--muted); }
 
 #send {
-  width:34px;height:34px;border-radius:50%;background:rgba(8,10,14,0.82);
-  border:1px solid rgba(200,203,214,0.13);display:flex;align-items:center;
-  justify-content:center;cursor:pointer;flex-shrink:0;color:var(--muted);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  transition:color .15s;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: rgba(10,12,16,0.82);
+  border: 1px solid rgba(200,203,214,0.14);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  color: var(--muted);
+  transition: background .15s, color .15s;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
-#send:hover { color:var(--accent); }
-#send svg { width:13px;height:13px;fill:currentColor; }
+#send:hover { background: rgba(30,35,45,0.92); color: var(--accent); }
+#send svg { width: 14px; height: 14px; fill: currentColor; }
 
-/* ── DROPDOWN type ── */
+/* ── DROPDOWN ── */
 #dd {
-  position:fixed;bottom:56px;left:14px;width:218px;
-  background:rgba(8,10,14,0.96);border:1px solid rgba(200,203,214,0.17);
-  border-radius:8px;overflow:hidden;display:none;flex-direction:column;
-  z-index:100;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  box-shadow:0 8px 32px rgba(0,0,0,.65);
+  position: fixed;
+  bottom: 64px;
+  left: 14px;
+  width: 220px;
+  background: rgba(10,12,16,0.94);
+  border: 1px solid rgba(200,203,214,0.18);
+  border-radius: 8px;
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+  z-index: 100;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
 }
-#dd.open { display:flex; }
-.ddt { padding:7px 12px;font-size:9px;font-weight:600;letter-spacing:.14em;
-       text-transform:uppercase;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.05); }
-.ddo { display:flex;align-items:center;gap:9px;padding:7px 12px;cursor:pointer;
-       transition:background .1s;border-bottom:1px solid rgba(255,255,255,.04); }
-.ddo:last-child { border-bottom:none; }
-.ddo:hover { background:rgba(255,255,255,.05); }
-.ddo.sel  { background:rgba(200,203,214,.07); }
-.ddot { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
-.ddoc { font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--accent);min-width:54px; }
-.ddod { font-size:11px;color:var(--muted); }
+#dd.open { display: flex; }
+
+.dd-title {
+  padding: 8px 12px 6px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.dd-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  cursor: pointer;
+  transition: background .1s;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.dd-opt:last-child { border-bottom: none; }
+.dd-opt:hover { background: rgba(255,255,255,0.05); }
+.dd-opt.sel { background: rgba(200,203,214,0.07); }
+.dd-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dd-cmd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent);
+  min-width: 54px;
+}
+.dd-desc { font-size: 11px; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -164,17 +271,17 @@ html, body {
 <div id="feed"></div>
 
 <div id="dd">
-  <div class="ddt">Type de message</div>
+  <div class="dd-title">Type de message</div>
 </div>
 
 <div id="input-area">
   <button id="type-pill" onclick="togDD()">
-    <span class="pd" id="pdot"></span>
+    <span class="pdot" id="pdot"></span>
     <span id="plabel">/say</span>
   </button>
   <div id="inp-wrap">
-    <input id="inp" placeholder="Envoyez un message ..."
-      maxlength="250" onkeydown="onKey(event)" oninput="onInput(event)" />
+    <input id="inp" placeholder="Envoyez un message ..." maxlength="250"
+      onkeydown="onKey(event)" oninput="onInput(event)" />
   </div>
   <button id="send" onclick="doSend()">
     <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
@@ -182,44 +289,36 @@ html, body {
 </div>
 
 <script>
-// ── Types disponibles
-var TYPES = [
+const TYPES = [
   {id:'say',    cmd:'/say',    label:'/say',    desc:'Dialogue normal',   color:'#c8cbd6'},
   {id:'me',     cmd:'/me',     label:'/me',     desc:'Action (3e pers.)', color:'#7eb8d4'},
   {id:'it',     cmd:'/it',     label:'/it',     desc:'Narration',         color:'#b09fd4'},
-  {id:'do',     cmd:'/do',     label:'/do',     desc:'Description',       color:'#7ec4a0'},
+  {id:'do',     cmd:'/do',     label:'/do',     desc:'Description scène', color:'#7ec4a0'},
   {id:'ooc',    cmd:'/ooc',    label:'/ooc',    desc:'Hors personnage',   color:'#c4b87e'},
   {id:'w',      cmd:'/w',      label:'/w',      desc:'Chuchotement',      color:'#c47e7e'},
   {id:'advert', cmd:'/advert', label:'/advert', desc:'Publicité',         color:'#c4a07e'},
 ];
-var BADGES = {say:'SAY',me:'ME',it:'IT','do':'DO',ooc:'OOC',w:'MURMURE',advert:'ANNONCE'};
-var MSG_LIFETIME = 14000;
-var MSG_MAX = 20;
+const TAGS = { say:'SAY', me:'ME', it:'IT', do:'DO', ooc:'OOC', w:'MURMURE', advert:'ANNONCE' };
 
-var currentType = TYPES[0];
-var ddOpen = false;
-var chatOpen = false;
+let cType = TYPES[0];
+let ddOpen = false;
 
-// ── Build dropdown
-var ddEl = document.getElementById('dd');
-TYPES.forEach(function(t) {
-  var el = document.createElement('div');
-  el.className = 'ddo' + (t.id === 'say' ? ' sel' : '');
+// Build dropdown
+const ddEl = document.getElementById('dd');
+TYPES.forEach(t => {
+  const el = document.createElement('div');
+  el.className = 'dd-opt' + (t.id === 'say' ? ' sel' : '');
   el.dataset.id = t.id;
-  el.innerHTML = '<span class="ddot" style="background:' + t.color + '"></span>'
-               + '<span class="ddoc">' + t.label + '</span>'
-               + '<span class="ddod">' + t.desc + '</span>';
-  el.onclick = function() { selType(t); };
+  el.innerHTML = `<span class="dd-dot" style="background:${t.color}"></span><span class="dd-cmd">${t.label}</span><span class="dd-desc">${t.desc}</span>`;
+  el.onclick = () => selType(t);
   ddEl.appendChild(el);
 });
 
 function selType(t) {
-  currentType = t;
+  cType = t;
   document.getElementById('pdot').style.background = t.color;
   document.getElementById('plabel').textContent = t.label;
-  document.querySelectorAll('.ddo').forEach(function(e) {
-    e.classList.toggle('sel', e.dataset.id === t.id);
-  });
+  document.querySelectorAll('.dd-opt').forEach(e => e.classList.toggle('sel', e.dataset.id === t.id));
   closDD();
   document.getElementById('inp').focus();
 }
@@ -227,125 +326,109 @@ function selType(t) {
 function togDD() { ddOpen ? closDD() : openDD(); }
 function openDD() { ddOpen = true; ddEl.classList.add('open'); }
 function closDD() { ddOpen = false; ddEl.classList.remove('open'); }
-
-document.addEventListener('click', function(e) {
+document.addEventListener('click', e => {
   if (ddOpen && !e.target.closest('#type-pill') && !e.target.closest('#dd')) closDD();
 });
 
-// ── Chat open/close (appelé par Lua via RunJavaScript)
-function openChat() {
-  chatOpen = true;
-  document.getElementById('input-area').classList.add('visible');
-  document.getElementById('inp').focus();
-}
-
-function closeChat() {
-  chatOpen = false;
-  closDD();
-  document.getElementById('input-area').classList.remove('visible');
-  document.getElementById('inp').value = '';
-}
-
-// ── Feed
-var feed = document.getElementById('feed');
+// Feed
+const feed = document.getElementById('feed');
+const MSG_LIFETIME = 14000; // ms avant fade
+const MSG_MAX = 20;
+const msgTimers = new Map();
 
 function gTime() {
-  var n = new Date();
+  const n = new Date();
   return String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
 }
 
-// Appelé par Lua : add({type, name, time, text})
-function add(m) {
-  var d = document.createElement('div');
+function addMsg(m) {
+  const d = document.createElement('div');
   d.className = 'msg t-' + (m.type || 'say');
 
-  var tm = document.createElement('span');
-  tm.className = 'mt';
-  tm.textContent = m.time || gTime();
+  const tm = document.createElement('span');
+  tm.className = 'msg-time';
+  tm.textContent = m.time;
   d.appendChild(tm);
 
-  var tp = m.type || 'say';
-  if (tp !== 'say' && tp !== 'system') {
-    var badge = document.createElement('span');
-    badge.className = 'mbadge';
-    badge.textContent = BADGES[tp] || tp.toUpperCase();
-    d.appendChild(badge);
+  const type = m.type || 'say';
+  if (type !== 'say' && type !== 'system') {
+    const tag = document.createElement('span');
+    tag.className = 'msg-tag';
+    tag.textContent = TAGS[type] || type.toUpperCase();
+    d.appendChild(tag);
   }
 
-  if (m.name && tp !== 'it' && tp !== 'system') {
-    var nm = document.createElement('span');
-    nm.className = 'mname';
+  if (m.name && type !== 'it' && type !== 'system') {
+    const nm = document.createElement('span');
+    nm.className = 'msg-name';
     nm.textContent = m.name;
     d.appendChild(nm);
-    var sep = document.createElement('span');
-    sep.className = 'msep';
-    sep.textContent = tp === 'say' ? ':' : '';
+    const sep = document.createElement('span');
+    sep.className = 'msg-sep';
+    sep.textContent = type === 'say' ? ':' : '';
     d.appendChild(sep);
   }
 
-  var tx = document.createElement('span');
-  tx.className = 'mtext';
+  const tx = document.createElement('span');
+  tx.className = 'msg-text';
   tx.textContent = m.text;
   d.appendChild(tx);
 
   feed.appendChild(d);
 
-  // Limite le nombre de messages affichés
+  // Limit max messages
   while (feed.children.length > MSG_MAX) {
-    feed.removeChild(feed.children[0]);
+    const old = feed.children[0];
+    if (msgTimers.has(old)) { clearTimeout(msgTimers.get(old)); msgTimers.delete(old); }
+    feed.removeChild(old);
   }
 
-  // Auto-fade
-  setTimeout(function() {
+  // Auto-fade & remove
+  const fadeT = setTimeout(() => {
     d.classList.add('fade');
-    setTimeout(function() { if (d.parentNode) feed.removeChild(d); }, 1200);
+    setTimeout(() => { if (d.parentNode) feed.removeChild(d); msgTimers.delete(d); }, 1200);
   }, MSG_LIFETIME);
+  msgTimers.set(d, fadeT);
 }
 
-// ── Envoi
 function doSend() {
-  var inp = document.getElementById('inp');
-  var txt = inp.value.trim();
-  if (!txt) { closeChat(); return; }
-
-  // Bridge GMod (window.GChat injecté par le DHTML Lua)
-  if (window.GChat && typeof window.GChat.Send === 'function') {
-    window.GChat.Send(currentType.id, txt);
-  } else {
-    // Fallback hors GMod (prévisualisation)
-    add({ type: currentType.id, name: 'Vous', time: gTime(), text: txt });
-  }
-
+  const inp = document.getElementById('inp');
+  const txt = inp.value.trim();
+  if (!txt) return;
   inp.value = '';
-  closeChat();
+  addMsg({ type: cType.id, name: 'Vous', time: gTime(), text: txt });
 }
 
 function onKey(e) {
-  if (e.key === 'Enter') { doSend(); }
-  if (e.key === 'Escape') {
-    closDD();
-    closeChat();
-    // Notifie Lua qu'on ferme
-    if (window.GChat && typeof window.GChat.Close === 'function') {
-      window.GChat.Close();
-    }
-  }
+  if (e.key === 'Enter') doSend();
+  if (e.key === 'Escape') closDD();
 }
 
 function onInput(e) {
-  var v = e.target.value;
+  const v = e.target.value;
   if (v.startsWith('/')) {
-    var cmd = v.split(' ')[0].toLowerCase();
-    var found = TYPES.find(function(t) { return t.cmd.toLowerCase() === cmd; });
-    if (found) {
-      e.target.value = v.slice(cmd.length).trimStart();
-      selType(found);
-    }
+    const cmd = v.split(' ')[0].toLowerCase();
+    const found = TYPES.find(t => t.cmd.toLowerCase() === cmd);
+    if (found) { e.target.value = v.slice(cmd.length).trimStart(); selType(found); }
   }
 }
 
-// Init
 selType(TYPES[0]);
+
+// Seed démo
+setTimeout(() => {
+  const demo = [
+    {type:'system', name:'', time:'00:38', text:'Connexion au serveur Genesis Network.'},
+    {type:'say',    name:'Yura Sabaku',     time:'00:39', text:'Retire son chapeau.'},
+    {type:'me',     name:'Yura Sabaku',     time:'00:39', text:'lui donne son bras.'},
+    {type:'me',     name:'Junko Shirogane', time:'00:40', text:'examine sa main et en particulier ses doigts, ses ongles.'},
+    {type:'me',     name:'Junko Shirogane', time:'00:41', text:'dépose sa main froide et rugueuse sur le visage de cette dernière.'},
+    {type:'ooc',    name:'NekoSan',         time:'00:41', text:'Je reviens dans 2 min.'},
+    {type:'it',     name:'',                time:'00:42', text:"Le vent froid s'engouffre dans la ruelle, faisant trembler les néons."},
+    {type:'advert', name:'Genesis Radio',   time:'00:42', text:'Nouveau stock — Dealership Route 66, ouvert 24h/24.'},
+  ];
+  demo.forEach((m, i) => setTimeout(() => addMsg(m), i * 180));
+}, 200);
 </script>
 </body>
 </html>
