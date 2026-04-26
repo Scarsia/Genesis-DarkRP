@@ -142,10 +142,11 @@ html, body {
   bottom: 18px;
   left: 14px;
   width: 460px;
-  display: flex;
+  display: none;           /* -- WLC FIX: caché par défaut, openChat() l'affiche -- */
   align-items: center;
   gap: 8px;
 }
+#input-area.open { display: flex; }   /* -- WLC FIX -- */
 
 #type-pill {
   display: flex;
@@ -289,28 +290,29 @@ html, body {
 </div>
 
 <script>
-const TYPES = [
+var TYPES = [
   {id:'say',    cmd:'/say',    label:'/say',    desc:'Dialogue normal',   color:'#c8cbd6'},
   {id:'me',     cmd:'/me',     label:'/me',     desc:'Action (3e pers.)', color:'#7eb8d4'},
   {id:'it',     cmd:'/it',     label:'/it',     desc:'Narration',         color:'#b09fd4'},
   {id:'do',     cmd:'/do',     label:'/do',     desc:'Description scène', color:'#7ec4a0'},
   {id:'ooc',    cmd:'/ooc',    label:'/ooc',    desc:'Hors personnage',   color:'#c4b87e'},
   {id:'w',      cmd:'/w',      label:'/w',      desc:'Chuchotement',      color:'#c47e7e'},
-  {id:'advert', cmd:'/advert', label:'/advert', desc:'Publicité',         color:'#c4a07e'},
+  {id:'advert', cmd:'/advert', label:'/advert', desc:'Publicité',         color:'#c4a07e'}
 ];
-const TAGS = { say:'SAY', me:'ME', it:'IT', do:'DO', ooc:'OOC', w:'MURMURE', advert:'ANNONCE' };
+var TAGS = { say:'SAY', me:'ME', it:'IT', 'do':'DO', ooc:'OOC', w:'MURMURE', advert:'ANNONCE' };
 
-let cType = TYPES[0];
-let ddOpen = false;
+var cType = TYPES[0];
+var ddOpen = false;
+var chatOpen = false;   // -- WLC FIX: état du chat --
 
 // Build dropdown
-const ddEl = document.getElementById('dd');
-TYPES.forEach(t => {
-  const el = document.createElement('div');
+var ddEl = document.getElementById('dd');
+TYPES.forEach(function(t) {
+  var el = document.createElement('div');
   el.className = 'dd-opt' + (t.id === 'say' ? ' sel' : '');
-  el.dataset.id = t.id;
-  el.innerHTML = `<span class="dd-dot" style="background:${t.color}"></span><span class="dd-cmd">${t.label}</span><span class="dd-desc">${t.desc}</span>`;
-  el.onclick = () => selType(t);
+  el.setAttribute('data-id', t.id);
+  el.innerHTML = '<span class="dd-dot" style="background:' + t.color + '"></span><span class="dd-cmd">' + t.label + '</span><span class="dd-desc">' + t.desc + '</span>';
+  el.onclick = function() { selType(t); };
   ddEl.appendChild(el);
 });
 
@@ -318,7 +320,14 @@ function selType(t) {
   cType = t;
   document.getElementById('pdot').style.background = t.color;
   document.getElementById('plabel').textContent = t.label;
-  document.querySelectorAll('.dd-opt').forEach(e => e.classList.toggle('sel', e.dataset.id === t.id));
+  var opts = document.querySelectorAll('.dd-opt');
+  for (var i = 0; i < opts.length; i++) {
+    if (opts[i].getAttribute('data-id') === t.id) {
+      opts[i].classList.add('sel');
+    } else {
+      opts[i].classList.remove('sel');
+    }
+  }
   closDD();
   document.getElementById('inp').focus();
 }
@@ -326,109 +335,210 @@ function selType(t) {
 function togDD() { ddOpen ? closDD() : openDD(); }
 function openDD() { ddOpen = true; ddEl.classList.add('open'); }
 function closDD() { ddOpen = false; ddEl.classList.remove('open'); }
-document.addEventListener('click', e => {
+document.addEventListener('click', function(e) {
   if (ddOpen && !e.target.closest('#type-pill') && !e.target.closest('#dd')) closDD();
 });
 
+// ═══════════════════════════════════════
+// WLC FIX: openChat / closeChat — appelés par le Lua
+// ═══════════════════════════════════════
+function openChat() {
+  chatOpen = true;
+  document.getElementById('input-area').classList.add('open');
+  // Réinitialiser le type à /say à chaque ouverture
+  selType(TYPES[0]);
+  var inp = document.getElementById('inp');
+  inp.value = '';
+  inp.focus();
+  // Annuler le fade des messages existants pour qu'on les voie pendant qu'on écrit
+  cancelAllFades();
+}
+
+function closeChat() {
+  chatOpen = false;
+  document.getElementById('input-area').classList.remove('open');
+  closDD();
+  document.getElementById('inp').value = '';
+  document.getElementById('inp').blur();
+  // Relancer les fades pour les messages visibles
+  restartFades();
+}
+
+// ═══════════════════════════════════════
+// WLC FIX: add() — appelé par PushToHTML côté Lua
+// Signature : add({type, name, time, text, color})
+// ═══════════════════════════════════════
+function add(m) {
+  addMsg(m);
+}
+
 // Feed
-const feed = document.getElementById('feed');
-const MSG_LIFETIME = 14000; // ms avant fade
-const MSG_MAX = 20;
-const msgTimers = new Map();
+var feed = document.getElementById('feed');
+var MSG_LIFETIME = 14000; // ms avant fade
+var MSG_MAX = 60;
+var msgTimers = [];  // [{el, timerId}]
 
 function gTime() {
-  const n = new Date();
+  var n = new Date();
   return String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
 }
 
-function addMsg(m) {
-  const d = document.createElement('div');
-  d.className = 'msg t-' + (m.type || 'say');
+// -- WLC FIX: annuler les fades quand le chat est ouvert --
+function cancelAllFades() {
+  for (var i = 0; i < msgTimers.length; i++) {
+    if (msgTimers[i].timerId) {
+      clearTimeout(msgTimers[i].timerId);
+      msgTimers[i].timerId = null;
+    }
+    msgTimers[i].el.classList.remove('fade');
+    msgTimers[i].el.style.opacity = '1';
+  }
+}
 
-  const tm = document.createElement('span');
+function restartFades() {
+  for (var i = 0; i < msgTimers.length; i++) {
+    (function(entry) {
+      if (!entry.timerId && entry.el.parentNode) {
+        entry.timerId = setTimeout(function() {
+          entry.el.classList.add('fade');
+          setTimeout(function() {
+            if (entry.el.parentNode) feed.removeChild(entry.el);
+            removeMsgTimer(entry.el);
+          }, 1200);
+        }, 3000); // court délai après fermeture
+      }
+    })(msgTimers[i]);
+  }
+}
+
+function removeMsgTimer(el) {
+  for (var i = msgTimers.length - 1; i >= 0; i--) {
+    if (msgTimers[i].el === el) {
+      msgTimers.splice(i, 1);
+      break;
+    }
+  }
+}
+
+function addMsg(m) {
+  var d = document.createElement('div');
+  var type = m.type || 'say';
+  d.className = 'msg t-' + type;
+
+  var tm = document.createElement('span');
   tm.className = 'msg-time';
-  tm.textContent = m.time;
+  tm.textContent = m.time || gTime();
   d.appendChild(tm);
 
-  const type = m.type || 'say';
   if (type !== 'say' && type !== 'system') {
-    const tag = document.createElement('span');
+    var tag = document.createElement('span');
     tag.className = 'msg-tag';
     tag.textContent = TAGS[type] || type.toUpperCase();
     d.appendChild(tag);
   }
 
   if (m.name && type !== 'it' && type !== 'system') {
-    const nm = document.createElement('span');
+    var nm = document.createElement('span');
     nm.className = 'msg-name';
+    // -- WLC FIX: appliquer la couleur du joueur si fournie --
+    if (m.color) nm.style.color = m.color;
     nm.textContent = m.name;
     d.appendChild(nm);
-    const sep = document.createElement('span');
+    var sep = document.createElement('span');
     sep.className = 'msg-sep';
     sep.textContent = type === 'say' ? ':' : '';
     d.appendChild(sep);
   }
 
-  const tx = document.createElement('span');
+  var tx = document.createElement('span');
   tx.className = 'msg-text';
-  tx.textContent = m.text;
+  tx.textContent = m.text || '';
   d.appendChild(tx);
 
   feed.appendChild(d);
 
   // Limit max messages
   while (feed.children.length > MSG_MAX) {
-    const old = feed.children[0];
-    if (msgTimers.has(old)) { clearTimeout(msgTimers.get(old)); msgTimers.delete(old); }
+    var old = feed.children[0];
+    removeMsgTimer(old);
     feed.removeChild(old);
   }
 
-  // Auto-fade & remove
-  const fadeT = setTimeout(() => {
-    d.classList.add('fade');
-    setTimeout(() => { if (d.parentNode) feed.removeChild(d); msgTimers.delete(d); }, 1200);
-  }, MSG_LIFETIME);
-  msgTimers.set(d, fadeT);
+  // Auto-fade & remove (sauf si chat ouvert)
+  var entry = { el: d, timerId: null };
+
+  if (!chatOpen) {
+    entry.timerId = setTimeout(function() {
+      d.classList.add('fade');
+      setTimeout(function() {
+        if (d.parentNode) feed.removeChild(d);
+        removeMsgTimer(d);
+      }, 1200);
+    }, MSG_LIFETIME);
+  }
+
+  msgTimers.push(entry);
 }
 
+// ═══════════════════════════════════════
+// WLC FIX: doSend bridge vers Lua via GChat.Send
+// ═══════════════════════════════════════
 function doSend() {
-  const inp = document.getElementById('inp');
-  const txt = inp.value.trim();
-  if (!txt) return;
+  var inp = document.getElementById('inp');
+  var txt = inp.value.trim();
   inp.value = '';
-  addMsg({ type: cType.id, name: 'Vous', time: gTime(), text: txt });
+
+  if (!txt) {
+    // Texte vide → juste fermer le chat
+    if (typeof GChat !== 'undefined' && GChat.Close) {
+      GChat.Close();
+    }
+    return;
+  }
+
+  // Prépend la commande si ce n'est pas /say
+  var fullText = txt;
+  if (cType.id !== 'say') {
+    fullText = cType.cmd + ' ' + txt;
+  }
+
+  // Envoyer au serveur via le bridge Lua
+  if (typeof GChat !== 'undefined' && GChat.Send) {
+    GChat.Send(cType.id, fullText);
+  }
 }
 
 function onKey(e) {
-  if (e.key === 'Enter') doSend();
-  if (e.key === 'Escape') closDD();
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    doSend();
+  }
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    closDD();
+    // -- WLC FIX: Escape ferme le chat via Lua --
+    if (typeof GChat !== 'undefined' && GChat.Close) {
+      GChat.Close();
+    }
+  }
 }
 
 function onInput(e) {
-  const v = e.target.value;
+  var v = e.target.value;
   if (v.startsWith('/')) {
-    const cmd = v.split(' ')[0].toLowerCase();
-    const found = TYPES.find(t => t.cmd.toLowerCase() === cmd);
-    if (found) { e.target.value = v.slice(cmd.length).trimStart(); selType(found); }
+    var cmd = v.split(' ')[0].toLowerCase();
+    var found = null;
+    for (var i = 0; i < TYPES.length; i++) {
+      if (TYPES[i].cmd.toLowerCase() === cmd) { found = TYPES[i]; break; }
+    }
+    if (found) {
+      e.target.value = v.slice(cmd.length).trimStart();
+      selType(found);
+    }
   }
 }
 
 selType(TYPES[0]);
-
-// Seed démo
-setTimeout(() => {
-  const demo = [
-    {type:'system', name:'', time:'00:38', text:'Connexion au serveur Genesis Network.'},
-    {type:'say',    name:'Yura Sabaku',     time:'00:39', text:'Retire son chapeau.'},
-    {type:'me',     name:'Yura Sabaku',     time:'00:39', text:'lui donne son bras.'},
-    {type:'me',     name:'Junko Shirogane', time:'00:40', text:'examine sa main et en particulier ses doigts, ses ongles.'},
-    {type:'me',     name:'Junko Shirogane', time:'00:41', text:'dépose sa main froide et rugueuse sur le visage de cette dernière.'},
-    {type:'ooc',    name:'NekoSan',         time:'00:41', text:'Je reviens dans 2 min.'},
-    {type:'it',     name:'',                time:'00:42', text:"Le vent froid s'engouffre dans la ruelle, faisant trembler les néons."},
-    {type:'advert', name:'Genesis Radio',   time:'00:42', text:'Nouveau stock — Dealership Route 66, ouvert 24h/24.'},
-  ];
-  demo.forEach((m, i) => setTimeout(() => addMsg(m), i * 180));
-}, 200);
 </script>
 </body>
 </html>
