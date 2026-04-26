@@ -53,6 +53,15 @@ html, body {
   pointer-events: none;
   overflow: hidden;
 }
+#feed.scrollable {
+  overflow-y: auto;
+  pointer-events: auto;
+  justify-content: flex-start;
+}
+#feed.scrollable::-webkit-scrollbar { width: 4px; }
+#feed.scrollable::-webkit-scrollbar-track { background: transparent; }
+#feed.scrollable::-webkit-scrollbar-thumb { background: rgba(200,203,214,0.2); border-radius: 2px; }
+#feed.scrollable::-webkit-scrollbar-thumb:hover { background: rgba(200,203,214,0.35); }
 
 .msg {
   display: flex;
@@ -431,16 +440,20 @@ document.addEventListener('click', function(e) {
 function openChat() {
   chatOpen = true;
   document.getElementById('input-area').classList.add('open');
+  document.getElementById('feed').classList.add('scrollable');
   selType(TYPES[0]);
   var inp = document.getElementById('inp');
   inp.value = '';
   inp.focus();
   cancelAllFades();
+  /* Scroll to bottom */
+  feed.scrollTop = feed.scrollHeight;
 }
 
 function closeChat() {
   chatOpen = false;
   document.getElementById('input-area').classList.remove('open');
+  document.getElementById('feed').classList.remove('scrollable');
   closDD();
   document.getElementById('inp').value = '';
   document.getElementById('inp').blur();
@@ -560,6 +573,11 @@ function addMsg(m) {
     }, MSG_LIFETIME);
   }
   msgTimers.push(entry);
+
+  /* Auto-scroll to bottom si chat ouvert */
+  if (chatOpen) {
+    feed.scrollTop = feed.scrollHeight;
+  }
 }
 
 /* ══════════════════════════════════════ */
