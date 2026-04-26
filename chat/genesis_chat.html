@@ -45,10 +45,13 @@ html, body {
   top: 14px;
   left: 14px;
   width: 530px;
+  max-height: 35%;
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   gap: 1px;
   pointer-events: none;
+  overflow: hidden;
 }
 
 .msg {
@@ -456,7 +459,7 @@ function add(m) { addMsg(m); }
 /* ══════════════════════════════════════ */
 var feed = document.getElementById('feed');
 var MSG_LIFETIME = 14000;
-var MSG_MAX = 80;
+var MSG_MAX = 25;
 var msgTimers = [];
 
 function gTime() {
