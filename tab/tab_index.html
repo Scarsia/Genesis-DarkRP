@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-
 ::-webkit-scrollbar{display:none;}
 html{scrollbar-width:none;}
 
@@ -17,29 +16,20 @@ html,body{
     user-select:none;-webkit-user-select:none;
 }
 
-/* ── GLASS TOKENS (from genesis_banking) ── */
-.glass{background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:0.5px solid rgba(255,255,255,0.08);border-radius:16px;}
-.glass-sm{background:rgba(255,255,255,0.025);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:0.5px solid rgba(255,255,255,0.06);border-radius:10px;}
-
-/* ── MAIN CONTAINER ── */
 .gt{
     width:100%;height:100%;
     display:flex;flex-direction:column;
-    padding:12px 14px 10px;
-    background:rgba(5,5,10,0.88);
-    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    padding:16px 18px;
     opacity:0;transition:opacity 0.2s ease;
 }
 .gt.visible{opacity:1;}
 
-/* ── HEADER ── */
 .gt-head{
-    display:flex;align-items:flex-start;justify-content:space-between;
-    margin-bottom:8px;flex-shrink:0;
+    display:flex;justify-content:space-between;align-items:flex-start;
+    margin-bottom:10px;flex-shrink:0;
 }
 .gt-title{font-size:13px;font-weight:600;letter-spacing:.18em;color:#c8ccd8;text-transform:uppercase;}
 .gt-sub{font-size:11px;color:#6a7890;margin-top:2px;}
-.gt-right{text-align:right;}
 .gt-online{font-size:10px;color:#6a7890;letter-spacing:.1em;text-transform:uppercase;}
 .gt-dot{
     display:inline-block;width:6px;height:6px;border-radius:50%;
@@ -47,40 +37,38 @@ html,body{
     box-shadow:0 0 6px rgba(34,185,96,0.4);
 }
 
-/* ── STATS BAR ── */
 .gt-stats{
-    display:flex;gap:8px;margin-bottom:8px;flex-shrink:0;
+    display:flex;gap:8px;margin-bottom:12px;flex-shrink:0;
 }
 .gt-stat{
-    flex:1;padding:10px 12px;
+    flex:1;
+    background:rgba(255,255,255,0.025);
+    border:0.5px solid rgba(255,255,255,0.06);
+    border-radius:10px;padding:10px 12px;
 }
-.gt-stat-label{font-size:10px;letter-spacing:.2em;color:#6a7890;text-transform:uppercase;}
-.gt-stat-val{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.5px;margin-top:2px;}
+.gt-stat-label{font-size:9px;letter-spacing:.2em;color:#6a7890;text-transform:uppercase;}
+.gt-stat-val{font-size:18px;font-weight:700;margin-top:2px;}
 .gt-stat-unit{font-size:10px;color:#6a7890;font-weight:400;}
-.gt-stat-val.accent-green{color:#22b960;}
-.gt-stat-val.accent-purple{color:#b8bcc8;}
 
-/* ── SECTION LABEL ── */
 .gt-section{
     font-size:10px;letter-spacing:.2em;color:#6a7890;
-    text-transform:uppercase;margin-bottom:6px;flex-shrink:0;
+    text-transform:uppercase;margin-bottom:8px;flex-shrink:0;
 }
 
-/* ── PLAYER LIST ── */
 .gt-list{
     flex:1;overflow-y:auto;overflow-x:hidden;
     display:flex;flex-direction:column;gap:3px;
     min-height:0;
 }
 
-/* ── PLAYER ROW ── */
 .gt-row{
     display:flex;align-items:center;
-    padding:7px 10px;border-radius:10px;
+    padding:8px 10px;border-radius:10px;
     cursor:pointer;transition:all .18s;
     position:relative;flex-shrink:0;
     background:rgba(255,255,255,0.025);
     border:0.5px solid rgba(255,255,255,0.05);
+    overflow:hidden;
 }
 .gt-row:hover{
     background:rgba(255,255,255,0.045);
@@ -92,7 +80,7 @@ html,body{
 }
 .gt-row.is-self::before{
     content:'';position:absolute;left:0;top:0;bottom:0;
-    width:3px;background:#b8bcc8;border-radius:0;
+    width:3px;background:#b8bcc8;
 }
 .gt-row.is-self .gt-name{color:#fff;}
 
@@ -124,7 +112,10 @@ html,body{
 .gt-ping-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .gt-ping-val{font-size:11px;color:#6a7890;font-weight:500;}
 
-/* ── CONTEXT MENU ── */
+.ping-good{background:#22b960;box-shadow:0 0 4px rgba(34,185,96,0.3);}
+.ping-mid{background:#d4a030;box-shadow:0 0 4px rgba(212,160,48,0.3);}
+.ping-bad{background:#d03030;box-shadow:0 0 4px rgba(208,48,48,0.3);}
+
 .gt-ctx-overlay{
     display:none;position:fixed;
     top:0;left:0;right:0;bottom:0;z-index:90;
@@ -167,85 +158,62 @@ html,body{
     color:#e06060;background:rgba(180,50,50,0.06);
 }
 
-/* ── FOOTER ── */
 .gt-foot{
-    margin-top:6px;display:flex;justify-content:space-between;
+    margin-top:10px;display:flex;justify-content:space-between;
     font-size:9px;letter-spacing:.12em;
     color:#4a5870;text-transform:uppercase;flex-shrink:0;
 }
-
-/* ── PING COLORS ── */
-.ping-good{background:#22b960;box-shadow:0 0 4px rgba(34,185,96,0.3);}
-.ping-mid{background:#d4a030;box-shadow:0 0 4px rgba(212,160,48,0.3);}
-.ping-bad{background:#d03030;box-shadow:0 0 4px rgba(208,48,48,0.3);}
 </style>
 </head>
 <body>
 
 <div class="gt" id="gtMain">
 
-    <!-- HEADER -->
     <div class="gt-head">
         <div>
             <div class="gt-title">Sessions</div>
             <div class="gt-sub">Genesis Network</div>
         </div>
-        <div class="gt-right">
+        <div>
             <div class="gt-online"><span class="gt-dot"></span>En ligne</div>
         </div>
     </div>
 
-    <!-- STATS -->
     <div class="gt-stats">
-        <div class="gt-stat glass-sm">
+        <div class="gt-stat">
             <div class="gt-stat-label">Ping</div>
-            <div class="gt-stat-val accent-green" id="statPing">
+            <div class="gt-stat-val" id="statPing" style="color:#22b960;">
                 — <span class="gt-stat-unit">ms</span>
             </div>
         </div>
-        <div class="gt-stat glass-sm">
+        <div class="gt-stat">
             <div class="gt-stat-label">Staff</div>
-            <div class="gt-stat-val accent-purple" id="statStaff">
+            <div class="gt-stat-val" id="statStaff" style="color:#b8bcc8;">
                 0 <span class="gt-stat-unit">en ligne</span>
             </div>
         </div>
-        <div class="gt-stat glass-sm">
+        <div class="gt-stat">
             <div class="gt-stat-label">Joueurs</div>
-            <div class="gt-stat-val" id="statPlayers">
+            <div class="gt-stat-val" id="statPlayers" style="color:#fff;">
                 0 <span class="gt-stat-unit">/ 64</span>
             </div>
         </div>
     </div>
 
-    <!-- SECTION -->
     <div class="gt-section">Joueurs connectés</div>
 
-    <!-- PLAYER LIST -->
     <div class="gt-list" id="playerList"></div>
 
-    <!-- FOOTER -->
     <div class="gt-foot">
         <div>genesis-network.fr</div>
         <div>Clic &rarr; options</div>
     </div>
 </div>
 
-<!-- CONTEXT MENU -->
 <div class="gt-ctx-overlay" id="ctxOverlay"></div>
 <div class="gt-ctx" id="ctxMenu"></div>
 
 <script>
-/* ================================================================
-   GENESIS TAB — ES5 COMPATIBLE
-   Same bridge pattern as genesis_banking
-   ================================================================ */
-
-/* === VIEWPORT SCALE (same as banking) === */
-(function(){
-    var zoom = Math.max(0.82, Math.min(window.innerWidth / 1380, 2.2));
-    document.body.style.zoom = zoom;
-})();
-
 var GT = {};
 GT.players    = [];
 GT.selfSid64  = "";
@@ -258,7 +226,6 @@ function pingClass(p) {
     return "ping-bad";
 }
 
-/* ── RENDER ── */
 function renderPlayers() {
     var list = document.getElementById("playerList");
     var html = "";
@@ -320,7 +287,6 @@ function updateStats() {
         GT.players.length + ' <span class="gt-stat-unit">/ ' + GT.maxPlayers + '</span>';
 }
 
-/* ── CONTEXT MENU ── */
 function openCtx(e, player) {
     var menu = document.getElementById("ctxMenu");
     var overlay = document.getElementById("ctxOverlay");
@@ -401,10 +367,6 @@ function escapeHtml(str) {
     div.appendChild(document.createTextNode(str));
     return div.innerHTML;
 }
-
-/* ================================================================
-   PUBLIC API — called from Lua via RunJavascript
-   ================================================================ */
 
 function GT_Update(json) {
     try {
