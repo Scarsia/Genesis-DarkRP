@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Cle BMW - boitier simple -->
+  <!-- Corps du boitier -->
+  <rect x="32" y="16" width="64" height="96" rx="12" fill="#1E1E1E"/>
+  <!-- Contour chrome -->
+  <rect x="32" y="16" width="64" height="96" rx="12" fill="none" stroke="#71717A" stroke-width="4"/>
+  <!-- Logo BMW simplifie (cercle divise) -->
+  <circle cx="64" cy="48" r="16" fill="#FFFFFF"/>
+  <path d="M64 32 L64 48 L48 48 A16 16 0 0 1 64 32" fill="#0066B1"/>
+  <path d="M64 48 L64 64 L80 48 A16 16 0 0 0 64 32" fill="#0066B1"/>
+  <!-- Boutons -->
+  <circle cx="48" cy="80" r="8" fill="#3F3F46"/>
+  <circle cx="80" cy="80" r="8" fill="#3F3F46"/>
+  <rect x="56" y="92" width="16" height="12" rx="4" fill="#3F3F46"/>
+</svg>

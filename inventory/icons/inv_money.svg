@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Argent/Billets - formes simples -->
+  <!-- Billet arriere -->
+  <rect x="24" y="28" width="80" height="48" rx="4" fill="#166534"/>
+  <!-- Billet milieu -->
+  <rect x="20" y="36" width="80" height="48" rx="4" fill="#22C55E"/>
+  <!-- Billet devant -->
+  <rect x="16" y="44" width="80" height="48" rx="4" fill="#4ADE80"/>
+  <!-- Symbole $ -->
+  <text x="56" y="78" font-family="Arial" font-size="32" font-weight="bold" fill="#166534">$</text>
+</svg>

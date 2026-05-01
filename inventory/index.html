@@ -301,15 +301,22 @@ html,body{
   height:1px;
   background:var(--border-dim);
 }
-#closeBtn{
+#topActions{
   position:absolute;
   top:18px;right:24px;
   z-index:100000;
-  width:132px;height:24px;
+  display:flex;
+  gap:8px;
+  pointer-events:auto;
+}
+.inv-action-btn{
+  height:24px;
+  min-width:132px;
+  padding:0 14px;
   border-radius:2px;
   border:1px solid var(--border-dim);
   border-top-color:var(--border-light);
-  background:rgba(255,255,255,.04);
+  background:rgba(255,255,255,.045);
   color:var(--text-dim);
   font-size:10px;
   font-weight:700;
@@ -317,14 +324,15 @@ html,body{
   text-transform:uppercase;
   cursor:pointer;
   outline:none;
-  transition:background-color .15s ease,border-color .15s ease,color .15s ease;
+  transition:background-color .15s ease,border-color .15s ease,color .15s ease,transform .12s ease;
 }
-#closeBtn:hover{
+.inv-action-btn:hover{
   background:rgba(var(--accent),.95);
   border-color:rgba(var(--accent),.95);
   color:#000;
 }
-#closeBtn:active{transform:translateY(1px)}
+.inv-action-btn:active{transform:translateY(1px)}
+.inv-action-btn[hidden]{display:none}
 #ghost{
   position:fixed;
   pointer-events:none;
@@ -339,14 +347,14 @@ html,body{
   border-color:rgba(var(--accent),.36)!important;
   box-shadow:0 0 0 1px rgba(var(--accent),.14),0 16px 30px rgba(0,0,0,.22)!important;
 }
-</style></head><body><div id="root"><button id="closeBtn" type="button">FERMER [ESC]</button><div id="main" class="pane"><div id="mainGrid" class="grid"></div></div><div id="equip"><div class="stack-wrap"><div class="stack-title">EQUIP.</div><div id="equipWrap"></div></div></div><div id="weapons"><div class="stack-wrap"><div class="stack-title">ARMES</div><div id="weaponWrap"></div></div></div><div id="bagTitle">SAC A DOS <span>[N] fermer</span></div><div id="bag" class="pane"><div id="bagGrid" class="grid"></div></div></div><script>
+</style></head><body><div id="root"><div id="topActions"><button id="folderBtn" class="inv-action-btn" type="button">+ DOSSIER</button><button id="closeBtn" class="inv-action-btn" type="button">FERMER [ESC]</button></div><div id="main" class="pane"><div id="mainGrid" class="grid"></div></div><div id="equip"><div class="stack-wrap"><div class="stack-title">EQUIP.</div><div id="equipWrap"></div></div></div><div id="weapons"><div class="stack-wrap"><div class="stack-title">ARMES</div><div id="weaponWrap"></div></div></div><div id="bagTitle">SAC A DOS <span>[N] fermer</span></div><div id="bag" class="pane"><div id="bagGrid" class="grid"></div></div></div><script>
 var moneyItemId='gxd_wallet_money',lockedSlot=0,mainMax=35,bagMax=20,bagVisible=false;
 var mainSlots=[],bagSlots=[],mainItems={},bagItems={},dragSource=null,dragGhost=null;
 var layout={mainX:0,mainY:0,bagX:0,bagY:0,eqX:0,eqY:0,wepX:0,wepY:0,modelX:0,modelY:0,modelW:0,modelH:0}; var modelHover=false;
 var RC={legendary:'legendary',rare:'rare',epic:'epic'};
 function _slotMarkup(idx){return '<div class="bg-dots"></div><div class="q"></div><img class="ico-img" draggable="false" alt=""><div class="emo"></div><div class="n-wrap"><div class="n"></div></div><div class="idx">'+idx+'</div>';}
 function _equipMarkup(s, idx, area){return '<div class="es '+area+(s.on?' on':'')+(s.sac?' sac':'')+(s.open?' open':'')+'" data-area="'+area+'" data-i="'+idx+'"><div class="es-lbl">'+s.lbl+'</div><div class="es-bar"></div><div class="es-sub">'+(s.sub||'')+'</div></div>';}
-function _makeSlot(idx, area){var d=document.createElement('div'); d.className='s emp'; d.dataset.area=area; d.dataset.i=idx; d.innerHTML=_slotMarkup(idx); d.addEventListener('mouseenter',function(){ d.classList.add('hov'); if(window.gmod&&window.gmod.onHoverSlot) window.gmod.onHoverSlot(area, idx, 1); }); d.addEventListener('mouseleave',function(){ d.classList.remove('hov'); if(window.gmod&&window.gmod.onHoverSlot) window.gmod.onHoverSlot(area, idx, 0); }); d.addEventListener('contextmenu',function(e){e.preventDefault(); if(window.gmod&&window.gmod.onContext) window.gmod.onContext(area, idx);}); d.addEventListener('mousedown',function(e){ if(e.button!==0 || d.classList.contains('emp')) return; if(area==='main' && d.classList.contains('locked')) return; dragSource={kind:'slot',area:area,slot:idx}; _setSelected(area, idx); dragGhost=_makeGhost(d); _moveGhost(e.clientX,e.clientY); e.preventDefault();}); return d;}
+function _makeSlot(idx, area){var d=document.createElement('div'); d.className='s emp'; d.dataset.area=area; d.dataset.i=idx; d.innerHTML=_slotMarkup(idx); d.addEventListener('mouseenter',function(){ d.classList.add('hov'); if(window.gmod&&window.gmod.onHoverSlot) window.gmod.onHoverSlot(area, idx, 1); }); d.addEventListener('mouseleave',function(){ d.classList.remove('hov'); if(window.gmod&&window.gmod.onHoverSlot) window.gmod.onHoverSlot(area, idx, 0); }); d.addEventListener('contextmenu',function(e){e.preventDefault(); if(d.classList.contains('emp')) return; if(window.gmod&&window.gmod.onContext) window.gmod.onContext(area, idx);}); d.addEventListener('mousedown',function(e){ if(e.button!==0 || d.classList.contains('emp')) return; if(area==='main' && d.classList.contains('locked')) return; if(dragSource) _cancelDrag(); dragSource={kind:'slot',area:area,slot:idx}; _setSelected(area, idx); dragGhost=_makeGhost(d); _moveGhost(e.clientX,e.clientY); e.preventDefault();}); return d;}
 function _makeGhost(slot){var g=document.createElement('div'); g.id='ghost'; g.className=slot.className.replace(/\bhov\b|\bsel\b|\bdrag-over\b/g,'').trim(); g.innerHTML=slot.innerHTML; document.body.appendChild(g); return g;}
 function _moveGhost(x,y){ if(!dragGhost) return; dragGhost.style.left=(x-40)+'px'; dragGhost.style.top=(y-47)+'px'; }
 function _clearHighlights(){ Object.values(mainSlots).forEach(function(s){if(s) s.classList.remove('drag-over');}); Object.values(bagSlots).forEach(function(s){if(s) s.classList.remove('drag-over');}); }
@@ -360,11 +368,14 @@ function _setModelHover(on){ on=!!on; if(modelHover===on) return; modelHover=on;
 function _handleDrop(target){ if(!dragSource || !target) return; if(dragSource.area===target.area && dragSource.slot===target.slot) return; if(dragSource.area==='main' && target.area==='main'){ if(target.slot===lockedSlot) return; window.gmod.onMainMove(dragSource.slot,target.slot); return; } if(dragSource.area==='bag' && target.area==='bag'){ window.gmod.onBagMove(dragSource.slot,target.slot); return; } if(dragSource.area==='main' && target.area==='bag'){ window.gmod.onMainToBag(dragSource.slot,target.slot); return; } if(dragSource.area==='bag' && target.area==='main'){ if(target.slot===lockedSlot) return; window.gmod.onBagToMain(dragSource.slot,target.slot); return; } }
 document.addEventListener('mousemove', function(e){ if(!dragSource) return; _moveGhost(e.clientX,e.clientY); var d=_getDraggedItem(); var canModelUse=_isModelUseItem(d); _setModelHover(canModelUse && _isOverModel(e.clientX,e.clientY)); _clearHighlights(); if(canModelUse && _isOverModel(e.clientX,e.clientY)) return; var t=_findTarget(e.clientX,e.clientY); if(t){ var list=t.area==='bag'?bagSlots:mainSlots; if(list[t.slot]) list[t.slot].classList.add('drag-over'); } });
 document.addEventListener('mouseup', function(e){ if(!dragSource) return; var d=_getDraggedItem(); if(_isModelUseItem(d) && _isOverModel(e.clientX,e.clientY)){ if(window.gmod&&window.gmod.onCharacterDrop) window.gmod.onCharacterDrop(dragSource.area, dragSource.slot); _cancelDrag(); return; } var t=_findTarget(e.clientX,e.clientY); _handleDrop(t); _cancelDrag(); });
+window.addEventListener('blur', function(){ _cancelDrag(); });
+document.addEventListener('mouseleave', function(){ _cancelDrag(); });
+document.addEventListener('contextmenu', function(e){ if(dragSource) _cancelDrag(); });
 function _clearUiFocus(){ _cancelDrag(); _setSelected('main',0); try{ if(window.getSelection){ var sel=window.getSelection(); if(sel && sel.removeAllRanges) sel.removeAllRanges(); } }catch(err){} try{ if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(err){} }
 document.addEventListener('dragstart', function(e){ e.preventDefault(); });
 document.addEventListener('selectstart', function(e){ e.preventDefault(); });
-document.addEventListener('mousedown', function(e){ if(e.button!==0) return; var t=e.target; if(t && (t.closest('.s') || t.closest('.es') || t.closest('#closeBtn'))) return; _clearUiFocus(); e.preventDefault(); });
-document.addEventListener('click', function(e){ var t=e.target; if(t && t.closest && t.closest('#closeBtn')) return; if(t && (t.closest('.s') || t.closest('.es'))) return; _clearUiFocus(); });
+document.addEventListener('mousedown', function(e){ if(e.button!==0) return; var t=e.target; if(t && (t.closest('.s') || t.closest('.es') || t.closest('#topActions'))) return; _clearUiFocus(); e.preventDefault(); });
+document.addEventListener('click', function(e){ var t=e.target; if(t && t.closest && t.closest('#topActions')) return; if(t && (t.closest('.s') || t.closest('.es'))) return; _clearUiFocus(); });
 function _safeUrl(v){ return String(v||'').replace(/[\"\n\r<>]/g,''); }
 function _paintIcon(slot,d){ var img=slot.querySelector('.ico-img'); var emo=slot.querySelector('.emo'); var iconUrl=_safeUrl(d&& (d.icon_url||d.iconUrl)); var emoji=String((d&& (d.emoji||d.icon_emoji))||''); slot.classList.remove('has-img','has-emoji'); if(img){ img.onerror=null; img.removeAttribute('src'); } if(emo) emo.textContent=''; if(iconUrl){ if(img){ img.onerror=function(){ slot.classList.remove('has-img'); if(emoji&&emo){ emo.textContent=emoji; slot.classList.add('has-emoji'); } }; img.src=iconUrl; } slot.classList.add('has-img'); return; } if(emoji){ if(emo) emo.textContent=emoji; slot.classList.add('has-emoji'); } }
 function _updateSlot(slot, d, idx, isMain){ var hov=slot.classList.contains('hov'), sel=slot.classList.contains('sel'); if(d&&d.item){ var cls='s'; if(d.rarity&&RC[d.rarity]) cls+=' '+d.rarity; if(hov) cls+=' hov'; if(sel) cls+=' sel'; slot.className=cls; _paintIcon(slot,d); var q=slot.querySelector('.q'); if((isMain && idx===lockedSlot) || d.item===moneyItemId || d.name==='Argent'){ q.textContent='$'+(d.count||0); q.className='q show'; } else if((d.count||1)>1){ q.textContent='x'+d.count; q.className='q show'; } else { q.textContent=''; q.className='q'; } slot.querySelector('.n').textContent=((isMain && idx===lockedSlot)?'Argent':(d.name||d.item||'')); if(isMain && idx===lockedSlot) slot.classList.add('locked'); } else { slot.className='s emp'+(hov?' hov':''); slot.querySelector('.q').className='q'; slot.querySelector('.n').textContent=''; _paintIcon(slot,null); } }
@@ -373,7 +384,7 @@ function setBagItems(data){ bagItems=data||{}; for(var i=1;i<=bagMax;i++){ if(ba
 function setBagVisible(v){ bagVisible=!!v; document.getElementById('bag').style.display=bagVisible?'block':'none'; document.getElementById('bagTitle').style.display=bagVisible?'block':'none'; }
 function setEquip(items){ var wrap=document.getElementById('equipWrap'); wrap.innerHTML=''; (items||[]).forEach(function(s,i){ var holder=document.createElement('div'); holder.innerHTML=_equipMarkup(s,i+1,'eq'); var el=holder.firstChild; el.addEventListener('click', function(){ if(window.gmod&&window.gmod.onEquipClick) window.gmod.onEquipClick(s.key); }); wrap.appendChild(el); }); }
 function setWeapons(items){ var wrap=document.getElementById('weaponWrap'); wrap.innerHTML=''; (items||[]).forEach(function(s,i){ var holder=document.createElement('div'); holder.innerHTML=_equipMarkup({lbl:'ARME '+(i+1),sub:s.name||'Vide',on:s.on},i+1,'wep'); var el=holder.firstChild; el.addEventListener('click', function(){ if(window.gmod&&window.gmod.onWeaponClick) window.gmod.onWeaponClick(i+1); }); wrap.appendChild(el); }); }
-function buildUnified(cfg){ layout=cfg||layout; mainMax=cfg.mainMax||35; bagMax=cfg.bagMax||20; moneyItemId=cfg.moneyItemId||moneyItemId; lockedSlot=cfg.lockedSlot||0; document.getElementById('main').style.left=cfg.mainX+'px'; document.getElementById('main').style.top=cfg.mainY+'px'; document.getElementById('bag').style.left=cfg.bagX+'px'; document.getElementById('bag').style.top=cfg.bagY+'px'; document.getElementById('bagTitle').style.left=cfg.bagX+'px'; document.getElementById('bagTitle').style.top=(cfg.bagY-28)+'px'; document.getElementById('bagTitle').style.width=cfg.bagW+'px'; document.getElementById('equip').style.left=cfg.eqX+'px'; document.getElementById('equip').style.top=cfg.eqY+'px'; document.getElementById('weapons').style.left=cfg.wepX+'px'; document.getElementById('weapons').style.top=cfg.wepY+'px'; layout.modelX=cfg.modelX||0; layout.modelY=cfg.modelY||0; layout.modelW=cfg.modelW||0; layout.modelH=cfg.modelH||0; var closeBtn=document.getElementById('closeBtn'); if(closeBtn){ closeBtn.onclick=function(e){ e.preventDefault(); e.stopPropagation(); _clearUiFocus(); if(window.gmod&&window.gmod.onClose) window.gmod.onClose(); }; } var mg=document.getElementById('mainGrid'); var bg=document.getElementById('bagGrid'); mg.innerHTML=''; bg.innerHTML=''; mainSlots=[]; bagSlots=[]; for(var i=1;i<=mainMax;i++){ var s=_makeSlot(i,'main'); mg.appendChild(s); mainSlots[i]=s; } for(var j=1;j<=bagMax;j++){ var b=_makeSlot(j,'bag'); bg.appendChild(b); bagSlots[j]=b; } setBagVisible(cfg.bagVisible); _setModelHover(false); }
+function buildUnified(cfg){ layout=cfg||layout; mainMax=cfg.mainMax||35; bagMax=cfg.bagMax||20; moneyItemId=cfg.moneyItemId||moneyItemId; lockedSlot=cfg.lockedSlot||0; document.getElementById('main').style.left=cfg.mainX+'px'; document.getElementById('main').style.top=cfg.mainY+'px'; document.getElementById('bag').style.left=cfg.bagX+'px'; document.getElementById('bag').style.top=cfg.bagY+'px'; document.getElementById('bagTitle').style.left=cfg.bagX+'px'; document.getElementById('bagTitle').style.top=(cfg.bagY-28)+'px'; document.getElementById('bagTitle').style.width=cfg.bagW+'px'; document.getElementById('equip').style.left=cfg.eqX+'px'; document.getElementById('equip').style.top=cfg.eqY+'px'; document.getElementById('weapons').style.left=cfg.wepX+'px'; document.getElementById('weapons').style.top=cfg.wepY+'px'; layout.modelX=cfg.modelX||0; layout.modelY=cfg.modelY||0; layout.modelW=cfg.modelW||0; layout.modelH=cfg.modelH||0; var closeBtn=document.getElementById('closeBtn'); if(closeBtn){ closeBtn.onclick=function(e){ e.preventDefault(); e.stopPropagation(); _clearUiFocus(); if(window.gmod&&window.gmod.onClose) window.gmod.onClose(); }; } var folderBtn=document.getElementById('folderBtn'); if(folderBtn){ folderBtn.hidden = cfg.folderEnabled===false; folderBtn.onclick=function(e){ e.preventDefault(); e.stopPropagation(); _clearUiFocus(); if(window.gmod&&window.gmod.onCreateFolder) window.gmod.onCreateFolder(); }; } var mg=document.getElementById('mainGrid'); var bg=document.getElementById('bagGrid'); mg.innerHTML=''; bg.innerHTML=''; mainSlots=[]; bagSlots=[]; for(var i=1;i<=mainMax;i++){ var s=_makeSlot(i,'main'); mg.appendChild(s); mainSlots[i]=s; } for(var j=1;j<=bagMax;j++){ var b=_makeSlot(j,'bag'); bg.appendChild(b); bagSlots[j]=b; } setBagVisible(cfg.bagVisible); _setModelHover(false); }
 
 (function(){
   function ready(){

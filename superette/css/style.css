@@ -5,24 +5,24 @@
 
 :root {
   --bg:          #0c0c0c;
-  --panel-bg:    rgba(18, 18, 18, 0.72);
-  --card-bg:     rgba(255, 255, 255, 0.02);
-  --card-bg-h:   rgba(255, 255, 255, 0.045);
-  --card-bg-sel: rgba(200, 203, 214, 0.055);
-  --border:      rgba(255, 255, 255, 0.06);
+  --panel-bg:    #121212;
+  --card-bg:     #181818;
+  --card-bg-h:   #202020;
+  --card-bg-sel: #22242a;
+  --border:      rgba(255, 255, 255, 0.12);
   --border-h:    rgba(200, 203, 214, 0.18);
   --border-top:  rgba(255, 255, 255, 0.17);   /* halo blanchâtre */
   --inset:       inset 0 1px 0 rgba(255,255,255,0.065);
   --accent:      #c8cbd6;
   --accent-dim:  rgba(200, 203, 214, 0.45);
-  --muted:       #3a4040;
-  --muted2:      #282c2c;
+  --muted:       #8a909b;
+  --muted2:      #747b86;
   --price:       #a8b060;
   --green:       #7aaf7a;
   --amber:       #a8b060;
   --red:         #c87070;
-  --radius:      8px;
-  --radius-sm:   5px;
+  --radius:      6px;
+  --radius-sm:   4px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,7 +48,7 @@ html, body {
   border: 1px solid var(--border);
   border-top-color: var(--border-top);
   border-radius: var(--radius);
-  box-shadow: var(--inset);
+  box-shadow: var(--inset), 0 18px 44px rgba(0,0,0,.38);
   overflow: hidden;
 }
 
@@ -68,7 +68,7 @@ html, body {
 }
 .ph-icon svg { opacity: .65; }
 .ph-title    { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); line-height: 1.15; }
-.ph-sub      { font-size: 9px; font-weight: 500; color: var(--muted); letter-spacing: .04em; margin-top: 1px; }
+.ph-sub      { font-size: clamp(11px, .75vw, 13px); font-weight: 600; color: var(--muted); letter-spacing: .045em; margin-top: 2px; }
 .btn-close {
   width: 20px; height: 20px; border-radius: 50%;
   background: rgba(255,255,255,.04);
@@ -96,7 +96,7 @@ html, body {
 
 /* ── Label section ── */
 .slbl {
-  font-size: 8.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  font-size: clamp(10px, .7vw, 12px); font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
   color: var(--muted2);
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 8px;
@@ -106,7 +106,7 @@ html, body {
 /* ── Section bar (avec accent) ── */
 .sbar {
   display: flex; align-items: center; gap: 7px;
-  font-size: 8.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  font-size: clamp(10px, .7vw, 12px); font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
   color: var(--accent); margin: 11px 0 8px;
 }
 .sbar::before { content:''; width: 2px; height: 11px; background: var(--accent-dim); border-radius: 1px; }

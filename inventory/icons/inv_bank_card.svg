@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Carte bancaire - formes simples -->
+  <!-- Corps de la carte -->
+  <rect x="12" y="32" width="104" height="64" rx="8" fill="#1E40AF"/>
+  <!-- Bande magnetique -->
+  <rect x="12" y="48" width="104" height="16" fill="#1E293B"/>
+  <!-- Puce -->
+  <rect x="24" y="72" width="20" height="16" rx="2" fill="#EAB308"/>
+</svg>

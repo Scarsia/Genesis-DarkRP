@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Objet inconnu - boite mystere -->
+  <!-- Boite -->
+  <rect x="24" y="32" width="80" height="72" rx="8" fill="#52525B"/>
+  <!-- Face superieure -->
+  <rect x="24" y="32" width="80" height="20" rx="8" fill="#71717A"/>
+  <!-- Point d'interrogation -->
+  <text x="64" y="92" font-family="Arial" font-size="48" font-weight="bold" fill="#A855F7" text-anchor="middle">?</text>
+</svg>

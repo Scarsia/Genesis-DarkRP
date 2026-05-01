@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Cle simple - formes simples -->
+  <!-- Tete de cle -->
+  <circle cx="40" cy="40" r="24" fill="#A1A1AA"/>
+  <circle cx="40" cy="40" r="12" fill="#71717A"/>
+  <!-- Tige -->
+  <rect x="56" y="32" width="56" height="16" rx="4" fill="#A1A1AA"/>
+  <!-- Dents -->
+  <rect x="88" y="48" width="12" height="12" fill="#A1A1AA"/>
+  <rect x="100" y="48" width="8" height="8" fill="#A1A1AA"/>
+</svg>

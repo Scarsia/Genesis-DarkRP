@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Sac de course - formes simples -->
+  <!-- Corps du sac -->
+  <rect x="24" y="40" width="80" height="72" rx="8" fill="#8B5A2B"/>
+  <!-- Ombre interieure -->
+  <rect x="32" y="48" width="64" height="56" rx="4" fill="#6B4423"/>
+  <!-- Anses -->
+  <path d="M40 40 Q40 20, 64 20 Q88 20, 88 40" fill="none" stroke="#5D3A1A" stroke-width="8" stroke-linecap="round"/>
+</svg>
