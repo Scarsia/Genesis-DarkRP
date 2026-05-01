@@ -1,0 +1,389 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{
+  width:100%;
+  height:100%;
+  background:transparent;
+  overflow:hidden;
+  font-family:'Rajdhani','Segoe UI',system-ui,sans-serif;
+  user-select:none;
+}
+:root{
+  --bg-overlay:rgba(5,5,8,.86);
+  --glass-bg:rgba(15,15,20,.95);
+  --row-bg:rgba(20,20,25,.90);
+  --row-hover:rgba(30,30,38,.95);
+  --border-light:rgba(255,255,255,.15);
+  --border-dim:rgba(255,255,255,.05);
+  --accent:200,203,214;
+  --text-main:#f0f0f5;
+  --text-dim:#a1a4b0;
+  --text-muted:#5a5e69;
+  --r-rare:114,150,194;
+  --r-epic:154,160,176;
+  --r-legendary:184,168,120;
+}
+#root{position:relative;width:100%;height:100%}
+.pane{position:absolute}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(5,80px);
+  gap:7px;
+  padding:10px 14px;
+  align-content:start;
+}
+.s{
+  width:80px;
+  height:94px;
+  position:relative;
+  border-radius:4px;
+  overflow:hidden;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.028) 0%,transparent 32%),
+    var(--row-bg);
+  border:1px solid var(--border-dim);
+  border-top-color:var(--border-light);
+  box-shadow:0 10px 24px rgba(0,0,0,.16);
+  transition:
+    background-color .15s ease,
+    border-color .15s ease,
+    transform .18s ease,
+    box-shadow .18s ease;
+}
+.s::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:32%;
+  background:linear-gradient(180deg,rgba(255,255,255,.026),transparent 80%);
+  z-index:1;
+  pointer-events:none;
+}
+.s::after{
+  content:'';
+  position:absolute;
+  left:8px;right:8px;bottom:0;
+  height:2px;
+  border-radius:2px;
+  background:rgba(255,255,255,.07);
+  z-index:6;
+  transition:background-color .15s ease,opacity .15s ease;
+}
+.s.emp{
+  background:rgba(12,12,16,.50);
+  border-color:rgba(255,255,255,.03);
+  border-top-color:rgba(255,255,255,.06);
+  box-shadow:none;
+}
+.s.emp::before,.s.emp::after{display:none}
+.s.emp .bg-dots{
+  position:absolute;
+  inset:0;
+  background-image:radial-gradient(circle,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:10px 10px;
+  opacity:.28;
+}
+.s.emp .idx{
+  position:absolute;
+  right:6px;bottom:5px;
+  font-size:7px;
+  font-weight:700;
+  letter-spacing:.08em;
+  color:rgba(90,94,105,.72);
+}
+.s.hov{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.04) 0%,transparent 32%),
+    var(--row-hover);
+  border-color:var(--border-light);
+  transform:translateY(-2px);
+  box-shadow:0 16px 30px rgba(0,0,0,.22);
+}
+.s.sel{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.04) 0%,transparent 32%),
+    rgba(24,24,30,.96);
+  border-color:rgba(var(--accent),.34);
+  box-shadow:
+    0 0 0 1px rgba(var(--accent),.12),
+    0 16px 30px rgba(0,0,0,.22);
+}
+.s.sel::after{
+  background:linear-gradient(90deg,transparent,rgba(var(--accent),.95),transparent);
+}
+.s.rare::after{background:linear-gradient(90deg,transparent,rgba(var(--r-rare),.88),transparent)}
+.s.epic::after{background:linear-gradient(90deg,transparent,rgba(var(--r-epic),.88),transparent)}
+.s.legendary::after{background:linear-gradient(90deg,transparent,rgba(var(--r-legendary),.88),transparent)}
+.q{
+  display:none;
+  position:absolute;
+  top:5px;left:5px;
+  z-index:10;
+  min-width:18px;
+  height:13px;
+  padding:0 5px;
+  border-radius:3px;
+  border:1px solid var(--border-dim);
+  border-top-color:var(--border-light);
+  background:rgba(5,5,8,.88);
+  color:var(--text-main);
+  font-size:7px;
+  font-weight:700;
+  line-height:11px;
+  letter-spacing:.08em;
+  text-align:center;
+}
+.q.show{display:block}
+.n-wrap{
+  position:absolute;
+  left:0;right:0;bottom:0;
+  padding:18px 5px 5px;
+  z-index:8;
+  background:linear-gradient(0deg,rgba(5,5,8,.86) 0%,rgba(5,5,8,.42) 58%,transparent 100%);
+}
+.n{
+  font-size:7px;
+  font-weight:600;
+  letter-spacing:.04em;
+  color:var(--text-dim);
+  text-align:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  text-shadow:0 1px 2px rgba(0,0,0,.65);
+}
+.ico-img{
+  position:absolute;
+  left:50%;top:15px;
+  width:52px;height:44px;
+  transform:translateX(-50%);
+  z-index:7;
+  display:none;
+  pointer-events:none;
+  object-fit:contain;
+  filter:drop-shadow(0 5px 10px rgba(0,0,0,.65));
+}
+.emo{
+  position:absolute;
+  left:0;right:0;top:18px;
+  z-index:7;
+  display:none;
+  text-align:center;
+  font-size:30px;
+  line-height:34px;
+  pointer-events:none;
+  text-shadow:0 4px 12px rgba(0,0,0,.70);
+}
+.s.has-img .ico-img{display:block}
+.s.has-emoji .emo{display:block}
+.s.hov .n,
+.s.sel .n{color:var(--text-main)}
+.s.emp .n-wrap{display:none}
+.s.locked{cursor:default!important}
+.s.locked::after{background:linear-gradient(90deg,transparent,rgba(184,168,120,.65),transparent)!important}
+
+#equip,#weapons{position:absolute;width:86px}
+.stack-title{
+  font-size:9px;
+  font-weight:600;
+  letter-spacing:.22em;
+  text-align:center;
+  color:var(--text-muted);
+  padding:0 0 10px;
+  margin:0 4px 12px;
+  border-bottom:1px solid var(--border-dim);
+  text-transform:uppercase;
+}
+.stack-wrap{display:flex;flex-direction:column;gap:8px;padding:8px 0}
+#equipWrap,#weaponWrap{display:flex;flex-direction:column;gap:14px}
+.es{
+  width:86px;
+  height:86px;
+  position:relative;
+  border-radius:4px;
+  overflow:hidden;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.028) 0%,transparent 34%),
+    var(--row-bg);
+  border:1px solid var(--border-dim);
+  border-top-color:var(--border-light);
+  box-shadow:0 10px 24px rgba(0,0,0,.16);
+  transition:background-color .15s ease,border-color .15s ease,transform .18s ease,box-shadow .18s ease;
+}
+.es::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:34%;
+  background:linear-gradient(180deg,rgba(255,255,255,.024),transparent 80%);
+  pointer-events:none;
+}
+.es:hover{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.04) 0%,transparent 34%),
+    var(--row-hover);
+  border-color:var(--border-light);
+  transform:translateY(-2px);
+  box-shadow:0 16px 30px rgba(0,0,0,.22);
+}
+.es-bar{
+  position:absolute;
+  left:8px;right:8px;bottom:0;
+  height:2px;
+  border-radius:2px;
+  background:rgba(255,255,255,.07);
+}
+.es-lbl{
+  position:absolute;
+  top:6px;left:0;right:0;
+  text-align:center;
+  font-size:7px;
+  font-weight:700;
+  letter-spacing:.14em;
+  color:var(--text-muted);
+  text-transform:uppercase;
+}
+.es-sub{
+  position:absolute;
+  left:0;right:0;bottom:7px;
+  padding:0 5px;
+  text-align:center;
+  font-size:8px;
+  font-weight:600;
+  color:var(--text-dim);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.es.eq,.es.wep{cursor:pointer}
+.es.eq.on,.es.wep.on{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.04) 0%,transparent 34%),
+    rgba(24,24,30,.96);
+  border-color:rgba(var(--accent),.34);
+  box-shadow:
+    0 0 0 1px rgba(var(--accent),.12),
+    0 16px 30px rgba(0,0,0,.22);
+}
+.es.eq.on .es-bar,.es.wep.on .es-bar{
+  background:linear-gradient(90deg,transparent,rgba(var(--accent),.92),transparent);
+}
+.es.eq.on .es-lbl,.es.wep.on .es-lbl{color:var(--text-main)}
+.es.eq.on .es-sub,.es.wep.on .es-sub{color:var(--text-main)}
+.es.eq.sac.open{
+  border-color:rgba(var(--accent),.44);
+  box-shadow:
+    0 0 0 1px rgba(var(--accent),.16),
+    0 16px 30px rgba(0,0,0,.22);
+}
+#bagTitle{
+  position:absolute;
+  display:none;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:.18em;
+  color:var(--text-main);
+  text-transform:uppercase;
+}
+#bagTitle span{
+  float:right;
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.18em;
+  color:var(--text-dim);
+  text-transform:uppercase;
+}
+#bagTitle:after{
+  content:'';
+  display:block;
+  position:absolute;
+  left:0;right:0;bottom:-8px;
+  height:1px;
+  background:var(--border-dim);
+}
+#closeBtn{
+  position:absolute;
+  top:18px;right:24px;
+  z-index:100000;
+  width:132px;height:24px;
+  border-radius:2px;
+  border:1px solid var(--border-dim);
+  border-top-color:var(--border-light);
+  background:rgba(255,255,255,.04);
+  color:var(--text-dim);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  cursor:pointer;
+  outline:none;
+  transition:background-color .15s ease,border-color .15s ease,color .15s ease;
+}
+#closeBtn:hover{
+  background:rgba(var(--accent),.95);
+  border-color:rgba(var(--accent),.95);
+  color:#000;
+}
+#closeBtn:active{transform:translateY(1px)}
+#ghost{
+  position:fixed;
+  pointer-events:none;
+  z-index:99999;
+  opacity:.86;
+  width:80px;height:94px;
+  border-radius:4px;
+  overflow:hidden;
+  box-shadow:0 18px 30px rgba(0,0,0,.24),0 0 0 1px rgba(var(--accent),.18);
+}
+.drag-over{
+  border-color:rgba(var(--accent),.36)!important;
+  box-shadow:0 0 0 1px rgba(var(--accent),.14),0 16px 30px rgba(0,0,0,.22)!important;
+}
+</style></head><body><div id="root"><button id="closeBtn" type="button">FERMER [ESC]</button><div id="main" class="pane"><div id="mainGrid" class="grid"></div></div><div id="equip"><div class="stack-wrap"><div class="stack-title">EQUIP.</div><div id="equipWrap"></div></div></div><div id="weapons"><div class="stack-wrap"><div class="stack-title">ARMES</div><div id="weaponWrap"></div></div></div><div id="bagTitle">SAC A DOS <span>[N] fermer</span></div><div id="bag" class="pane"><div id="bagGrid" class="grid"></div></div></div><script>
+var moneyItemId='gxd_wallet_money',lockedSlot=0,mainMax=35,bagMax=20,bagVisible=false;
+var mainSlots=[],bagSlots=[],mainItems={},bagItems={},dragSource=null,dragGhost=null;
+var layout={mainX:0,mainY:0,bagX:0,bagY:0,eqX:0,eqY:0,wepX:0,wepY:0,modelX:0,modelY:0,modelW:0,modelH:0}; var modelHover=false;
+var RC={legendary:'legendary',rare:'rare',epic:'epic'};
+function _slotMarkup(idx){return '<div class="bg-dots"></div><div class="q"></div><img class="ico-img" draggable="false" alt=""><div class="emo"></div><div class="n-wrap"><div class="n"></div></div><div class="idx">'+idx+'</div>';}
+function _equipMarkup(s, idx, area){return '<div class="es '+area+(s.on?' on':'')+(s.sac?' sac':'')+(s.open?' open':'')+'" data-area="'+area+'" data-i="'+idx+'"><div class="es-lbl">'+s.lbl+'</div><div class="es-bar"></div><div class="es-sub">'+(s.sub||'')+'</div></div>';}
+function _makeSlot(idx, area){var d=document.createElement('div'); d.className='s emp'; d.dataset.area=area; d.dataset.i=idx; d.innerHTML=_slotMarkup(idx); d.addEventListener('mouseenter',function(){ d.classList.add('hov'); if(window.gmod&&window.gmod.onHoverSlot) window.gmod.onHoverSlot(area, idx, 1); }); d.addEventListener('mouseleave',function(){ d.classList.remove('hov'); if(window.gmod&&window.gmod.onHoverSlot) window.gmod.onHoverSlot(area, idx, 0); }); d.addEventListener('contextmenu',function(e){e.preventDefault(); if(window.gmod&&window.gmod.onContext) window.gmod.onContext(area, idx);}); d.addEventListener('mousedown',function(e){ if(e.button!==0 || d.classList.contains('emp')) return; if(area==='main' && d.classList.contains('locked')) return; dragSource={kind:'slot',area:area,slot:idx}; _setSelected(area, idx); dragGhost=_makeGhost(d); _moveGhost(e.clientX,e.clientY); e.preventDefault();}); return d;}
+function _makeGhost(slot){var g=document.createElement('div'); g.id='ghost'; g.className=slot.className.replace(/\bhov\b|\bsel\b|\bdrag-over\b/g,'').trim(); g.innerHTML=slot.innerHTML; document.body.appendChild(g); return g;}
+function _moveGhost(x,y){ if(!dragGhost) return; dragGhost.style.left=(x-40)+'px'; dragGhost.style.top=(y-47)+'px'; }
+function _clearHighlights(){ Object.values(mainSlots).forEach(function(s){if(s) s.classList.remove('drag-over');}); Object.values(bagSlots).forEach(function(s){if(s) s.classList.remove('drag-over');}); }
+function _setSelected(area, idx){ Object.values(mainSlots).forEach(function(s){if(s) s.classList.remove('sel');}); Object.values(bagSlots).forEach(function(s){if(s) s.classList.remove('sel');}); var list=area==='bag'?bagSlots:mainSlots; if(list[idx]) list[idx].classList.add('sel'); }
+function _cancelDrag(){ if(dragGhost){dragGhost.remove(); dragGhost=null;} _clearHighlights(); dragSource=null; _setSelected('main',0); _setModelHover(false); }
+function _findTarget(x,y){ var el=document.elementFromPoint(x,y); while(el && (!el.dataset || !el.dataset.area || !el.dataset.i)) el=el.parentElement; if(!el) return null; return {area:el.dataset.area, slot:parseInt(el.dataset.i,10)}; }
+function _getDraggedItem(){ if(!dragSource) return null; return dragSource.area==='bag' ? bagItems[dragSource.slot] : mainItems[dragSource.slot]; }
+function _isModelUseItem(d){ return !!(d && d.item && d.item!==moneyItemId); }
+function _isOverModel(x,y){ return x>=layout.modelX && x<=layout.modelX+layout.modelW && y>=layout.modelY && y<=layout.modelY+layout.modelH; }
+function _setModelHover(on){ on=!!on; if(modelHover===on) return; modelHover=on; if(window.gmod&&window.gmod.onCharacterHover) window.gmod.onCharacterHover(on?1:0); }
+function _handleDrop(target){ if(!dragSource || !target) return; if(dragSource.area===target.area && dragSource.slot===target.slot) return; if(dragSource.area==='main' && target.area==='main'){ if(target.slot===lockedSlot) return; window.gmod.onMainMove(dragSource.slot,target.slot); return; } if(dragSource.area==='bag' && target.area==='bag'){ window.gmod.onBagMove(dragSource.slot,target.slot); return; } if(dragSource.area==='main' && target.area==='bag'){ window.gmod.onMainToBag(dragSource.slot,target.slot); return; } if(dragSource.area==='bag' && target.area==='main'){ if(target.slot===lockedSlot) return; window.gmod.onBagToMain(dragSource.slot,target.slot); return; } }
+document.addEventListener('mousemove', function(e){ if(!dragSource) return; _moveGhost(e.clientX,e.clientY); var d=_getDraggedItem(); var canModelUse=_isModelUseItem(d); _setModelHover(canModelUse && _isOverModel(e.clientX,e.clientY)); _clearHighlights(); if(canModelUse && _isOverModel(e.clientX,e.clientY)) return; var t=_findTarget(e.clientX,e.clientY); if(t){ var list=t.area==='bag'?bagSlots:mainSlots; if(list[t.slot]) list[t.slot].classList.add('drag-over'); } });
+document.addEventListener('mouseup', function(e){ if(!dragSource) return; var d=_getDraggedItem(); if(_isModelUseItem(d) && _isOverModel(e.clientX,e.clientY)){ if(window.gmod&&window.gmod.onCharacterDrop) window.gmod.onCharacterDrop(dragSource.area, dragSource.slot); _cancelDrag(); return; } var t=_findTarget(e.clientX,e.clientY); _handleDrop(t); _cancelDrag(); });
+function _clearUiFocus(){ _cancelDrag(); _setSelected('main',0); try{ if(window.getSelection){ var sel=window.getSelection(); if(sel && sel.removeAllRanges) sel.removeAllRanges(); } }catch(err){} try{ if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(err){} }
+document.addEventListener('dragstart', function(e){ e.preventDefault(); });
+document.addEventListener('selectstart', function(e){ e.preventDefault(); });
+document.addEventListener('mousedown', function(e){ if(e.button!==0) return; var t=e.target; if(t && (t.closest('.s') || t.closest('.es') || t.closest('#closeBtn'))) return; _clearUiFocus(); e.preventDefault(); });
+document.addEventListener('click', function(e){ var t=e.target; if(t && t.closest && t.closest('#closeBtn')) return; if(t && (t.closest('.s') || t.closest('.es'))) return; _clearUiFocus(); });
+function _safeUrl(v){ return String(v||'').replace(/[\"\n\r<>]/g,''); }
+function _paintIcon(slot,d){ var img=slot.querySelector('.ico-img'); var emo=slot.querySelector('.emo'); var iconUrl=_safeUrl(d&& (d.icon_url||d.iconUrl)); var emoji=String((d&& (d.emoji||d.icon_emoji))||''); slot.classList.remove('has-img','has-emoji'); if(img){ img.onerror=null; img.removeAttribute('src'); } if(emo) emo.textContent=''; if(iconUrl){ if(img){ img.onerror=function(){ slot.classList.remove('has-img'); if(emoji&&emo){ emo.textContent=emoji; slot.classList.add('has-emoji'); } }; img.src=iconUrl; } slot.classList.add('has-img'); return; } if(emoji){ if(emo) emo.textContent=emoji; slot.classList.add('has-emoji'); } }
+function _updateSlot(slot, d, idx, isMain){ var hov=slot.classList.contains('hov'), sel=slot.classList.contains('sel'); if(d&&d.item){ var cls='s'; if(d.rarity&&RC[d.rarity]) cls+=' '+d.rarity; if(hov) cls+=' hov'; if(sel) cls+=' sel'; slot.className=cls; _paintIcon(slot,d); var q=slot.querySelector('.q'); if((isMain && idx===lockedSlot) || d.item===moneyItemId || d.name==='Argent'){ q.textContent='$'+(d.count||0); q.className='q show'; } else if((d.count||1)>1){ q.textContent='x'+d.count; q.className='q show'; } else { q.textContent=''; q.className='q'; } slot.querySelector('.n').textContent=((isMain && idx===lockedSlot)?'Argent':(d.name||d.item||'')); if(isMain && idx===lockedSlot) slot.classList.add('locked'); } else { slot.className='s emp'+(hov?' hov':''); slot.querySelector('.q').className='q'; slot.querySelector('.n').textContent=''; _paintIcon(slot,null); } }
+function setMainItems(data){ mainItems=data||{}; for(var i=1;i<=mainMax;i++){ if(mainSlots[i]) _updateSlot(mainSlots[i], mainItems[i], i, true); } }
+function setBagItems(data){ bagItems=data||{}; for(var i=1;i<=bagMax;i++){ if(bagSlots[i]) _updateSlot(bagSlots[i], bagItems[i], i, false); } }
+function setBagVisible(v){ bagVisible=!!v; document.getElementById('bag').style.display=bagVisible?'block':'none'; document.getElementById('bagTitle').style.display=bagVisible?'block':'none'; }
+function setEquip(items){ var wrap=document.getElementById('equipWrap'); wrap.innerHTML=''; (items||[]).forEach(function(s,i){ var holder=document.createElement('div'); holder.innerHTML=_equipMarkup(s,i+1,'eq'); var el=holder.firstChild; el.addEventListener('click', function(){ if(window.gmod&&window.gmod.onEquipClick) window.gmod.onEquipClick(s.key); }); wrap.appendChild(el); }); }
+function setWeapons(items){ var wrap=document.getElementById('weaponWrap'); wrap.innerHTML=''; (items||[]).forEach(function(s,i){ var holder=document.createElement('div'); holder.innerHTML=_equipMarkup({lbl:'ARME '+(i+1),sub:s.name||'Vide',on:s.on},i+1,'wep'); var el=holder.firstChild; el.addEventListener('click', function(){ if(window.gmod&&window.gmod.onWeaponClick) window.gmod.onWeaponClick(i+1); }); wrap.appendChild(el); }); }
+function buildUnified(cfg){ layout=cfg||layout; mainMax=cfg.mainMax||35; bagMax=cfg.bagMax||20; moneyItemId=cfg.moneyItemId||moneyItemId; lockedSlot=cfg.lockedSlot||0; document.getElementById('main').style.left=cfg.mainX+'px'; document.getElementById('main').style.top=cfg.mainY+'px'; document.getElementById('bag').style.left=cfg.bagX+'px'; document.getElementById('bag').style.top=cfg.bagY+'px'; document.getElementById('bagTitle').style.left=cfg.bagX+'px'; document.getElementById('bagTitle').style.top=(cfg.bagY-28)+'px'; document.getElementById('bagTitle').style.width=cfg.bagW+'px'; document.getElementById('equip').style.left=cfg.eqX+'px'; document.getElementById('equip').style.top=cfg.eqY+'px'; document.getElementById('weapons').style.left=cfg.wepX+'px'; document.getElementById('weapons').style.top=cfg.wepY+'px'; layout.modelX=cfg.modelX||0; layout.modelY=cfg.modelY||0; layout.modelW=cfg.modelW||0; layout.modelH=cfg.modelH||0; var closeBtn=document.getElementById('closeBtn'); if(closeBtn){ closeBtn.onclick=function(e){ e.preventDefault(); e.stopPropagation(); _clearUiFocus(); if(window.gmod&&window.gmod.onClose) window.gmod.onClose(); }; } var mg=document.getElementById('mainGrid'); var bg=document.getElementById('bagGrid'); mg.innerHTML=''; bg.innerHTML=''; mainSlots=[]; bagSlots=[]; for(var i=1;i<=mainMax;i++){ var s=_makeSlot(i,'main'); mg.appendChild(s); mainSlots[i]=s; } for(var j=1;j<=bagMax;j++){ var b=_makeSlot(j,'bag'); bg.appendChild(b); bagSlots[j]=b; } setBagVisible(cfg.bagVisible); _setModelHover(false); }
+
+(function(){
+  function ready(){
+    if(window.gmod && typeof window.gmod.onReady === 'function'){
+      try{ window.gmod.onReady(); }catch(e){}
+      return;
+    }
+    setTimeout(ready, 50);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready);
+  else ready();
+})();
+</script></body></html>
