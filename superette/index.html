@@ -9,24 +9,24 @@
 body    { display: flex; align-items: center; justify-content: center; height: 100vh; }
 
 /* Layout two-column */
-#app    { display: flex; gap: 12px; width: 860px; height: 600px; }
+#app    { display: flex; gap: 14px; width: min(1040px, calc(100vw - 24px)); height: min(680px, calc(100vh - 24px)); }
 
 /* ── Left : products (flex 1) ── */
 #left   { flex: 1; display: flex; flex-direction: column; }
-.pb     { padding: 12px 14px; flex: 1; overflow-y: auto; }
+.pb     { padding: 14px 16px; flex: 1; overflow-y: auto; }
 
 /* product grid */
-#prod-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-bottom: 0; }
+#prod-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin-bottom: 0; }
 
 .pcard {
-  cursor: pointer; position: relative; padding: 9px 8px 8px;
-  display: flex; flex-direction: column;
+  cursor: pointer; position: relative; padding: 11px 10px 10px;
+  display: flex; flex-direction: column; min-height: 92px;
 }
-.pcard-em   { font-size: 24px; text-align: center; height: 36px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; }
-.pcard-name { font-size: 10.5px; font-weight: 600; color: var(--accent); line-height: 1.2; margin-bottom: 2px; }
-.pcard-desc { font-size: 8.5px; color: var(--muted2); margin-bottom: 6px; flex: 1; line-height: 1.3; }
+.pcard-em   { font-size: 29px; text-align: center; height: 42px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; }
+.pcard-name { font-size: 11.5px; font-weight: 600; color: var(--accent); line-height: 1.2; margin-bottom: 2px; }
+.pcard-desc { font-size: 9.5px; color: var(--muted2); margin-bottom: 6px; flex: 1; line-height: 1.3; }
 .pcard-foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
-.pcard-price{ font-size: 11px; font-weight: 700; color: var(--price); }
+.pcard-price{ font-size: 12px; font-weight: 700; color: var(--price); }
 .sdot       { width: 5px; height: 5px; border-radius: 50%; position: absolute; top: 7px; right: 7px; }
 
 /* qty controls on card */
@@ -53,7 +53,7 @@ body    { display: flex; align-items: center; justify-content: center; height: 1
 
 /* ── Right : cart ── */
 #right {
-  width: 256px; flex-shrink: 0;
+  width: 320px; flex-shrink: 0;
   display: flex; flex-direction: column;
 }
 .cart-body  { padding: 12px 14px; flex: 1; overflow-y: auto; }
@@ -62,7 +62,7 @@ body    { display: flex; align-items: center; justify-content: center; height: 1
   display: flex; align-items: center; gap: 8px;
   padding: 7px 9px; margin-bottom: 6px;
 }
-.crow-img   { width: 30px; height: 30px; border-radius: 5px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.05); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.crow-img   { width: 34px; height: 34px; border-radius: 5px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.05); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
 .crow-info  { flex: 1; }
 .crow-name  { font-size: 10.5px; font-weight: 600; color: var(--accent); }
 .crow-unit  { font-size: 8.5px; color: var(--muted2); }
@@ -118,7 +118,7 @@ body    { display: flex; align-items: center; justify-content: center; height: 1
           <div class="ph-sub">Achat de produits</div>
         </div>
       </div>
-      <button class="btn-close" onclick="GS.Close()">✕</button>
+      <button class="btn-close" onclick="closePanel()">✕</button>
     </div>
 
     <div class="pb">
@@ -215,6 +215,45 @@ var _balance    = 0;
 var _activecat  = 'all';
 var _search     = '';
 
+function esc(v) {
+  return String(v == null ? '' : v)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function hasGS(fn) {
+  return window.GS && typeof window.GS[fn] === 'function';
+}
+
+function callGS(fn, arg) {
+  if (!hasGS(fn)) {
+    showToast('Bridge Lua non prêt: ' + fn, 'err');
+    return false;
+  }
+  try {
+    if (typeof arg === 'undefined') window.GS[fn]();
+    else window.GS[fn](arg);
+    return true;
+  } catch (e) {
+    showToast('Erreur bridge Lua: ' + fn, 'err');
+    return false;
+  }
+}
+
+function waitForGS(fn, cb, tries) {
+  tries = tries || 0;
+  if (hasGS(fn)) { cb(); return; }
+  if (tries > 80) { showToast('Connexion Lua impossible.', 'err'); return; }
+  setTimeout(function(){ waitForGS(fn, cb, tries + 1); }, 50);
+}
+
+function closePanel() {
+  if (!callGS('Close')) document.body.style.display = 'none';
+}
+
 // ── Bridge Lua → JS ──
 function GS_Init(data) {
   _balance  = data.balance || 0;
@@ -232,12 +271,13 @@ function GS_BuyResult(res) {
 
   if (res.ok) {
     _balance = res.balance;
+    if (Array.isArray(res.products)) _products = res.products;
     _cart    = {};
     renderCart();
     renderBalance();
     renderProducts(); // màj stocks
     closeCheckout();
-    showToast('Achat effectué !', 'ok');
+    showToast(res.msg || 'Achat effectué !', 'ok');
   } else {
     showToast(res.msg || 'Erreur lors de l\'achat.', 'err');
   }
@@ -311,11 +351,11 @@ function renderProducts() {
 
     card.innerHTML =
       '<div class="sdot" style="background:' + dotColor + '"></div>' +
-      '<div class="pcard-em">' + p.emoji + '</div>' +
-      '<div class="pcard-name">' + p.name + '</div>' +
-      '<div class="pcard-desc">' + p.description + '</div>' +
+      '<div class="pcard-em">' + esc(p.emoji) + '</div>' +
+      '<div class="pcard-name">' + esc(p.name) + '</div>' +
+      '<div class="pcard-desc">' + esc(p.description) + '</div>' +
       '<div class="pcard-foot">' +
-        '<div class="pcard-price">$' + p.price.toFixed(2) + '</div>' +
+        '<div class="pcard-price">$' + (Number(p.price) || 0).toFixed(2) + '</div>' +
         (inCart
           ? '<div class="qty-ctrl">' +
               '<div class="qbtn" data-id="' + p.id + '" data-act="rem">−</div>' +
@@ -374,7 +414,7 @@ function clearCart() {
 
 function cartTotal() {
   var t = 0;
-  for (var k in _cart) { t += _cart[k].prod.price * _cart[k].qty; }
+  for (var k in _cart) { t += (Number(_cart[k].prod.price) || 0) * _cart[k].qty; }
   return Math.round(t * 100) / 100;
 }
 
@@ -392,7 +432,7 @@ function renderCart() {
 
   document.getElementById('cart-count-lbl').textContent = count + ' article' + (count !== 1 ? 's' : '');
   document.getElementById('total-val').textContent = '$' + total.toFixed(2);
-  document.getElementById('btn-pay').disabled = count === 0 || total > _balance;
+  document.getElementById('btn-pay').disabled = count === 0; // le serveur valide le vrai solde/backend
   el.innerHTML = '';
 
   if (count === 0) { empty.style.display = 'block'; return; }
@@ -404,13 +444,13 @@ function renderCart() {
     var row   = document.createElement('div');
     row.className = 'crow gc';
     row.innerHTML =
-      '<div class="crow-img">' + p.emoji + '</div>' +
+      '<div class="crow-img">' + esc(p.emoji) + '</div>' +
       '<div class="crow-info">' +
-        '<div class="crow-name">' + p.name + '</div>' +
-        '<div class="crow-unit">$' + p.price.toFixed(2) + ' / u.</div>' +
+        '<div class="crow-name">' + esc(p.name) + '</div>' +
+        '<div class="crow-unit">$' + (Number(p.price) || 0).toFixed(2) + ' / u.</div>' +
       '</div>' +
       '<div class="crow-right">' +
-        '<div class="crow-price">$' + (p.price * entry.qty).toFixed(2) + '</div>' +
+        '<div class="crow-price">$' + ((Number(p.price) || 0) * entry.qty).toFixed(2) + '</div>' +
         '<div class="crow-ctrl">' +
           '<div class="qbtn" data-id="' + k + '" data-act="rem">−</div>' +
           '<div class="qv">' + entry.qty + '</div>' +
@@ -430,14 +470,12 @@ function renderCart() {
 }
 
 function renderBalance() {
-  document.getElementById('balance-val').textContent = '$' + _balance.toFixed(2);
+  document.getElementById('balance-val').textContent = '$' + (Number(_balance) || 0).toFixed(2);
 }
 
 // ── Checkout ──
 function openCheckout() {
   var total = cartTotal();
-  if (total > _balance) { showToast('Solde insuffisant.', 'err'); return; }
-
   var list = document.getElementById('checkout-items');
   list.innerHTML = '';
   for (var k in _cart) {
@@ -445,8 +483,8 @@ function openCheckout() {
     var row = document.createElement('div');
     row.className = 'ci-row';
     row.innerHTML =
-      '<span class="ci-name">' + e.prod.name + ' × ' + e.qty + '</span>' +
-      '<span class="ci-price">$' + (e.prod.price * e.qty).toFixed(2) + '</span>';
+      '<span class="ci-name">' + esc(e.prod.name) + ' × ' + e.qty + '</span>' +
+      '<span class="ci-price">$' + ((Number(e.prod.price) || 0) * e.qty).toFixed(2) + '</span>';
     list.appendChild(row);
   }
   document.getElementById('checkout-total-val').textContent = '$' + total.toFixed(2);
@@ -466,7 +504,7 @@ function confirmBuy() {
   for (var k in _cart) {
     cart.push({ id: _cart[k].prod.id, qty: _cart[k].qty });
   }
-  GS.Buy(JSON.stringify(cart));
+  callGS('Buy', JSON.stringify(cart));
 }
 
 // ── Toast ──
@@ -482,7 +520,7 @@ function showToast(msg, type) {
 // ── Init ──
 window.onload = function() {
   renderCart();
-  GS.Ready();
+  waitForGS('Ready', function() { callGS('Ready'); }, 0);
 };
 </script>
 </body>
